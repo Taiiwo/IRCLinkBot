@@ -15,19 +15,21 @@ port = 6667 #6667 is the default irc port
 nick = "TaiiwoBot"
 user = "Taiiwo"
 loginmessage = "-- LinkBot v2.1.5 ONLINE --" #Leave blank for no message
+tinylen = 42 #The minimum length of an URL that get made into a tinyurl.
 recvbits = 315 #How many bits to wait for. This affects the max length of links.
 numr = 27 #Number of recvs to ignore on startup. This can be determined by running the script and checking when the
-	#last title was send to the chat by the number printed in square brackets.
+	#last title was sent to the chat by the number printed below square brackets. Setting to 0 will allow the script
+	#To funtion regardless, but will output some of the titles and tinyurls of the links mentioned while connecting to irc.
 
 def gettitle(url):#get the page title of an URL
         soup = BeautifulSoup(urllib2.urlopen(url))
         return soup.title.string
-def pong(recv):#respond to ping req in a string --Not perfect, but works
+def pong(recv):#respond to ping req in a string --Not perfect, but works (It's not perfect because freenode ,quite rightly, doesn't put 'http://' at the start of the host of the ping, and this is nopicked up by geturl().
 	if "ping" or "PING" in recv:
 		url = str(geturl(str(recv)))
 		if url != "":
 			s.send("PONG " + url + "\n\r")
-def geturl(recv):#parse an URL from a string
+def geturl(recv):#parse an http/https URL from a string
 	return re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', recv)
 def maketiny(url):
 	html = urllib2.urlopen("http://tinyurl.com/api-create.php?url=" + url)
@@ -88,8 +90,8 @@ while loop >= 0:
 			print "[E]No valid title"
 			error = 2
 		#post title to irc
-		if error == 0  and loop >= numr:
-			if len(nlink) >= 40:
+		if error == 0  and loop >= numr: #Things gett a little messy here while I was trying to stop the bot from posting unnececary tinyurls.
+			if len(nlink) >= tinylen:
 				s.send('privmsg ' + channel + ' : ^ ' + str(title) + " " + maketiny(link[0]) + ' ^\n\r')
 			else:
 				s.send('privmsg ' + channel + ' : ^ ' + str(title) + " ^\r\n")
