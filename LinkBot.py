@@ -3,7 +3,7 @@
 ##Doesn't post titles to the same link twice, so you can't DOS it.
 ##Pongs all ping requests so should run indefinitely
 ##
-#GPL v2
+#GPL v3
 #Note: You need to install BeautifulSoup. sudo apt-get install python-BeautifulSoup
 import socket, sys, re, urllib2, time
 from BeautifulSoup import BeautifulSoup
