@@ -71,6 +71,11 @@ while loop >= 0:
 	pong(recv)
 	#check for links
 	error = 0
+	if "!love " in recv:
+		match = re.search(r"[^a-zA-Z](is)[^a-zA-Z]", mystr)
+		num = match.start()
+		message = recv[:num+5]
+		s.send('privmsg ' + channel + ' : I love ' + message + "\r\n")
 	urlsfound = True
 	try:
 		link2 = link
