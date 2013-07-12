@@ -3,9 +3,9 @@
 ##Doesn't post titles to the same link twice, so you can't DOS it.
 ##Pongs all ping requests so should run indefinitely
 ##
-#GPL v3
+#GPL v2
 #Note: You need to install BeautifulSoup. sudo apt-get install python-BeautifulSoup
-import socket, sys, re, urllib2, time
+import socket, sys, re, urllib2, time, os
 from BeautifulSoup import BeautifulSoup
 
 #Settings:
@@ -15,21 +15,34 @@ port = 6667 #6667 is the default irc port
 nick = "TaiiwoBot"
 user = "Taiiwo"
 loginmessage = "-- LinkBot v2.1.5 ONLINE --" #Leave blank for no message
-tinylen = 42 #The minimum length of an URL that get made into a tinyurl.
 recvbits = 315 #How many bits to wait for. This affects the max length of links.
 numr = 27 #Number of recvs to ignore on startup. This can be determined by running the script and checking when the
-	#last title was sent to the chat by the number printed below square brackets. Setting to 0 will allow the script
-	#To funtion regardless, but will output some of the titles and tinyurls of the links mentioned while connecting to irc.
-
+	#last title was send to the chat by the number printed in square brackets.
+def textbetween(str1,str2,text):
+	posstr1 = re.search(r"[^a-zA-Z](" + str1 + ")[^a-zA-Z]", text).start(1)
+	posstr2 = re.search(r"[^a-zA-Z](" + str2 + ")[^a-zA-Z]", text).start(1)
+	between = text[posstr1 + len(str1):posstr2]
+	return between
+def command(command): #finds the argument for a command.
+	if command + " " in recv:
+                match = re.search(r"[^a-zA-Z](" + command + ")[^a-zA-Z]", recv)
+                num = match.start(1)
+                message = recv[num + len(command):]
+		if message == '':
+			return 'no word'
+                else:
+			return str(message[1:])
+	else:
+		message = "None"
 def gettitle(url):#get the page title of an URL
         soup = BeautifulSoup(urllib2.urlopen(url))
         return soup.title.string
-def pong(recv):#respond to ping req in a string --Not perfect, but works (It's not perfect because freenode ,quite rightly, doesn't put 'http://' at the start of the host of the ping, and this is nopicked up by geturl().
+def pong(recv):#respond to ping req in a string --Not perfect, but works
 	if "ping" or "PING" in recv:
 		url = str(geturl(str(recv)))
 		if url != "":
 			s.send("PONG " + url + "\n\r")
-def geturl(recv):#parse an http/https URL from a string
+def geturl(recv):#parse an URL from a string
 	return re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', recv)
 def maketiny(url):
 	html = urllib2.urlopen("http://tinyurl.com/api-create.php?url=" + url)
@@ -65,17 +78,27 @@ input("Logged in yet?")
 while loop >= 0:
 	loop = loop + 1
 	print loop #print the number of times the script has looped
-	time.sleep(0.2)#space out the loop so as not to run too fast
+	time.sleep(0.05)#space out the loop so as not to run too fast
 	print recv #prints everything received from freenode. Remove this to clean up the debugging
 	#check for ping
 	pong(recv)
 	#check for links
 	error = 0
-	if "!love " in recv:
-		match = re.search(r"[^a-zA-Z](is)[^a-zA-Z]", mystr)
-		num = match.start()
-		message = recv[:num+5]
-		s.send('privmsg ' + channel + ' : I love ' + message + "\r\n")
+	message = command("!love")
+	if str(message) != 'None':
+		s.send('privmsg ' + channel + ' :I love ' + str(message) + '\r\n')
+	message = command("!say")
+	if str(message) != 'None':
+		s.send('privmsg ' + channel + ' :' + str(message) + '\r\n')
+	message = command("!rfl")
+        if str(message) != 'None':
+                s.send('privmsg ' + channel + ' :I really fucking love ' + str(message) + '\r\n')
+	message = command("!fact")
+        if str(message) != 'None':
+                s.send('privmsg ' + channel + ' :' + textbetween("<strong>","</strong>", urllib2.urlopen("http://randomfunfacts.com").read())[3:-4] + '\r\n')
+
+
+
 	urlsfound = True
 	try:
 		link2 = link
@@ -95,8 +118,8 @@ while loop >= 0:
 			print "[E]No valid title"
 			error = 2
 		#post title to irc
-		if error == 0  and loop >= numr: #Things gett a little messy here while I was trying to stop the bot from posting unnececary tinyurls.
-			if len(nlink) >= tinylen:
+		if error == 0  and loop >= numr:
+			if len(nlink) >= 40:
 				s.send('privmsg ' + channel + ' : ^ ' + str(title) + " " + maketiny(link[0]) + ' ^\n\r')
 			else:
 				s.send('privmsg ' + channel + ' : ^ ' + str(title) + " ^\r\n")
