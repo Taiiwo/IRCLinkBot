@@ -5,7 +5,7 @@
 ##
 #GPL v2
 #Note: You need to install BeautifulSoup. sudo apt-get install python-BeautifulSoup
-import socket, sys, re, urllib2, time, os
+import socket, sys, re, urllib2, time, os, random
 from BeautifulSoup import BeautifulSoup
 
 #Settings:
@@ -18,6 +18,8 @@ loginmessage = "-- LinkBot v2.1.5 ONLINE --" #Leave blank for no message
 recvbits = 315 #How many bits to wait for. This affects the max length of links.
 numr = 27 #Number of recvs to ignore on startup. This can be determined by running the script and checking when the
 	#last title was send to the chat by the number printed in square brackets.
+def randomnum(low,high):
+	random.randint(low,high)
 def textbetween(str1,str2,text):
 	posstr1 = re.search(r"[^a-zA-Z](" + str1 + ")[^a-zA-Z]", text).start(1)
 	posstr2 = re.search(r"[^a-zA-Z](" + str2 + ")[^a-zA-Z]", text).start(1)
@@ -96,9 +98,21 @@ while loop >= 0:
 	message = command("!fact")
         if str(message) != 'None':
                 s.send('privmsg ' + channel + ' :' + textbetween("<strong>","</strong>", urllib2.urlopen("http://randomfunfacts.com").read())[3:-4] + '\r\n')
-
-
-
+	message = command("!joke")
+        if str(message) != 'None':
+                s.send('privmsg ' + channel + ' :' + textbetween('<td style="color: #000000">','<td align="right width="95px">', urllib2.urlopen('http://www.sickipedia.org/joke/view/' + str(randomnum(61,1300))).read()[:-5]) + '\r\n')
+        message = ""
+	if "!wyr1" in recv:
+        	file = open("WYR.txt","r")
+		text = file.read()
+		lines = text.splitlines()
+		s.send('privmsg ' + channel + ' :' + lines[int(random.randint(0,62))] + '\r\n')
+	message = ""
+	if "!wyr" in recv and "!wyr1" not in recv:
+		try:
+			s.send('PRIVMSG '+ channel +' :' + gettitle('http://www.rrrather.com/view/' + str(random.randint(0,40000)))+ '\r\n') 
+		except:
+			s.send('PRIVMSG '+channel +' :[Server Error (Not my fault)]\r\n')
 	urlsfound = True
 	try:
 		link2 = link
