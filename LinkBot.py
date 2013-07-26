@@ -109,10 +109,14 @@ while loop >= 0:
 		s.send('privmsg ' + channel + ' :' + lines[int(random.randint(0,62))] + '\r\n')
 	message = ""
 	if "!wyr" in recv and "!wyr1" not in recv:
-		try:
-			s.send('PRIVMSG '+ channel +' :' + gettitle('http://www.rrrather.com/view/' + str(random.randint(0,40000)))+ '\r\n') 
-		except:
-			s.send('PRIVMSG '+channel +' :[Server Error (Not my fault)]\r\n')
+		error = 1
+		while error == 1:
+			try:
+				s.send('PRIVMSG '+ channel +' :' + gettitle('http://www.rrrather.com/view/' + str(random.randint(0,40000)))+ '\r\n') 
+				error = 0
+			except:
+				print '[Server Error (Not my fault)]'
+				error = 1
 	urlsfound = True
 	try:
 		link2 = link
