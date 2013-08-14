@@ -126,11 +126,14 @@ while loop >= 0:
 		print "[-]No URLS found"
 		error = 1
 		urlsfound = False
-	#chack for title
+	#check for title
 	if link2 != link:
 		try:
 			nlink = link[0]
-			title = gettitle(link[0])
+			if nlink[-4:] == '.cgi' or nlink[-4:] == '.CGI':
+				title = 'Get fucked'
+			else:
+				title = gettitle(link[0])
 			print title
 		except:
 			print "[E]No valid title"
