@@ -27,18 +27,18 @@ def textbetween(str1,str2,text):
 	return between
 def command(command): #finds the argument for a command.
 	if command + " " in recv:
-                match = re.search(r"[^a-zA-Z](" + command + ")[^a-zA-Z]", recv)
-                num = match.start(1)
-                message = recv[num + len(command):]
+		match = re.search(r"[^a-zA-Z](" + command + ")[^a-zA-Z]", recv)
+		num = match.start(1)
+		message = recv[num + len(command):]
 		if message == '':
 			return 'no word'
-                else:
+		else:
 			return str(message[1:])
 	else:
 		message = "None"
 def gettitle(url):#get the page title of an URL
-        soup = BeautifulSoup(urllib2.urlopen(url))
-        return soup.title.string
+	soup = BeautifulSoup(urllib2.urlopen(url))
+	return soup.title.string
 def pong(recv):#respond to ping req in a string --Not perfect, but works
 	if "ping" or "PING" in recv:
 		url = str(geturl(str(recv)))
@@ -93,17 +93,17 @@ while loop >= 0:
 	if str(message) != 'None':
 		s.send('privmsg ' + channel + ' :' + str(message) + '\r\n')
 	message = command("!rfl")
-        if str(message) != 'None':
-                s.send('privmsg ' + channel + ' :I really fucking love ' + str(message) + '\r\n')
+	if str(message) != 'None':
+		s.send('privmsg ' + channel + ' :I really fucking love ' + str(message) + '\r\n')
 	message = command("!fact")
-        if str(message) != 'None':
-                s.send('privmsg ' + channel + ' :' + textbetween("<strong>","</strong>", urllib2.urlopen("http://randomfunfacts.com").read())[3:-4] + '\r\n')
+	if str(message) != 'None':
+		s.send('privmsg ' + channel + ' :' + textbetween("<strong>","</strong>", urllib2.urlopen("http://randomfunfacts.com").read())[3:-4] + '\r\n')
 	message = command("!joke")
-        if str(message) != 'None':
-                s.send('privmsg ' + channel + ' :' + textbetween('<td style="color: #000000">','<td align="right width="95px">', urllib2.urlopen('http://www.sickipedia.org/joke/view/' + str(randomnum(61,1300))).read()[:-5]) + '\r\n')
-        message = ""
+	if str(message) != 'None':
+		s.send('privmsg ' + channel + ' :' + textbetween('<td style="color: #000000">','<td align="right width="95px">', urllib2.urlopen('http://www.sickipedia.org/joke/view/' + str(randomnum(61,1300))).read()[:-5]) + '\r\n')
+	message = ""
 	if "!wyr1" in recv:
-        	file = open("WYR.txt","r")
+		file = open("WYR.txt","r")
 		text = file.read()
 		lines = text.splitlines()
 		s.send('privmsg ' + channel + ' :' + lines[int(random.randint(0,62))] + '\r\n')
@@ -133,7 +133,9 @@ while loop >= 0:
 			if nlink[-4:] == '.cgi' or nlink[-4:] == '.CGI':
 				title = 'Get fucked'
 			else:
-				title = gettitle(link[0])
+				title = gettitle(nlink)
+				title = title.splitlines()
+				title = title[0]
 			print title
 		except:
 			print "[E]No valid title"
