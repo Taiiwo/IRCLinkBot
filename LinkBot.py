@@ -129,7 +129,7 @@ while loop >= 0:
 			error = 0
 		except:
 			error = 1
-		if error != 1 and len(message) <= 6:
+		if error != 1 and len(message) <= 6 and int(message) >= 1:
 			s.send('PRIVMSG '+ channel +' :' + str(random.randint(1,int(message))) + '\r\n')
 	urlsfound = True
 	try:

@@ -1,6 +1,7 @@
 #util.py
 #This file contains fuctions available for the plugin developers.
 import socket, sys, re, urllib2, time, os, random
+from plugins import *
 from BeautifulSoup import BeautifulSoup
 
 #start functions
@@ -39,4 +40,3 @@ def maketiny(url):
         html = urllib2.urlopen("http://tinyurl.com/api-create.php?url=" + url)
         tiny = str(html.read())
         return tiny
-
