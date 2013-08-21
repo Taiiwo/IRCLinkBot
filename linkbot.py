@@ -19,7 +19,7 @@ from plugins import *
 from BeautifulSoup import BeautifulSoup
 
 #Settings:
-channel = "#426699k"
+channel = "#426699t"
 server = "irc.freenode.net"
 port = 6667 #6667 is the default irc port
 nick = "TaiiwoBot"
@@ -60,7 +60,6 @@ while loop >= 0:
 	print loop #print the number of times the script has looped
 	time.sleep(0.05)#space out the loop so as not to run too fast
 	print recv #prints everything received from freenode. Remove this to clean up the debugging
-	pong(recv)
 	#iterate through plugins executing the all
 	data = {'s': s , 'recv': recv , 'loop': loop}
 	for plugin in plugins.__dict__.values():

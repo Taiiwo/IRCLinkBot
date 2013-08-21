@@ -1,5 +1,5 @@
 from util import *
-class plugins(object):
+class plugins:
 	def love(data):
 		message = command("!love")
         	if str(message) != 'None':
@@ -21,7 +21,7 @@ class plugins(object):
         	if str(message) != 'None':
         	        data['s'].send('privmsg ' + channel + ' :' + textbetween('<td style="color: #000000">','<td align="right width="95px">', urllib2.urlopen('http://www.sickipedia.org/joke/view/' + str(randomnum(61,1300))).read()[:-5]) + '\r\n')
 	def pong(data):#respond to ping req in a string --Not perfect, but works
-	        if "ping" or "PING" in recv:
+	        if "ping" in data['recv'] or "PING" in data['recv']:
 	                url = str(geturl(str(data['recv'])))
 	                if url != "":
 	                        data['s'].send("PONG " + url + "\n\r")

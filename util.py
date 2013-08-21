@@ -16,10 +16,10 @@ def textbetween(str1,str2,text):
         between = text[posstr1 + len(str1):posstr2]
         return between
 def command(command): #finds the argument for a command.
-        if command + " " in recv:
-                match = re.search(r"[^a-zA-Z](" + command + ")[^a-zA-Z]", recv)
+        if command + " " in data['recv']:
+                match = re.search(r"[^a-zA-Z](" + command + ")[^a-zA-Z]", data['recv'])
                 num = match.start(1)
-                message = recv[num + len(command):]
+                message = data['recv'][num + len(command):]
                 if message == '':
                         return 'no word'
                 else:
@@ -29,11 +29,6 @@ def command(command): #finds the argument for a command.
 def gettitle(url):#get the page title of an URL
         soup = BeautifulSoup(urllib2.urlopen(url))
         return soup.title.string
-def pong(recv):#respond to ping req in a string --Not perfect, but works
-        if "ping" or "PING" in recv:
-                url = str(geturl(str(recv)))
-                if url != "":
-                        s.send("PONG " + url + "\n\r")
 def geturl(recv):#parse an URL from a string
         return re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', recv)
 def maketiny(url):
