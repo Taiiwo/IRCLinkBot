@@ -18,6 +18,11 @@ loginmessage = "-- LinkBot v2.1.5 ONLINE --" #Leave blank for no message
 recvbits = 315 #How many bits to wait for. This affects the max length of links.
 numr = 27 #Number of recvs to ignore on startup. This can be determined by running the script and checking when the
 	#last title was send to the chat by the number printed in square brackets.
+def html_decode(s):
+	htmlCodes = (("'", '&#39;'),('"', '&quot;'),('>', '&gt;'),('<', '&lt;'),('&', '&amp;'))
+	for code in htmlCodes:
+		s = s.replace(code[1], code[0])
+	return s
 def randomnum(low,high):
 	random.randint(low,high)
 def textbetween(str1,str2,text):
@@ -117,6 +122,15 @@ while loop >= 0:
 			except:
 				print '[Server Error (Not my fault)]'
 				error = 1
+	message = command('!roll')
+        if str(message) != 'None':
+		try:
+			int(message)
+			error = 0
+		except:
+			error = 1
+		if error != 1 and len(message) <= 6:
+			s.send('PRIVMSG '+ channel +' :' + str(random.randint(1,int(message))) + '\r\n')
 	urlsfound = True
 	try:
 		link2 = link
@@ -136,6 +150,9 @@ while loop >= 0:
 				title = gettitle(nlink)
 				title = title.splitlines()
 				title = title[0]
+			if len(title) >= 150:
+				title = title[:150]
+			title = html_decode(title)
 			print title
 		except:
 			print "[E]No valid title"
