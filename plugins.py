@@ -70,15 +70,16 @@ class plugins(object):
         	        if error != 1 and len(message) <= 6 and int(message) >= 1:
         	                return 'PRIVMSG '+ data['channel'] +' :' + str(random.randint(1,int(message))) + '\r\n'
 	def linkbot(self,data):
-		if not hasattr(self, "link"):
-			self.link = ''  # it doesn't exist yet, so initialize it
-			self.nlink = ''
+		if not hasattr(self, "link"):# it doesn't exist yet, so initialize it
 			self.link2 = ''
+		self.nlink = ''
+		self.link = ''
 		urlsfound = True
 	        try:#look for urls in recv
 	                self.link2 = self.link#make a backup of last url
 	                self.link = geturl(data['recv'])
 	                print self.link
+			error = 0
 	        except Exception , err:
 			print sys.exc_info()[1]
 	                print "[-]No URLS found"
