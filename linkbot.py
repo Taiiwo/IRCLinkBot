@@ -14,12 +14,11 @@
 #
 #Importing Libraries
 import socket, sys, re, urllib2, time, os, random
-from util import *
 from plugins import *
 from BeautifulSoup import BeautifulSoup
 
 #Settings:
-channel = "#426699t"
+channel = "#426699k"
 server = "irc.freenode.net"
 port = 6667 #6667 is the default irc port
 nick = "TaiiwoBot"
@@ -48,11 +47,8 @@ s.send('privmsg ' + channel + ' :' + loginmessage + "\n\r")
 time.sleep(1)
 #setting variables
 recv = ""
-link = ""
-link2 = ""
 loop = 0
-error = 0
-nlink = ""
+plugclass = plugins('')
 input("Logged in yet?")
 #### Begin loop ####
 while loop >= 0:
@@ -60,12 +56,16 @@ while loop >= 0:
 	print loop #print the number of times the script has looped
 	time.sleep(0.05)#space out the loop so as not to run too fast
 	print recv #prints everything received from freenode. Remove this to clean up the debugging
-	#iterate through plugins executing the all
-	data = {'s': s , 'recv': recv , 'loop': loop}
+	#iterate through plugins executing all functions
+	data = {'s': s , 'recv': recv , 'loop': loop , 'numr' : numr , 'channel' : channel}# format data to send to plugins
 	for plugin in plugins.__dict__.values():
+		message = None
 		try:
-			plugin(data)
-		except TypeError:
-			pass
+			message = plugin(plugclass,data)
+		except Exception , err:
+			print sys.exc_info()[1]
+		print message
+		if message != '' and message != None:
+			s.send(str(message))
 	#get recv last. I thought this would be a good idea. I can't remember why, but there was a reason.
 	recv = s.recv(recvbits)	

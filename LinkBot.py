@@ -12,7 +12,7 @@ from BeautifulSoup import BeautifulSoup
 channel = "#426699k"
 server = "irc.freenode.net"
 port = 6667 #6667 is the default irc port
-nick = "TaiiwoBot"
+nick = "LinkBot"
 user = "Taiiwo"
 loginmessage = "-- LinkBot v2.1.5 ONLINE --" #Leave blank for no message
 recvbits = 315 #How many bits to wait for. This affects the max length of links.
@@ -131,6 +131,22 @@ while loop >= 0:
 			error = 1
 		if error != 1 and len(message) <= 6 and int(message) >= 1:
 			s.send('PRIVMSG '+ channel +' :' + str(random.randint(1,int(message))) + '\r\n')
+	message = command('!insult')
+	if str(message) != 'None':
+		error = 0
+		try:
+		        message = int(str(message))
+		except:
+        		error = 1
+		adjectives = ('faggy','hipster','ugly','cunt sucker','dick munching','fanny bashing','bloody nob faced','whiny bum muffin-like','trend following', 'nigger bashing','flat faced','stupid','fucking','nob swallower','fucking hell you dick gargling','jew bashing','bomb smuggling','sweaty','mexican','donkey fucking','jibberish speaking','mango sauced', 'quesadilla swallowing' ,'turtlenecked')
+		nouns = ('twat','cunt','cock monkey','cheese inspector','dick machine',"fucker and I'll hook u in the jabber m8",'homofag','douche canoe','peasant','ROFLCopter','failure at life','whale','tit head fucking jew crusher','fuckmobile')
+		adjective = []
+		if error == 0 and int(message) <= 5:
+			taco = int(message)
+		        while taco >= 0:
+		                adjective.append(adjectives[random.randint(0,len(adjectives) - 1)])
+		                taco = taco - 1
+		        s.send('PRIVMSG '+ channel +' :You ' + ' '.join(adjective) + ' ' + nouns[random.randint(0,len(nouns) - 1)] + '\r\n')
 	urlsfound = True
 	try:
 		link2 = link
@@ -160,9 +176,15 @@ while loop >= 0:
 		#post title to irc
 		if error == 0  and loop >= numr:
 			if len(nlink) >= 40:
-				s.send('privmsg ' + channel + ' : ^ ' + str(title) + " " + maketiny(link[0]) + ' ^\n\r')
+				try:
+					s.send('privmsg ' + channel + ' : ^ ' + str(title) + " " + maketiny(link[0]) + ' ^\n\r')
+				except:
+					pass
 			else:
-				s.send('privmsg ' + channel + ' : ^ ' + str(title) + " ^\r\n")
+				try:
+					s.send('privmsg ' + channel + ' : ^ ' + str(title) + " ^\r\n")
+				except:
+					pass
 		if error == 2 and urlsfound == True and nlink != "" and loop >= numr and len(nlink) >= 40:
 			s.send('privmsg ' + channel + ' : ^ ' + maketiny(nlink) + ' ^\r\n')
 	#get recv last. I thought this would be a good idea. I can't remember why, but there was a reason.

@@ -5,6 +5,9 @@ from plugins import *
 from BeautifulSoup import BeautifulSoup
 
 #start functions
+def say(channel, message):
+	return 'privmsg ' + channel + ' :' + message + '\r\n'
+	
 def html_decode(s):
         htmlCodes = (("'", '&#39;'),('"', '&quot;'),('>', '&gt;'),('<', '&lt;'),('&', '&amp;'))
         for code in htmlCodes:
@@ -15,11 +18,11 @@ def textbetween(str1,str2,text):
         posstr2 = re.search(r"[^a-zA-Z](" + str2 + ")[^a-zA-Z]", text).start(1)
         between = text[posstr1 + len(str1):posstr2]
         return between
-def command(command): #finds the argument for a command.
-        if command + " " in data['recv']:
-                match = re.search(r"[^a-zA-Z](" + command + ")[^a-zA-Z]", data['recv'])
+def command(command,recv): #finds the argument for a command.
+        if command + " " in recv:
+                match = re.search(r"[^a-zA-Z](" + command + ")[^a-zA-Z]", recv)
                 num = match.start(1)
-                message = data['recv'][num + len(command):]
+                message = recv[num + len(command):]
                 if message == '':
                         return 'no word'
                 else:
