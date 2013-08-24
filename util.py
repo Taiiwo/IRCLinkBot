@@ -6,7 +6,7 @@ from BeautifulSoup import BeautifulSoup
 
 #start functions
 def say(channel, message):
-	return 'privmsg ' + channel + ' :' + message + '\r\n'
+	return 'PRIVMSG ' + channel + ' :' + message + '\r\n'
 	
 def html_decode(s):
         htmlCodes = (("'", '&#39;'),('"', '&quot;'),('>', '&gt;'),('<', '&lt;'),('&', '&amp;'))

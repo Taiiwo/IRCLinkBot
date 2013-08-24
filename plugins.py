@@ -35,9 +35,18 @@ class plugins(object):
 		else:
 			return ''
         def joke(self,data):
-		message = command("!joke", data['recv'])
-        	if str(message) != 'None':
-        	        return 'privmsg ' + data['channel'] + ' :' + textbetween('<td style="color: #000000">','<td align="right width="95px">', urllib2.urlopen('http://www.sickipedia.org/joke/view/' + str(randomnum(61,1300))).read()[:-5]) + '\r\n'
+		if '!joke' in data['recv']:
+			loop = 1
+			while loop == 1:
+				html = urllib2.urlopen('http://www.sickipedia.org/getjokes/random').read()
+				soup = BeautifulSoup(html)
+				table = soup.body.findAll('table')[3]
+				joke = table.findAll('td')[0].text
+				if len(joke) <= 300:
+					loop = 0
+			ujoke = joke.decode("utf-8")
+			joke = html_decode(ujoke.encode("ascii","ignore"))
+        	        return 'privmsg ' + data['channel'] + ' :' + joke + '\r\n'
 		else:
 			return ''
 	def pong(self,data):#respond to ping req in a string --Not perfect, but works
@@ -60,15 +69,38 @@ class plugins(object):
         	                        print '[Server Error (Not my fault)]'
         	                        error = 1
         def roll(self,data):
-		message = command('!roll', data['recv'])
+		message = command('!r', data['recv'])
         	if str(message) != 'None':
-        	        try:
-        	                int(message)
-        	                error = 0
-        	        except:
-        	                error = 1
-        	        if error != 1 and len(message) <= 6 and int(message) >= 1:
-        	                return 'PRIVMSG '+ data['channel'] +' :' + str(random.randint(1,int(message))) + '\r\n'
+			if 'd' in message or 'D' in message:
+				message.replace('D','d')
+				pos_of_d = re.search(r"[^a-zA-Z](d)[^a-zA-Z]", message).start(1)
+				num_of_dice = message[:pos_of_d]
+				print num_of_dice
+				dice_value = message[pos_of_d + 1:]
+				print dice_value
+				try:
+                                        num_of_dice = int(num_of_dice)
+					dice_value = int(dice_value)
+                                        num_valid = True 
+                                except:
+                                        num_valid = False
+				if num_valid and num_of_dice >= 1 and len(str(num_of_dice)) <4 and len(str(dice_value)) < 10 and dice_value >= 1:
+					i = num_of_dice
+					total = 0
+					while i > 0:
+						total += random.randint(1,dice_value)
+						i = i - 1
+					return say(data['channel'],str(total))
+				else:
+					return ''
+			else:
+        	        	try:
+        	        	        int(message)
+        	        	        error = 0
+        	        	except:
+        	        	        error = 1
+        	        	if error != 1 and len(message) < 10 and int(message) >= 1:
+        	        	        return 'PRIVMSG '+ data['channel'] +' :' + str(random.randint(1,int(message))) + '\r\n'
 	def linkbot(self,data):
 		if not hasattr(self, "link"):# it doesn't exist yet, so initialize it
 			self.link2 = ''

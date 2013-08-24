@@ -49,7 +49,7 @@ time.sleep(1)
 recv = ""
 loop = 0
 plugclass = plugins('')
-input("Logged in yet?")
+#input("Logged in yet?")
 #### Begin loop ####
 while loop >= 0:
 	loop = loop + 1
