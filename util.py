@@ -5,20 +5,20 @@ from plugins import *
 from BeautifulSoup import BeautifulSoup
 
 #start functions
-def say(channel, message):
-	return 'PRIVMSG ' + channel + ' :' + message + '\r\n'
+def say(channel, message):# A quick way to make the bot say something. Use return say(argv['channel'],message)
+	return 'PRIVMSG ' + channel + ' :' + message + '\r\n'# (You need to define argv with the argv() function
 	
-def html_decode(s):
+def html_decode(s):# Replaces some HTML codes with normal text ones.
         htmlCodes = (("'", '&#39;'),('"', '&quot;'),('>', '&gt;'),('<', '&lt;'),('&', '&amp;'))
         for code in htmlCodes:
                 s = s.replace(code[1], code[0])
         return s
-def textbetween(str1,str2,text):
+def textbetween(str1,str2,text):# returns the text between str1 and str2 in text. This is usefull for parsing data.
         posstr1 = text.find(str1)
         posstr2 = text.find(str2)
         between = text[posstr1 + len(str1):posstr2]
         return between
-def command(command,recv): #finds the argument for a command.
+def command(command,recv): #finds the argument for a command. (Depricated. Use argv())
         if command + " " in recv or command in recv:
                 num = recv.find(command)
                 message = recv[num + len(command):]
@@ -28,9 +28,9 @@ def command(command,recv): #finds the argument for a command.
                         return str(message[1:])
         else:
                 message = "None"
-def argv(gcommand,recv):# returns a named, multidimentional array of info (nick, user, (argv[1], argv[2],  etc..)) (Args are in a
-	com = gcommand
-	gcommand = command(gcommand,recv) # separate array)
+def argv(gcommand,recv):# returns a named, multidimentional array of on recv info [nick, user, channel, [argv[0], argv[1],
+	com = gcommand # 							etc..]] (Args are in aseparate array)
+	gcommand = command(gcommand,recv)
 	if recv[0] == ':':
 		nick = textbetween(':', '!', recv)
 		user = textbetween('~', '@', recv)
@@ -49,7 +49,7 @@ def gettitle(url):#get the page title of an URL
         return soup.title.string
 def geturl(recv):#parse an URL from a string
         return re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', recv)
-def maketiny(url):
+def maketiny(url):# make a tinyurl from a string
         html = urllib2.urlopen("http://tinyurl.com/api-create.php?url=" + url)
         tiny = str(html.read())
         return tiny
