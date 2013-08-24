@@ -12,31 +12,46 @@ from util import *
 class plugins(object):
 	def __init__(self,data):
 		from util import *
+	def reload(self,data):
+		if '!update' in data['recv'] and argv('!reload',data['recv'])['user'] == 'taiiwo':
+			status = 'Successful'
+			try:
+				reload(plugins.plugins)
+				reload(util)
+			except:
+				status = 'Failed'
+			args = argv('!reload', data['recv'])
+			return say(args['channel'],'Dynamic update: ' + status)
 	def love(self,data):
 		message = command("!love",data['recv'])
         	if str(message) != 'None':
-        	        return say(data['channel'],'I love ' + str(message))# Example of 'say' function.
+			args = argv('!love', data['recv'])
+        	        return say(args['channel'],'I love ' + str(message))# Example of 'say' function.
 		else:
 			return ''
         def say(self,data):
 		message = command("!say", data['recv'])
 	        if str(message) != 'None':
-	                return 'privmsg ' + data['channel'] + ' :' + str(message) + '\r\n'
+			args = argv('!say', data['recv'])
+	                return 'privmsg ' + args['channel'] + ' :' + str(message) + '\r\n'
         def rfl(self,data):
 		message = command("!rfl", data['recv'])
         	if str(message) != 'None':
-        	        return 'privmsg ' + data['channel'] + ' :I really fucking love ' + str(message) + '\r\n'
+			args = argv('!rfl', data['recv'])
+        	        return 'privmsg ' + args['channel'] + ' :I really fucking love ' + str(message) + '\r\n'
 		else:
 			return ''
         def fact(self,data):
 		message = command("!fact", data['recv'])
 	        if str(message) != 'None':
-	                return 'privmsg ' + data['channel'] + ' :' + textbetween("<strong>","</strong>", urllib2.urlopen("http://randomfunfacts.com").read())[3:-4] + '\r\n'
+			args = argv('!fact', data['recv'])
+	                return 'privmsg ' + args['channel'] + ' :' + textbetween("<strong>","</strong>", urllib2.urlopen("http://randomfunfacts.com").read())[3:-4] + '\r\n'
 		else:
 			return ''
         def joke(self,data):
 		if '!joke' in data['recv']:
 			loop = 1
+			args = argv('!joke',data['recv'])
 			while loop == 1:
 				html = urllib2.urlopen('http://www.sickipedia.org/getjokes/random').read()
 				soup = BeautifulSoup(html)
@@ -46,7 +61,7 @@ class plugins(object):
 					loop = 0
 			ujoke = joke.decode("utf-8")
 			joke = html_decode(ujoke.encode("ascii","ignore"))
-        	        return 'privmsg ' + data['channel'] + ' :' + joke + '\r\n'
+        	        return 'privmsg ' + args['channel'] + ' :' + joke + '\r\n'
 		else:
 			return ''
 	def pong(self,data):#respond to ping req in a string --Not perfect, but works
@@ -61,9 +76,10 @@ class plugins(object):
         def wyr(self,data):
 		if "!wyr" in data['recv']:
         	        error = 1
+			args = argv('!wyr',data['recv'])
         	        while error == 1:
         	                try:
-        	                        return 'PRIVMSG '+ data['channel'] +' :' + gettitle('http://www.rrrather.com/view/' + str(random.randint(0,40000)))+ '\r\n'
+        	                        return 'PRIVMSG '+ args['channel'] +' :' + gettitle('http://www.rrrather.com/view/' + str(random.randint(0,40000)))+ '\r\n'
         	                        error = 0
         	                except:
         	                        print '[Server Error (Not my fault)]'
@@ -72,6 +88,7 @@ class plugins(object):
 		message = command('!r', data['recv'])
         	if str(message) != 'None':
 			if 'd' in message or 'D' in message:
+				args = argv('!r', data['recv'])
 				message.replace('D','d')
 				pos_of_d = re.search(r"[^a-zA-Z](d)[^a-zA-Z]", message).start(1)
 				num_of_dice = message[:pos_of_d]
@@ -90,7 +107,7 @@ class plugins(object):
 					while i > 0:
 						total += random.randint(1,dice_value)
 						i = i - 1
-					return say(data['channel'],str(total))
+					return say(argv['channel'],str(total))
 				else:
 					return ''
 			else:
@@ -100,8 +117,10 @@ class plugins(object):
         	        	except:
         	        	        error = 1
         	        	if error != 1 and len(message) < 10 and int(message) >= 1:
-        	        	        return 'PRIVMSG '+ data['channel'] +' :' + str(random.randint(1,int(message))) + '\r\n'
+					args = argv('!r', data['recv'])
+        	        	        return 'PRIVMSG '+ args['channel'] +' :' + str(random.randint(1,int(message))) + '\r\n'
 	def linkbot(self,data):
+		args = argv(' :',data['recv'])
 		if not hasattr(self, "link"):# it doesn't exist yet, so initialize it
 			self.link2 = ''
 		self.nlink = ''
@@ -137,12 +156,61 @@ class plugins(object):
                 	#post title to irc
                 	if error == 0 and data['loop'] >= data['numr']:
                 	        if len(self.nlink) >= 40:
-					return 'privmsg ' + data['channel'] + ' : ^ ' + str(title) + " " + maketiny(self.link[0]) + ' ^\n\r'
+					return 'privmsg ' + args['channel'] + ' : ^ ' + str(title) + " " + maketiny(self.link[0]) + ' ^\r\n'
                         	else:
-                                	return 'privmsg ' + data['channel'] + ' : ^ ' + str(title) + " ^\r\n"
+                                	return 'privmsg ' + args['channel'] + ' : ^ ' + str(title) + " ^\r\n"
                		if error == 2 and urlsfound == True and self.nlink != "" and data['loop'] >= data['numr'] and len(self.nlink) >= 40:
-                        	return 'privmsg ' + data['channel'] + ' : ^ ' + maketiny(self.nlink) + ' ^\r\n'
+                        	return 'privmsg ' + args['channel'] + ' : ^ ' + maketiny(self.nlink) + ' ^\r\n'
 			else:
 				return ''
 		else:
 			return ''
+	def nmap(self,data):
+		if '!nmap' in data['recv']:
+			args = argv('!nmap',data['recv'])
+			if args['user'] == 'taiiwo':
+				host = args['argv'][len(args['argv']) - 1]
+				arguments = args['argv'][0:len(args['argv']) - 1]
+				error = 0
+				for i in host:
+					if i.islower() or i.isupper() or i == '.':
+						pass
+					else:
+						error = 1
+				for argument in arguments:
+					for c in argument:
+						if c.islower() or c.isupper():
+							pass
+						else:
+							error = 1
+				if error == 0:
+					command = []
+					command.append('nmap')
+					for i in arguments:
+						command.append(i)
+					out = subprocess.call(command)
+					out = textbetween('VERSION', 'Service Info:', out)
+					out = out.splitlines()
+					fout = []
+					for i in out:
+						fout.append(say(i))
+					fout = ''.join(fout)
+					return say(args['channel'], fout)
+			else:
+				return say(args['channel'], 'You are not my daddy, ' + args['nick'] + '.')
+	def join(self,data):
+		try:
+			message = argv('!join',data['recv'])
+		except:
+			message = ''
+		if message != '' and message['user'] == 'taiiwo':
+			return 'JOIN ' + message['argv'][1] + '\r\n'
+	def leave(self,data):
+                try:
+                        message = argv('!leave',data['recv'])
+                except:
+                        message = ''
+                if message != '' and message['user'] == 'taiiwo':
+                        return 'PART ' + message['argv'][1] + '\r\n'
+
+

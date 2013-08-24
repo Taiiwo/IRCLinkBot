@@ -14,14 +14,13 @@ def html_decode(s):
                 s = s.replace(code[1], code[0])
         return s
 def textbetween(str1,str2,text):
-        posstr1 = re.search(r"[^a-zA-Z](" + str1 + ")[^a-zA-Z]", text).start(1)
-        posstr2 = re.search(r"[^a-zA-Z](" + str2 + ")[^a-zA-Z]", text).start(1)
+        posstr1 = text.find(str1)
+        posstr2 = text.find(str2)
         between = text[posstr1 + len(str1):posstr2]
         return between
 def command(command,recv): #finds the argument for a command.
-        if command + " " in recv:
-                match = re.search(r"[^a-zA-Z](" + command + ")[^a-zA-Z]", recv)
-                num = match.start(1)
+        if command + " " in recv or command in recv:
+                num = recv.find(command)
                 message = recv[num + len(command):]
                 if message == '':
                         return 'no word'
@@ -29,6 +28,22 @@ def command(command,recv): #finds the argument for a command.
                         return str(message[1:])
         else:
                 message = "None"
+def argv(gcommand,recv):# returns a named, multidimentional array of info (nick, user, (argv[1], argv[2],  etc..)) (Args are in a
+	com = gcommand
+	gcommand = command(gcommand,recv) # separate array)
+	if recv[0] == ':':
+		nick = textbetween(':', '!', recv)
+		user = textbetween('~', '@', recv)
+		channel = textbetween('PRIVMSG ', ' :', recv)
+	else:
+		nick = 'Unknown'
+		user = 'Unknown'
+	argc = gcommand.split()
+	argv = []
+	argv.append(com)
+	for i in argc:
+		argv.append(i)
+	return {'nick' : nick, 'user' : user,'channel' : channel, 'argv' : argv}
 def gettitle(url):#get the page title of an URL
         soup = BeautifulSoup(urllib2.urlopen(url))
         return soup.title.string
