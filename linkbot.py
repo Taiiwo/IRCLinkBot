@@ -13,7 +13,7 @@
 #Note: You need to install BeautifulSoup. sudo apt-get install python-BeautifulSoup
 #
 #Importing Libraries
-import socket, sys, re, urllib2, time, os, random, subprocess
+import socket, sys, re, urllib2, time, os, random, subprocess, plugins, util
 from plugins import *
 from BeautifulSoup import BeautifulSoup
 
@@ -57,7 +57,7 @@ while loop >= 0:
 	time.sleep(0.05)#space out the loop so as not to run too fast
 	print recv #prints everything received from freenode. Remove this to clean up the debugging
 	#iterate through plugins executing all functions
-	data = {'s': s , 'recv': recv , 'loop': loop , 'numr' : numr , 'channel' : channel}# format data to send to plugins
+	data = {'s': s , 'recv': recv , 'loop': loop , 'numr' : numr , 'channel' : channel, 'plugclass' : plugclass}# format data to send to plugins
 	for plugin in plugins.__dict__.values():
 		message = None
 		try:
@@ -67,5 +67,16 @@ while loop >= 0:
 		print message
 		if message != '' and message != None:
 			s.send(str(message))
+        if '!update' in recv and util.argv('!update',recv)['user'] == 'taiiwo':
+        	status = 'Successful'
+                try:
+                	execfile('./plugins.py')
+                        from plugins import *
+                       	execfile('./util.py')
+                except Exception, err:
+                        print sys.exc_info()[1]
+                        status = 'Failed'
+                args = argv('!update', data['recv'])
+                s.send(util.say(args['channel'],'Dynamic update: ' + status))
 	#get recv last. I thought this would be a good idea. I can't remember why, but there was a reason.
 	recv = s.recv(recvbits)	

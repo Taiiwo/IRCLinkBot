@@ -12,16 +12,6 @@ from util import *
 class plugins(object):
 	def __init__(self,data):
 		from util import *
-	def reload(self,data):
-		if '!update' in data['recv'] and argv('!reload',data['recv'])['user'] == 'taiiwo':
-			status = 'Successful'
-			try:
-				reload(plugins.plugins)
-				reload(util)
-			except:
-				status = 'Failed'
-			args = argv('!reload', data['recv'])
-			return say(args['channel'],'Dynamic update: ' + status)
 	def love(self,data):
 		message = command("!love",data['recv'])
         	if str(message) != 'None':
@@ -30,10 +20,10 @@ class plugins(object):
 		else:
 			return ''
         def say(self,data):
-		message = command("!say", data['recv'])
-	        if str(message) != 'None':
-			args = argv('!say', data['recv'])
-	                return 'privmsg ' + args['channel'] + ' :' + str(message) + '\r\n'
+		message = argv("!say", data['recv'])
+	        if message['argv'][0] == '!say':
+			say = ' '.join(message['argv'][2:])
+	                return 'privmsg ' + message['argv'][1] + ' :' + say + '\r\n'
         def rfl(self,data):
 		message = command("!rfl", data['recv'])
         	if str(message) != 'None':
@@ -107,7 +97,7 @@ class plugins(object):
 					while i > 0:
 						total += random.randint(1,dice_value)
 						i = i - 1
-					return say(argv['channel'],str(total))
+					return say(args['channel'],str(total))
 				else:
 					return ''
 			else:
@@ -118,6 +108,7 @@ class plugins(object):
         	        	        error = 1
         	        	if error != 1 and len(message) < 10 and int(message) >= 1:
 					args = argv('!r', data['recv'])
+					print args['channel']
         	        	        return 'PRIVMSG '+ args['channel'] +' :' + str(random.randint(1,int(message))) + '\r\n'
 	def linkbot(self,data):
 		args = argv(' :',data['recv'])
@@ -155,8 +146,10 @@ class plugins(object):
                 	        error = 2
                 	#post title to irc
                 	if error == 0 and data['loop'] >= data['numr']:
+				slink = self.nlink.decode("utf-8")
+				self.nlink = slink.encode("ascii","ignore")
                 	        if len(self.nlink) >= 40:
-					return 'privmsg ' + args['channel'] + ' : ^ ' + str(title) + " " + maketiny(self.link[0]) + ' ^\r\n'
+					return 'privmsg ' + args['channel'] + ' : ^ ' + str(title) + " " + maketiny(self.nlink) + ' ^\r\n'
                         	else:
                                 	return 'privmsg ' + args['channel'] + ' : ^ ' + str(title) + " ^\r\n"
                		if error == 2 and urlsfound == True and self.nlink != "" and data['loop'] >= data['numr'] and len(self.nlink) >= 40:
