@@ -135,7 +135,7 @@ class plugins(object):
 				else:#only get one line of titles
                                 	title = gettitle(self.nlink)
                                 	title = title.splitlines()
-                                	title = title[0]
+                                	title = ''.join(title)
                         	if len(title) >= 150:#cap the length of titles
                         	        title = title[:150]
                         	title = html_decode(title)
