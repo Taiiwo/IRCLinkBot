@@ -21,7 +21,7 @@ class plugins(object):
 			return ''
         def say(self,data):
 		message = argv("!say", data['recv'])
-	        if message['argv'][0] == '!say':
+	        if message['argv'][0] == '!say' and message['user'] in data['admins']:
 			say = ' '.join(message['argv'][2:])
 	                return 'privmsg ' + message['argv'][1] + ' :' + say + '\r\n'
         def rfl(self,data):
@@ -161,7 +161,7 @@ class plugins(object):
 	def nmap(self,data):
 		if '!nmap' in data['recv']:
 			args = argv('!nmap',data['recv'])
-			if args['user'] == 'taiiwo':
+			if args['user'] in data['admins']:
 				host = args['argv'][len(args['argv']) - 1]
 				arguments = args['argv'][0:len(args['argv']) - 1]
 				error = 0
@@ -196,14 +196,14 @@ class plugins(object):
 			message = argv('!join',data['recv'])
 		except:
 			message = ''
-		if message != '' and message['user'] == 'taiiwo':
+		if message != '' and message['user'] in data['admins']:
 			return 'JOIN ' + message['argv'][1] + '\r\n'
 	def leave(self,data):
                 try:
                         message = argv('!leave',data['recv'])
                 except:
                         message = ''
-                if message != '' and message['user'] == 'taiiwo':
+                if message != '' and message['user'] in data['admins']:
                         return 'PART ' + message['argv'][1] + '\r\n'
 
 
