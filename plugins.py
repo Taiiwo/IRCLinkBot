@@ -129,9 +129,10 @@ class plugins(object):
 	                urlsfound = False
 	        if self.link2 != self.link:#This stops spamming links
 	                try:#try to get the title of the url
-	                        self.nlink = self.link[0]
-	                        if self.nlink[-4:] == '.cgi' or self.nlink[-4:] == '.CGI':#don't process cgi links
-	                                title = 'Get fucked'# You should probaly change this...
+	                        self.nlink = self.link[0
+				badext = ('.cgi','.CGI','.jpg','.png','.gif','.bmp')
+	                        if self.nlink[-4:] in badext:# don't process images and stuff
+	                                pass
 				else:#only get one line of titles
                                 	title = gettitle(self.nlink)
                                 	title = title.splitlines()
@@ -148,7 +149,7 @@ class plugins(object):
                 	if error == 0 and data['loop'] >= data['numr']:
 				slink = self.nlink.decode("utf-8")
 				self.nlink = slink.encode("ascii","ignore")
-                	        if len(self.nlink) >= 40:
+                	        if len(self.nlink) >= 53:
 					return 'privmsg ' + args['channel'] + ' : ^ ' + str(title) + " " + maketiny(self.nlink) + ' ^\r\n'
                         	else:
                                 	return 'privmsg ' + args['channel'] + ' : ^ ' + str(title) + " ^\r\n"
