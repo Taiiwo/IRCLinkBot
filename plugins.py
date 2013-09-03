@@ -153,7 +153,7 @@ class plugins(object):
 					return 'privmsg ' + args['channel'] + ' : ^ ' + str(title) + " " + maketiny(self.nlink) + ' ^\r\n'
                         	else:
                                 	return 'privmsg ' + args['channel'] + ' : ^ ' + str(title) + " ^\r\n"
-               		if error == 2 and urlsfound == True and self.nlink != "" and data['loop'] >= data['numr'] and len(self.nlink) >= 40:
+               		if error == 2 and urlsfound == True and self.nlink != "" and data['loop'] >= data['numr'] and len(self.nlink) >= 53:
                         	return 'privmsg ' + args['channel'] + ' : ^ ' + maketiny(self.nlink) + ' ^\r\n'
 			else:
 				return ''
