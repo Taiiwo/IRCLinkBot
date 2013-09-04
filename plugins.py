@@ -208,7 +208,7 @@ class plugins(object):
                         return 'PART ' + message['argv'][1] + '\r\n'
 	def scoop(self, data):
 		if '!scoop ' in data['recv']:
-			argv = args('!scoop',data['recv'])
+			args = args('!scoop',data['recv'])
 			if args['argv'][3] == '-r':
 				try:
 					rat = int(args['argv'][4])
