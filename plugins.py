@@ -208,22 +208,22 @@ class plugins(object):
                         return 'PART ' + message['argv'][1] + '\r\n'
 	def scoop(self, data):
 		if '!scoop ' in data['recv']:
-			argv = args('!scoop',data['recv'])
-			if argv['argv'][3] == '-r':
+			args = argv('!scoop',data['recv'])
+			if args['argv'][3] == '-r':
 				try:
-					rat = int(argv['argv'][4])
+					rat = int(args['argv'][4])
 				except:
 					rat = 'error'# number is invalid, ignore
 			else:
 				rat = 'none'# no number submitted
-			if argv['user'] in data['admins'] or argv['argv'][1] == 'me':
+			if args['user'] in data['admins'] or args['argv'][1] == 'me':
 				if rat == 'error' or rat == 'none':
-					sum = urllib2.urlopen('http://thescoop.io/ots.php?tosum=' + argv['argv'][2] + '&ratio=10')
+					sum = urllib2.urlopen('http://thescoop.io/ots.php?tosum=' + args['argv'][2] + '&ratio=10')
 				elif rat != 'none' and rat != 'error':
-					sum = urllib2.urlopen('http://thescoop.io/ots.php?tosum=' + argv['argv'][2] + '&ratio=' + str(rat))
+					sum = urllib2.urlopen('http://thescoop.io/ots.php?tosum=' + args['argv'][2] + '&ratio=' + str(rat))
 				sum = re.sub('<[^<]+?>', '', sum)# strip HTML tags
 				sum = html_decode(sum)
-				if argv['user'] in data['admins'] and sum != '':
-					return say(argv['argv'][1],sum)
+				if args['user'] in data['admins'] and sum != '':
+					return say(args['argv'][1],sum)
 				elif args['argv'][1] == 'me' and sum != '':
-					return say(argv['nick'],sum)
+					return say(args['nick'],sum)
