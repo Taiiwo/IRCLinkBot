@@ -206,5 +206,24 @@ class plugins(object):
                         message = ''
                 if message != '' and message['user'] in data['admins']:
                         return 'PART ' + message['argv'][1] + '\r\n'
-
-
+	def scoop(self, data):
+		if '!scoop ' in data['recv']:
+			argv = args('!scoop',data['recv'])
+			if args['argv'][3] == '-r':
+				try:
+					rat = int(args['argv'][4])
+				except:
+					rat = 'error'# number is invalid, ignore
+			else:
+				rat = 'none'# no number submitted
+			if args['user'] in data['admins'] or args['argv'][1] == 'me':
+				if rat == 'error' or rat == 'none':
+					sum = urllib2.urlopen('http://thescoop.io/ots.php?tosum=' + args['argv'][2] + '&ratio=10')
+				elif rat != 'none' and rat != 'error':
+					sum = urllib2.urlopen('http://thescoop.io/ots.php?tosum=' args['argv'][2] + '&ratio=' + str(rat))
+				sum = re.sub('<[^<]+?>', '', sum)# strip HTML tags
+				sum = html_decode(sum)
+				if args['user'] in data['admins'] and sum != '':
+					return say(args['argv'][1],sum)
+				elif args['argv'][1] == 'me' and sum != '':
+					return say(args['nick'],sum)
