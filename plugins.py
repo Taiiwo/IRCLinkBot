@@ -220,7 +220,7 @@ class plugins(object):
 				if rat == 'error' or rat == 'none':
 					sum = urllib2.urlopen('http://thescoop.io/ots.php?tosum=' + args['argv'][2] + '&ratio=10')
 				elif rat != 'none' and rat != 'error':
-					sum = urllib2.urlopen('http://thescoop.io/ots.php?tosum=' args['argv'][2] + '&ratio=' + str(rat))
+					sum = urllib2.urlopen('http://thescoop.io/ots.php?tosum=' + args['argv'][2] + '&ratio=' + str(rat))
 				sum = re.sub('<[^<]+?>', '', sum)# strip HTML tags
 				sum = html_decode(sum)
 				if args['user'] in data['admins'] and sum != '':
