@@ -9,6 +9,7 @@
 #  numr = user specified value of how many links to ignore (int)
 #  channel = user specified channel name (str)
 from util import *
+import urllib
 class plugins(object):
 	def __init__(self,data):
 		from util import *
@@ -209,21 +210,18 @@ class plugins(object):
 	def scoop(self, data):
 		if '!scoop ' in data['recv']:
 			args = argv('!scoop',data['recv'])
-			if args['argv'][3] == '-r':
-				try:
-					rat = int(args['argv'][4])
-				except:
-					rat = 'error'# number is invalid, ignore
-			else:
-				rat = 'none'# no number submitted
 			if args['user'] in data['admins'] or args['argv'][1] == 'me':
-				if rat == 'error' or rat == 'none':
-					sum = urllib2.urlopen('http://thescoop.io/ots.php?tosum=' + args['argv'][2] + '&ratio=10')
-				elif rat != 'none' and rat != 'error':
-					sum = urllib2.urlopen('http://thescoop.io/ots.php?tosum=' + args['argv'][2] + '&ratio=' + str(rat))
+				sum = urllib2.urlopen('http://thescoop.io/ots.php?to_sum=' + str(args['argv'][2]) + '&ratio=10').read()
+				sum = " ".join(sum.split())
+				#print 'http://thescoop.io/ots.php?tosum=' + urllib.quote_plus(args['argv'][2]) + '&ratio=10'
 				sum = re.sub('<[^<]+?>', '', sum)# strip HTML tags
 				sum = html_decode(sum)
+				sum = sum.splitlines()
+				sum = ''.join(sum)
 				if args['user'] in data['admins'] and sum != '':
-					return say(args['argv'][1],sum)
+					if args['argv'][1] == "me":
+						return say(args['nick'],sum)
+					else:
+						return say(args['argv'][1],sum)
 				elif args['argv'][1] == 'me' and sum != '':
 					return say(args['nick'],sum)

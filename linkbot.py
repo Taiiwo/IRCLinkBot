@@ -13,7 +13,7 @@
 #Note: You need to install BeautifulSoup. sudo apt-get install python-BeautifulSoup
 #
 #Importing Libraries
-import socket, sys, re, urllib2, time, os, random, subprocess, plugins, util
+import socket, sys, re, urllib2, urllib, time, os, random, subprocess, plugins, util
 from plugins import *
 from BeautifulSoup import BeautifulSoup
 
