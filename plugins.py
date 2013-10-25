@@ -229,4 +229,4 @@ class plugins(object):
 		if '!send' in data['recv']:
 			args = argv('!send',data['recv'])
 			if args['user'] in data['admins']:
-				return ' '.join(args['argv'][1:])
+				return ' '.join(args['argv'][1:])+ '\r\n'
