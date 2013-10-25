@@ -18,7 +18,7 @@ from plugins import *
 from BeautifulSoup import BeautifulSoup
 
 #Settings:
-channel = "#426699t"
+channel = "#426699k"
 server = "irc.freenode.net"
 port = 6667 #6667 is the default irc port
 nick = "TaiiwoBot"
