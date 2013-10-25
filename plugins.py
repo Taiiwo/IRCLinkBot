@@ -168,7 +168,7 @@ class plugins(object):
 				arguments = args['argv'][0:len(args['argv']) - 1]
 				error = 0
 				for i in host:
-					if i.islower() or i.isupper() or i == '.':
+					if i.islower() or i.isupper() or '.' in i or '/' in i or ':' in i:
 						pass
 					else:
 						error = 1
@@ -225,3 +225,8 @@ class plugins(object):
 						return say(args['argv'][1],sum)
 				elif args['argv'][1] == 'me' and sum != '':
 					return say(args['nick'],sum)
+	def send(self, data):
+		if '!send' in data['recv']:
+			args = argv('!send',data['recv'])
+			if args['user'] in data['admins']:
+				return args['argv'][1:]
