@@ -10,6 +10,7 @@
 #  channel = user specified channel name (str)
 from util import *
 import urllib
+from lxml import etree
 class plugins(object):
 	def __init__(self,data):
 		from util import *
@@ -230,3 +231,10 @@ class plugins(object):
 			args = argv('!send',data['recv'])
 			if args['user'] in data['admins']:
 				return ' '.join(args['argv'][1:])+ '\r\n'
+	def wa(self, data):
+		if '!wa' in data['recv']:
+			args = argv('!wa',data['recv'])
+			response = urllib2.urlopen('http://api.wolframalpha.com/v2/query?input=pi&appid=Y76J7A-WKLWTY7RKJ').read()
+			tree = etree.XML(response)
+			answer = tree.findall('pod')[1].find('subpod').find('plaintext').text
+			return say(args['channel'],answer)						
