@@ -142,6 +142,7 @@ class plugins(object):
                         	if len(title) >= 150:#cap the length of titles
                         	        title = title[:150]
                         	title = html_decode(title)
+				title = title.encode('ascii', 'ignore')
                         	print title
 				error = 0
                		except:	
@@ -152,9 +153,9 @@ class plugins(object):
 				slink = self.nlink.decode("utf-8")
 				self.nlink = slink.encode("ascii","ignore")
                 	        if len(self.nlink) >= 53:
-					return 'privmsg ' + args['channel'] + ' : ^ ' + str(title) + " " + maketiny(self.nlink) + ' ^\r\n'
+					return 'privmsg ' + args['channel'] + ' :^ ' + str(title) + " " + maketiny(self.nlink) + ' ^\r\n'
                         	else:
-                                	return 'privmsg ' + args['channel'] + ' : ^ ' + str(title) + " ^\r\n"
+                                	return 'privmsg ' + args['channel'] + ' :^ ' + str(title) + " ^\r\n"
                		if error == 2 and urlsfound == True and self.nlink != "" and data['loop'] >= data['numr'] and len(self.nlink) >= 53:
                         	return 'privmsg ' + args['channel'] + ' : ^ ' + maketiny(self.nlink) + ' ^\r\n'
 			else:
