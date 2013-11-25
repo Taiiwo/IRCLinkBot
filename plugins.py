@@ -310,5 +310,5 @@ class plugins(object):
 			toret = []
 			for i in answer:
 				toret.append(say(args['channel'],i).encode('ascii', 'ignore'))
-			return say(args['channel'],answer)
+			return ''join(toret)
 
