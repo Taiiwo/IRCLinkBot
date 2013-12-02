@@ -18,7 +18,7 @@ from plugins import *
 from BeautifulSoup import BeautifulSoup
 
 #Settings:
-channel = "#426699k"
+channels = ["##426699k", "#33012013"]
 server = "irc.freenode.net"
 port = 6667 #6667 is the default irc port
 nick = "TaiiwoBot"
@@ -40,11 +40,11 @@ s.send('nick ' + nick + '\r\n')
 time.sleep(1)
 s.send('user 8 * ' + user + ' my name\r\n')
 time.sleep(1)
-print "[-]Joining channel..."
-s.send('join ' + channel + '\r\n')
-time.sleep(1)
-print "Sending login message..."
-s.send('privmsg ' + channel + ' :' + loginmessage + "\n\r")
+print "[-]Joining channels..."
+for channel in channels:
+	s.send('join ' + channel + '\r\n')
+	#Sending login message
+	s.send('privmsg ' + channel + ' :' + loginmessage + "\n\r")
 time.sleep(1)
 #setting variables
 recv = ""
