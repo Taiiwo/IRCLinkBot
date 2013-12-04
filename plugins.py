@@ -47,7 +47,7 @@ class plugins(object):
 			while loop == 1:
 				html = urllib2.urlopen('http://www.sickipedia.org/getjokes/random').read()
 				soup = BeautifulSoup(html)
-				joke = soup.body.find('div', attrs={'class':'jokeText').text
+				joke = soup.body.find('div', attrs={'class':'jokeText'}).text
 				if len(joke) <= 300:
 					loop = 0
 			ujoke = joke.decode("utf-8")
