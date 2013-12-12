@@ -20,10 +20,10 @@ from plugins import *
 from BeautifulSoup import BeautifulSoup
 
 #Settings:
-channels = ["#426699t"]
+channels = ["##426699k", "#33012013"]
 server = "irc.freenode.net"
 port = 6667 #6667 is the default irc port
-nick = "TaiiwoTest"
+nick = "TaiiwoBot"
 user = "Taiiwo"
 admins = ['taiiwo','trollstrich']
 loginmessage = "-- LinkBot v3.0 ONLINE --" #Leave blank for no message
