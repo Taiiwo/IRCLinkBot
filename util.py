@@ -54,6 +54,10 @@ def maketiny(url):# make a tinyurl from a string
         tiny = str(html.read())
         return tiny
 def f(function):
+	global message
+	global plugclass
+	global data
+	global s
 	try:
 		message = function(plugclass, data)
 	except Exception , err:
