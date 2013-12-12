@@ -77,7 +77,7 @@ while loop >= 0:
 		 'loop': loop ,'numr' : numr ,
 		 'channel' : channel,
 		 'plugclass' : plugclass}# format data to send to plugins
-	thread.start_new_thread(runplugins)
+	thread.start_new_thread(runplugins,())
 	if '!update' in recv and util.argv('!update',recv)['user'] in data['admins']:
         	status = 'Successful'
                 try:
