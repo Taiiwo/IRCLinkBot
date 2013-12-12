@@ -23,7 +23,7 @@ from BeautifulSoup import BeautifulSoup
 channels = ["#426699t"]
 server = "irc.freenode.net"
 port = 6667 #6667 is the default irc port
-nick = "TaiiwoBot"
+nick = "TaiiwoTest"
 user = "Taiiwo"
 admins = ['taiiwo','trollstrich']
 loginmessage = "-- LinkBot v3.0 ONLINE --" #Leave blank for no message
