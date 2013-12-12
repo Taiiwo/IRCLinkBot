@@ -66,6 +66,7 @@ while loop >= 0:
 		 'channel' : channel,
 		 'plugclass' : plugclass}# format data to send to plugins
 	for plugin in plugins.__dict__.values():
+		global message
 		message = None
 		thread.start_new_thread(f,(plugin,))
 	if '!update' in recv and util.argv('!update',recv)['user'] in data['admins']:
