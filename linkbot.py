@@ -58,7 +58,7 @@ def runplugins():# This is for threading
 	for plugin in plugins.__dict__.values():
 		message = None
         	try:
-        	        message = function(plugclass, data)
+        	        message = plugin(plugclass, data)
         	except Exception , err:
         	        print sys.exc_info()[1]
         	print message
