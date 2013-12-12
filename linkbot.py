@@ -13,9 +13,9 @@
 #Note: You need to install BeautifulSoup. sudo apt-get install python-BeautifulSoup
 #
 #Importing Libraries
-import socket, sys, re, urllib2, urllib, time,
+import socket, sys, re, urllib2, urllib, time
 import os, random, subprocess, plugins, util
-import thread
+import thread, json
 from plugins import *
 from BeautifulSoup import BeautifulSoup
 
