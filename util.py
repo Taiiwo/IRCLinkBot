@@ -53,15 +53,3 @@ def maketiny(url):# make a tinyurl from a string
         html = urllib2.urlopen("http://tinyurl.com/api-create.php?url=" + url)
         tiny = str(html.read())
         return tiny
-def f(function):
-	global message
-	global plugclass
-	global data
-	global s
-	try:
-		message = function(plugclass, data)
-	except Exception , err:
-		print sys.exc_info()[1]
-	print message
-	if message != '' and message != None:
-		s.send(str(message))

@@ -53,6 +53,18 @@ recv = ""
 loop = 0
 plugclass = plugins('')
 #input("Logged in yet?")
+def runplugins():# This is for threading
+	global message
+	for plugin in plugins.__dict__.values():
+		message = None
+        	try:
+        	        message = function(plugclass, data)
+        	except Exception , err:
+        	        print sys.exc_info()[1]
+        	print message
+        	if message != '' and message != None:
+        	        s.send(str(message))
+
 #### Begin loop ####
 while loop >= 0:
 	loop = loop + 1
@@ -65,10 +77,7 @@ while loop >= 0:
 		 'loop': loop ,'numr' : numr ,
 		 'channel' : channel,
 		 'plugclass' : plugclass}# format data to send to plugins
-	for plugin in plugins.__dict__.values():
-		global message
-		message = None
-		thread.start_new_thread(f,(plugin,))
+	thread.start_new_thread(runplugins)
 	if '!update' in recv and util.argv('!update',recv)['user'] in data['admins']:
         	status = 'Successful'
                 try:
