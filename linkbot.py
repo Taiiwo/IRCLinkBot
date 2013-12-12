@@ -13,12 +13,14 @@
 #Note: You need to install BeautifulSoup. sudo apt-get install python-BeautifulSoup
 #
 #Importing Libraries
-import socket, sys, re, urllib2, urllib, time, os, random, subprocess, plugins, util
+import socket, sys, re, urllib2, urllib, time,
+import os, random, subprocess, plugins, util
+import thread
 from plugins import *
 from BeautifulSoup import BeautifulSoup
 
 #Settings:
-channels = ["##426699k", "#33012013"]
+channels = ["#426699t"]
 server = "irc.freenode.net"
 port = 6667 #6667 is the default irc port
 nick = "TaiiwoBot"
@@ -65,14 +67,8 @@ while loop >= 0:
 		 'plugclass' : plugclass}# format data to send to plugins
 	for plugin in plugins.__dict__.values():
 		message = None
-		try:
-			message = plugin(plugclass,data)
-		except Exception , err:
-			print sys.exc_info()[1]
-		print message
-		if message != '' and message != None:
-			s.send(str(message))
-        if '!update' in recv and util.argv('!update',recv)['user'] in data['admins']:
+		thread.start_new_thread(f,(plugin))
+	if '!update' in recv and util.argv('!update',recv)['user'] in data['admins']:
         	status = 'Successful'
                 try:
                 	execfile('./plugins.py')
