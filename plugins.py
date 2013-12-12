@@ -311,3 +311,16 @@ class plugins(object):
 				toret.append(say(args['channel'],i).encode('ascii', 'ignore'))
 			return ''.join(toret)
 
+	def whoisonjoin(self, data):
+		#:Taiiwo!~Taiiwo@cpc3-nott16-2-0-cust414.12-2.cable.virginm.net JOIN ##426699k
+		if ' JOIN ' in data['recv']:
+			args = argv('JOIN',data['recv'])
+			return 'WHOIS ' + args['nick'] + '\r\n'
+	def autoop(self,data):
+		if ':End of /WHOIS list.' in data['recv']:
+			args = argv("", data['recv'])
+			if ':is logged in as' in data['recv']:
+				lastline = data['recv'].splitlines()[len(data['recv'].splitlines())-1]
+				for user in data['channelops']:
+					if textbetween(data['nick'],':End of /WHOIS list.',lastline) == user['nick']:
+						return 'MODE +o ' + user['channel'] + ' ' + user['nick'] + '\r\n'

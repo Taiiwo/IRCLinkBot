@@ -26,6 +26,12 @@ port = 6667 #6667 is the default irc port
 nick = "TaiiwoBot"
 user = "Taiiwo"
 admins = ['taiiwo','trollstrich']
+channelops = [
+		{
+			"channel":"#33012013",
+			"user":"Taiiwo"
+		}
+	]
 loginmessage = "-- LinkBot v3.0 ONLINE --" #Leave blank for no message
 recvbits = 315 #How many bits to wait for. This affects the max length of links.
 numr = 27 #Number of recvs to ignore on startup. This can be determined by running the script and checking when the
@@ -75,10 +81,12 @@ while loop >= 0:
 	print recv #prints everything received from freenode. Remove this to clean up the debugging
 	#iterate through plugins executing all functions
 	data = {'admins' : admins,
-		 's': s ,'recv': recv ,
-		 'loop': loop ,'numr' : numr ,
-		 'channel' : channel,
-		 'plugclass' : plugclass}# format data to send to plugins
+		's': s ,'recv': recv ,
+		'nick':nick,
+		'loop': loop ,'numr' : numr ,
+		'channel' : channel,
+		'channelops':channelops,
+		'plugclass' : plugclass}# format data to send to plugins
 	thread.start_new_thread(runplugins,())
 	if '!update' in recv and util.argv('!update',recv)['user'] in data['admins']:
         	status = 'Successful'
