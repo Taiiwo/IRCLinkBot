@@ -63,7 +63,9 @@ def runplugins():# This is for threading
         	        print sys.exc_info()[1]
         	print message
         	if message != '' and message != None:
-        	        s.send(str(message))
+        	        for msg in message.splitlines():
+				s.send(str(message))
+				time.sleep(0.1)
 
 #### Begin loop ####
 while loop >= 0:
