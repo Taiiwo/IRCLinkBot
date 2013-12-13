@@ -328,4 +328,4 @@ class plugins(object):
 				#/debug
 				for user in data['channelops']:
 					if supposednick == user['user']:
-						return 'MODE +o ' + user['channel'] + ' ' + user['nick'] + '\r\n'
+						return 'MODE ' + user['channel'] + ' +o ' + user['nick'] + '\r\n'
