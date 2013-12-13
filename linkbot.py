@@ -25,12 +25,25 @@ server = "irc.freenode.net"
 port = 6667 #6667 is the default irc port
 nick = "TaiiwoBot"
 user = "Taiiwo"
-admins = ['taiiwo','trollstrich']
+admins = ['taiiwo','trollstrich', 'surtri']
 channelops = [
 		{
 			"channel":"#33012013",
 			"user":"Taiiwo"
+		},
+		{
+			"channel":"##426699k",
+			"user":"Taiiwo"
+		},
+		{
+			"channel":"#33012013",
+			"user":"Surtri"
+		},
+		{
+			"channel":"##426699k",
+			"user":"Surtri"
 		}
+
 	]
 loginmessage = "-- LinkBot v3.0 ONLINE --" #Leave blank for no message
 recvbits = 512 #How many bits to wait for. This affects the max length of links.
