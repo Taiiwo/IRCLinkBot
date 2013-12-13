@@ -322,5 +322,5 @@ class plugins(object):
 			if ':is logged in as' in data['recv']:
 				lastline = data['recv'].splitlines()[len(data['recv'].splitlines())-1]
 				for user in data['channelops']:
-					if textbetween(data['nick'],':End of /WHOIS list.',lastline) == user['nick']:
+					if textbetween(data['nick']+' ',' :End of /WHOIS list.',lastline) == user['nick']:
 						return 'MODE +o ' + user['channel'] + ' ' + user['nick'] + '\r\n'
