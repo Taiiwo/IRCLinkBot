@@ -327,5 +327,5 @@ class plugins(object):
 				print supposednick
 				#/debug
 				for user in data['channelops']:
-					if supposednick == user['nick']:
+					if supposednick == user['user']:
 						return 'MODE +o ' + user['channel'] + ' ' + user['nick'] + '\r\n'
