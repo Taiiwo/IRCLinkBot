@@ -79,7 +79,9 @@ def runplugins():# This is for threading
         	try:
         	        message = plugin(plugclass, data)
         	except Exception , err:
-        	        print sys.exc_info()[1]
+        	        errormsg = sys.exc_info()[1]
+			if errormsg != None:
+				print errormsg
         	print message
         	if message != '' and message != None:
         	        for msg in message.split('\n'):
