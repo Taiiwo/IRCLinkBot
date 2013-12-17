@@ -73,7 +73,6 @@ loop = 0
 plugclass = plugins('')
 #input("Logged in yet?")
 def runplugins():# This is for threading
-	global message
 	for plugin in plugins.__dict__.values():
 		message = None
         	try:
