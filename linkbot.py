@@ -37,6 +37,10 @@ channelops = [
 		},
 		{
 			"channel":"#33012013",
+			"user":"absence_"
+		},
+		{
+			"channel":"#33012013",
 			"user":"Surtri"
 		},
 		{
