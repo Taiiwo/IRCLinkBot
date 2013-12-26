@@ -100,32 +100,15 @@ while loop >= 0:
 	print recv #prints everything received from freenode. Remove this to clean up the debugging
 	#iterate through plugins executing all functions
 	data = {'admins' : admins,
-<<<<<<< HEAD
-		 's': s ,'recv': recv ,
-		 'loop': loop ,'numr' : numr ,
-		 'channel' : channel,
-		 'maxspam' : maxspam,
-		 'plugclass' : plugclass}# format data to send to plugins
-	for plugin in plugins.__dict__.values():
-		message = None
-		try:
-			message = plugin(plugclass,data)
-		except Exception , err:
-			print sys.exc_info()[1]
-		print message
-		if message != '' and message != None:
-			s.send(str(message))
-        if '!update' in recv and util.argv('!update',recv)['user'] in data['admins']:
-=======
 		's': s ,'recv': recv ,
 		'nick':nick,
 		'loop': loop ,'numr' : numr ,
 		'channel' : channel,
+		'maxspam' : maxspam,
 		'channelops':channelops,
 		'plugclass' : plugclass}# format data to send to plugins
 	thread.start_new_thread(runplugins,())
 	if '!update' in recv and util.argv('!update',recv)['user'] in data['admins']:
->>>>>>> 5798b4505b44964c9f1f4091c1a68c7e7499eced
         	status = 'Successful'
                 try:
                 	execfile('./plugins.py')

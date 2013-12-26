@@ -226,7 +226,6 @@ class plugins(object):
 						return say(args['argv'][1],sum)
 				elif args['argv'][1] == 'me' and sum != '':
 					return say(args['nick'],sum)
-<<<<<<< HEAD
 	def spambot(self,data):
 		global lastmessage
 		global spamcount
@@ -235,7 +234,7 @@ class plugins(object):
 		if spamcount >= data['maxspam']:
 			args = argv('@',data['recv'])
 			return 'mode ' + args['channel'] + ' +k ' + args['nick'] + '\r\n'
-=======
+
 	def send(self, data):
 		if '!send' in data['recv']:
 			args = argv('!send',data['recv'])
@@ -339,4 +338,3 @@ class plugins(object):
 				for user in data['channelops']:
 					if supposednick == user['user']:
 						return 'MODE ' + user['channel'] + ' +o ' + user['user'] + '\r\n'
->>>>>>> 5798b4505b44964c9f1f4091c1a68c7e7499eced
