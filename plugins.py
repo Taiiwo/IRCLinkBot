@@ -115,8 +115,8 @@ class plugins(object):
 		args = argv(' :',data['recv'])
 		if not hasattr(self, "link"):# it doesn't exist yet, so initialize it
 			self.link2 = ''
-		self.nlink = ''
-		self.link = ''
+			self.nlink = ''
+			self.link = ''
 		urlsfound = True
 	        try:#look for urls in recv
 	                self.link2 = self.link#make a backup of last url
@@ -227,13 +227,17 @@ class plugins(object):
 				elif args['argv'][1] == 'me' and sum != '':
 					return say(args['nick'],sum)
 	def spambot(self,data):
-		global lastmessage
-		global spamcount
-		if data['recv'] == lastmessage:
-			spamcount += 1
-		if spamcount >= data['maxspam']:
+		if not hasattr(self, 'lastmessage'):
+			self.lastmessage = None
+		if not hasattr(self, 'spamcount'):
+			self.spamcount = 0
+		if data['recv'] == self.lastmessage:
+			self.spamcount += 1
+		if self.spamcount >= data['maxspam']:
 			args = argv('@',data['recv'])
-			return 'mode ' + args['channel'] + ' +k ' + args['nick'] + '\r\n'
+			self.spamcount = 0
+			return 'kick ' + args['channel'] + ' ' + args['nick'] + ' Spam\r\n'
+		self.lastmessage = data['recv']
 
 	def send(self, data):
 		if '!send' in data['recv']:
