@@ -236,6 +236,7 @@ class plugins(object):
 		if self.spamcount >= data['maxspam']:
 			args = argv('@',data['recv'])
 			self.spamcount = 0
+			self.lastmessage = data['recv']
 			return 'kick ' + args['channel'] + ' ' + args['nick'] + ' Spam\r\n'
 		self.lastmessage = data['recv']
 

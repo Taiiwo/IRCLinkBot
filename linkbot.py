@@ -26,7 +26,7 @@ server = "irc.freenode.net"
 port = 6667 #6667 is the default irc port
 nick = "TaiiwoBot"
 user = "Taiiwo"
-maxspam = 4 #number of identical message people can send to the channel before being kicked. 1 for off.
+maxspam = 6 #number of identical message people can send to the channel before being kicked. 1 for off.
 admins = ['taiiwo','trollstrich', 'surtri']
 channelops = [
 		{
