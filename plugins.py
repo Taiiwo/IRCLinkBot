@@ -233,6 +233,8 @@ class plugins(object):
 			self.spamcount = 0
 		if data['recv'] == self.lastmessage:
 			self.spamcount += 1
+		else:
+			self.spamcount = 0
 		if self.spamcount >= data['maxspam']:
 			args = argv('@',data['recv'])
 			self.spamcount = 0
