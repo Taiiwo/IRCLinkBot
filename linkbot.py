@@ -18,12 +18,13 @@ from plugins import *
 from BeautifulSoup import BeautifulSoup
 
 #Settings:
-channel = "#426699t"
+channel = "##426699k"
 server = "irc.freenode.net"
 port = 6667 #6667 is the default irc port
-nick = "TaiiwoBot"
-user = "Taiiwo"
+nick = "VanillaBot"
+user = "VanillaCoke"
 admins = ['taiiwo','trollstrich']
+maxspam = 6 #number of identical message people can send to the channel before being kicked. 1 for off.
 loginmessage = "-- LinkBot v3.0 ONLINE --" #Leave blank for no message
 recvbits = 315 #How many bits to wait for. This affects the max length of links.
 numr = 27 #Number of recvs to ignore on startup. This can be determined by running the script and checking when the
@@ -62,6 +63,7 @@ while loop >= 0:
 		 's': s ,'recv': recv ,
 		 'loop': loop ,'numr' : numr ,
 		 'channel' : channel,
+		 'maxspam' : maxspam,
 		 'plugclass' : plugclass}# format data to send to plugins
 	for plugin in plugins.__dict__.values():
 		message = None
