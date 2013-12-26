@@ -9,6 +9,8 @@
 #  numr = user specified value of how many links to ignore (int)
 #  channel = user specified channel name (str)
 from util import *
+import urllib, json
+from lxml import etree
 class plugins(object):
 	def __init__(self,data):
 		from util import *
@@ -45,8 +47,7 @@ class plugins(object):
 			while loop == 1:
 				html = urllib2.urlopen('http://www.sickipedia.org/getjokes/random').read()
 				soup = BeautifulSoup(html)
-				table = soup.body.findAll('table')[3]
-				joke = table.findAll('td')[0].text
+				joke = soup.body.find('div', attrs={'class':'jokeText'}).text
 				if len(joke) <= 300:
 					loop = 0
 			ujoke = joke.decode("utf-8")
@@ -140,6 +141,7 @@ class plugins(object):
                         	if len(title) >= 150:#cap the length of titles
                         	        title = title[:150]
                         	title = html_decode(title)
+				title = title.encode('ascii', 'ignore')
                         	print title
 				error = 0
                		except:	
@@ -150,9 +152,9 @@ class plugins(object):
 				slink = self.nlink.decode("utf-8")
 				self.nlink = slink.encode("ascii","ignore")
                 	        if len(self.nlink) >= 53:
-					return 'privmsg ' + args['channel'] + ' : ^ ' + str(title) + " " + maketiny(self.nlink) + ' ^\r\n'
+					return 'privmsg ' + args['channel'] + ' :^ ' + str(title) + " " + maketiny(self.nlink) + ' ^\r\n'
                         	else:
-                                	return 'privmsg ' + args['channel'] + ' : ^ ' + str(title) + " ^\r\n"
+                                	return 'privmsg ' + args['channel'] + ' :^ ' + str(title) + " ^\r\n"
                		if error == 2 and urlsfound == True and self.nlink != "" and data['loop'] >= data['numr'] and len(self.nlink) >= 53:
                         	return 'privmsg ' + args['channel'] + ' : ^ ' + maketiny(self.nlink) + ' ^\r\n'
 			else:
@@ -167,7 +169,7 @@ class plugins(object):
 				arguments = args['argv'][0:len(args['argv']) - 1]
 				error = 0
 				for i in host:
-					if i.islower() or i.isupper() or i == '.':
+					if i.islower() or i.isupper() or '.' in i or '/' in i or ':' in i:
 						pass
 					else:
 						error = 1
@@ -209,24 +211,22 @@ class plugins(object):
 	def scoop(self, data):
 		if '!scoop ' in data['recv']:
 			args = argv('!scoop',data['recv'])
-			if args['argv'][3] == '-r':
-				try:
-					rat = int(args['argv'][4])
-				except:
-					rat = 'error'# number is invalid, ignore
-			else:
-				rat = 'none'# no number submitted
 			if args['user'] in data['admins'] or args['argv'][1] == 'me':
-				if rat == 'error' or rat == 'none':
-					sum = urllib2.urlopen('http://thescoop.io/ots.php?tosum=' + args['argv'][2] + '&ratio=10')
-				elif rat != 'none' and rat != 'error':
-					sum = urllib2.urlopen('http://thescoop.io/ots.php?tosum=' + args['argv'][2] + '&ratio=' + str(rat))
+				sum = urllib2.urlopen('http://thescoop.io/ots.php?to_sum=' + str(args['argv'][2]) + '&ratio=10').read()
+				sum = " ".join(sum.split())
+				#print 'http://thescoop.io/ots.php?tosum=' + urllib.quote_plus(args['argv'][2]) + '&ratio=10'
 				sum = re.sub('<[^<]+?>', '', sum)# strip HTML tags
 				sum = html_decode(sum)
+				sum = sum.splitlines()
+				sum = ''.join(sum)
 				if args['user'] in data['admins'] and sum != '':
-					return say(args['argv'][1],sum)
+					if args['argv'][1] == "me":
+						return say(args['nick'],sum)
+					else:
+						return say(args['argv'][1],sum)
 				elif args['argv'][1] == 'me' and sum != '':
 					return say(args['nick'],sum)
+<<<<<<< HEAD
 	def spambot(self,data):
 		global lastmessage
 		global spamcount
@@ -235,3 +235,108 @@ class plugins(object):
 		if spamcount >= data['maxspam']:
 			args = argv('@',data['recv'])
 			return 'mode ' + args['channel'] + ' +k ' + args['nick'] + '\r\n'
+=======
+	def send(self, data):
+		if '!send' in data['recv']:
+			args = argv('!send',data['recv'])
+			if args['user'] in data['admins']:
+				return ' '.join(args['argv'][1:])+ '\r\n'
+
+	def chansearch(self, data):
+	    if '!4search' in data['recv']:
+	        args = argv('!4search',data['recv'])
+	        if args['argv'][1] == 'usage':
+	            return say(args['channel'], '!4search b op/all Taiiwo Trollstrich TJ')
+	        board = args['argv'][1]
+	        arg = args['argv'][2]#Should be either all or op
+            words = args['argv'][3:]
+            #Doing stupid TJ's suggestion:
+            for word in words:
+                for letter in word:
+                    if letter == '-':
+                        letter = ' '
+            results = []
+            rawjson = urllib2.urlopen('http://api.4chan.org/' + board + '/catalog.json').read()
+            time.sleep(1)
+            parsedjson = json.loads(rawjson)
+            count = 0
+            pagecount = 0
+            retme = []
+            for page in parsedjson:
+                print 'Searching page ' + str(count)
+                count += 1
+                threadcount = 0
+                for thread in page['threads']:
+                    if 'args' in locals():
+                        if arg != 'op':
+                            print 'On thread ' + str(threadcount)
+                            threadcount += 1
+                            #get thread number
+                            num = thread['no']
+                            try:
+                                rawreplies = urllib2.urlopen('http://api.4chan.org/' + board + '/res/' + str(num) + '.json').read()
+                            except:
+                                print "Thread 404'd"
+                                break
+                            time.sleep(0.00001)
+                            parsedreplies = json.loads(rawreplies)
+                            for post in parsedreplies['posts']:
+                                if 'com' in post:
+                                    for string in words:
+                                        if string in post['com']: # (Thinking of checking post['name']
+                                            if num == post['no']:
+                                                retme.append('http://boards.4chan.org/' + board + '/res/' + str(num))
+                                                print 'http://boards.4chan.org/' + board + '/res/' + str(num)
+                                            else:
+                                                retme.append('http://boards.4chan.org/' + board + '/res/' + str(num) + '#p' + str(post['no']))
+                                                print 'http://boards.4chan.org/' + board + '/res/' + str(num) + '#p' + str(post['no'])
+                        else:
+                            #print pagecount
+                            pagecount += 1
+                            if 'com' in thread:
+                                for string in words:
+                                    if string in thread['com']:
+                                        retme.append('http://boards.4chan.org/' + board + '/res/' + str(thread['no']))
+                                        print 'http://boards.4chan.org/' + board + '/res/' + str(thread['no'])
+            if retme == []:
+                return say(args['nick'], "No threads found")
+            retmeforrealthistime = []
+            lt = 15
+            appendloop = 0
+            for i in retme:
+                if appendloop <= lt:
+                    retmeforrealthistime.append(say(args['nick'], i))
+                appendloop += 1
+            return ''.join(retmeforrealthistime)
+	def wa(self, data):
+		if '!wa' in data['recv']:
+			args = argv('!wa',data['recv'])
+			query = '%20'.join(args['argv'][1:])
+			response = urllib2.urlopen('http://api.wolframalpha.com/v2/query?input=' + query + '&appid=Y76J7A-WKLWTY7RKJ').read()
+			tree = etree.XML(response)
+			answer = tree.findall('pod')[1].find('subpod').find('plaintext').text
+			answer = answer.split('\n')
+			toret = []
+			for i in answer:
+				toret.append(say(args['channel'],i).encode('ascii', 'ignore'))
+			return ''.join(toret)
+
+	def whoisonjoin(self, data):
+		#:Taiiwo!~Taiiwo@cpc3-nott16-2-0-cust414.12-2.cable.virginm.net JOIN ##426699k
+		if ' JOIN ' in data['recv']:
+			args = argv('JOIN',data['recv'])
+			return 'WHOIS ' + args['nick'] + '\r\n'
+	def autoop(self,data):
+		if ':End of /WHOIS list.' in data['recv']:
+			args = argv("", data['recv'])
+			if ':is logged in as' in data['recv']:
+				lastline = data['recv'].splitlines()[len(data['recv'].splitlines())-1]
+				supposednick = textbetween(data['nick']+' ',' :End of /WHOIS list.',lastline)
+				#debug
+				print lastline
+				print supposednick
+				#/debug
+				for user in data['channelops']:
+					if supposednick == user['user']:
+						return 'MODE ' + user['channel'] + ' +o ' + user['user'] + '\r\n'
+>>>>>>> 5798b4505b44964c9f1f4091c1a68c7e7499eced
