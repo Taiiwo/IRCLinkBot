@@ -227,20 +227,22 @@ class plugins(object):
 				elif args['argv'][1] == 'me' and sum != '':
 					return say(args['nick'],sum)
 	def spambot(self,data):
+		# set root variables
 		if not hasattr(self, 'lastmessage'):
-			self.lastmessage = None
+			self.lastmessage = {'nick':None,'msg':None}
 		if not hasattr(self, 'spamcount'):
 			self.spamcount = 0
-		if data['recv'] == self.lastmessage:
+		# if the same message is posted twice
+		args = argv('@', data['recv'])
+		if data['recv'] == self.lastmessage['msg'] and args['nick'] == self.lastmessage['nick']:
 			self.spamcount += 1
 		else:
 			self.spamcount = 0
 		if self.spamcount >= data['maxspam']:
-			args = argv('@',data['recv'])
 			self.spamcount = 0
-			self.lastmessage = data['recv']
+			self.lastmessage = {'nick':args['nick'],'msg':data['recv']}
 			return 'kick ' + args['channel'] + ' ' + args['nick'] + ' Spam\r\n'
-		self.lastmessage = data['recv']
+		self.lastmessage = {'nick':args['nick'],'msg':data['recv']}
 
 	def send(self, data):
 		if '!send' in data['recv']:
