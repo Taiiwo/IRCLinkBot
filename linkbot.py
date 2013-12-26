@@ -27,7 +27,6 @@ port = 6667 #6667 is the default irc port
 nick = "TaiiwoBot"
 user = "Taiiwo"
 maxspam = 6 #number of identical message people can send to the channel before being kicked. 1 for off.
-admins = ['taiiwo','trollstrich', 'surtri']
 channelops = [
 		{
 			"channel":"#33012013",
@@ -36,10 +35,6 @@ channelops = [
 		{
 			"channel":"##426699k",
 			"user":"Taiiwo"
-		},
-		{
-			"channel":"#33012013",
-			"user":"absence_"
 		},
 		{
 			"channel":"#33012013",
@@ -87,7 +82,8 @@ def runplugins():# This is for threading
         	        errormsg = sys.exc_info()[1]
 			if errormsg != None:
 				print errormsg
-        	print message
+		if message != None and message != '':
+	        	print message
         	if message != '' and message != None:
         	        for msg in message.split('\n'):
 				s.send(str(msg))
@@ -100,7 +96,7 @@ while loop >= 0:
 	time.sleep(0.05)#space out the loop so as not to run too fast
 	print recv #prints everything received from freenode. Remove this to clean up the debugging
 	#iterate through plugins executing all functions
-	data = {'admins' : admins,
+	data = {
 		's': s ,'recv': recv ,
 		'nick':nick,
 		'loop': loop ,'numr' : numr ,

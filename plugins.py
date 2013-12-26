@@ -22,10 +22,10 @@ class plugins(object):
 		else:
 			return ''
         def say(self,data):
-		message = argv("!say", data['recv'])
-	        if message['argv'][0] == '!say' and message['user'] in data['admins']:
-			say = ' '.join(message['argv'][2:])
-	                return 'privmsg ' + message['argv'][1] + ' :' + say + '\r\n'
+		args = argv("!say", data['recv'])
+	        if args['argv'][0] == '!say' and args['nick'] in self.authnick:
+			say = ' '.join(args['argv'][2:])
+	                return 'privmsg ' + args['argv'][1] + ' :' + say + '\r\n'
         def rfl(self,data):
 		message = command("!rfl", data['recv'])
         	if str(message) != 'None':
@@ -164,7 +164,7 @@ class plugins(object):
 	def nmap(self,data):
 		if '!nmap' in data['recv']:
 			args = argv('!nmap',data['recv'])
-			if args['user'] in data['admins']:
+			if args['user'] in self.authnick:
 				host = args['argv'][len(args['argv']) - 1]
 				arguments = args['argv'][0:len(args['argv']) - 1]
 				error = 0
@@ -199,19 +199,19 @@ class plugins(object):
 			message = argv('!join',data['recv'])
 		except:
 			message = ''
-		if message != '' and message['user'] in data['admins']:
+		if message != '' and message['user'] in self.authnick:
 			return 'JOIN ' + message['argv'][1] + '\r\n'
 	def leave(self,data):
                 try:
                         message = argv('!leave',data['recv'])
                 except:
                         message = ''
-                if message != '' and message['user'] in data['admins']:
+                if message != '' and message['user'] in self.authnick:
                         return 'PART ' + message['argv'][1] + '\r\n'
 	def scoop(self, data):
 		if '!scoop ' in data['recv']:
 			args = argv('!scoop',data['recv'])
-			if args['user'] in data['admins'] or args['argv'][1] == 'me':
+			if args['user'] in self.authnick or args['argv'][1] == 'me':
 				sum = urllib2.urlopen('http://thescoop.io/ots.php?to_sum=' + str(args['argv'][2]) + '&ratio=10').read()
 				sum = " ".join(sum.split())
 				#print 'http://thescoop.io/ots.php?tosum=' + urllib.quote_plus(args['argv'][2]) + '&ratio=10'
@@ -219,7 +219,7 @@ class plugins(object):
 				sum = html_decode(sum)
 				sum = sum.splitlines()
 				sum = ''.join(sum)
-				if args['user'] in data['admins'] and sum != '':
+				if args['user'] in self.authnick and sum != '':
 					if args['argv'][1] == "me":
 						return say(args['nick'],sum)
 					else:
@@ -245,7 +245,7 @@ class plugins(object):
 	def send(self, data):
 		if '!send' in data['recv']:
 			args = argv('!send',data['recv'])
-			if args['user'] in data['admins']:
+			if args['nick'] in self.authnick:
 				return ' '.join(args['argv'][1:])+ '\r\n'
 
 	def chansearch(self, data):
@@ -344,4 +344,15 @@ class plugins(object):
 				#/debug
 				for user in data['channelops']:
 					if supposednick == user['user']:
+						if not hasattr(self, 'authnick'):
+							self.authnick = []
+						if not user['user'] in self.authnick:
+							self.authnick.append(user['user'])
+							print 'nicklist: ' + str(self.authnick)
 						return 'MODE ' + user['channel'] + ' +o ' + user['user'] + '\r\n'
+			elif args['nick'] in self.authnick:
+				self.authnick.remove(args['nick'])
+	def authme(self, data):
+		if '!authme' in data['recv']:
+			args = argv('!authme',data['recv'])
+			return 'WHOIS ' + args['nick'] + '\r\n'
