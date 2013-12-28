@@ -148,7 +148,8 @@ class plugins(object):
 				error = 0
                		except:	
                 	        print "[E]No valid title"
-				urlsfound = False
+				if not 'http' in data['recv']:
+					urlsfound = False
                 	        error = 2
                 	#post title to irc
                 	if error == 0 and data['loop'] >= data['numr']:
