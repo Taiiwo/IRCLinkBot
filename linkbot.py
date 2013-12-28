@@ -73,6 +73,7 @@ time.sleep(1)
 recv = ""
 loop = 0
 plugclass = plugins('')
+f = open (nick + '.log','a')
 #input("Logged in yet?")
 def runplugins():# This is for threading
 	for plugin in plugins.__dict__.values():
@@ -120,3 +121,4 @@ while loop >= 0:
                 s.send(util.say(args['channel'],'Dynamic update: ' + status))
 	#get recv last. I thought this would be a good idea. I can't remember why, but there was a reason.
 	recv = s.recv(recvbits)	
+	f.write(recv)
