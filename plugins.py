@@ -76,16 +76,13 @@ class plugins(object):
         	                        print '[Server Error (Not my fault)]'
         	                        error = 1
         def roll(self,data):
-		message = command('!r', data['recv'])
-        	if str(message) != 'None':
-			if 'd' in message or 'D' in message:
-				args = argv('!r', data['recv'])
-				message.replace('D','d')
-				pos_of_d = re.search(r"[^a-zA-Z](d)[^a-zA-Z]", message).start(1)
-				num_of_dice = message[:pos_of_d]
-				print num_of_dice
-				dice_value = message[pos_of_d + 1:]
-				print dice_value
+		if '!r' in data['recv']:
+			args = argv('!r', data['recv'])
+			if 'd' in args['argv'][1] or 'D' in args['argv'][1]:
+				args['argv'][1].replace('D','d')
+				pos_of_d = re.search(r"[^a-zA-Z](d)[^a-zA-Z]", args['argv'][1]).start(1)
+				num_of_dice = args['argv'][1][:pos_of_d]
+				dice_value = args['argv'][1][pos_of_d + 1:]
 				try:
                                         num_of_dice = int(num_of_dice)
 					dice_value = int(dice_value)
@@ -103,14 +100,13 @@ class plugins(object):
 					return ''
 			else:
         	        	try:
-        	        	        int(message)
+        	        	        int(args['argv'][1])
         	        	        error = 0
         	        	except:
         	        	        error = 1
-        	        	if error != 1 and len(message) < 10 and int(message) >= 1:
-					args = argv('!r', data['recv'])
+        	        	if error != 1 and len(args['argv'][1]) < 10 and int(args['argv'][1]) >= 1:
 					print args['channel']
-        	        	        return 'PRIVMSG '+ args['channel'] +' :' + str(random.randint(1,int(message))) + '\r\n'
+        	        	        return 'PRIVMSG '+ args['channel'] +' :' + str(random.randint(1,int(args['argv'][1]))) + '\r\n'
 	def linkbot(self,data):
 		args = argv('@',data['recv'])
 		if not hasattr(self, "link"):# it doesn't exist yet, so initialize it
@@ -199,19 +195,15 @@ class plugins(object):
 			else:
 				return say(args['channel'], 'You are not my daddy, ' + args['nick'] + '.')
 	def join(self,data):
-		try:
-			message = argv('!join',data['recv'])
-		except:
-			message = ''
-		if message != '' and message['user'] in self.authnick:
-			return 'JOIN ' + message['argv'][1] + '\r\n'
+		if '!join' in data['recv']:
+			args = argv('!join',data['recv'])
+			if args['nick'] in self.authnick:
+				return 'JOIN ' + args['argv'][1] + '\r\n'
 	def leave(self,data):
-                try:
-                        message = argv('!leave',data['recv'])
-                except:
-                        message = ''
-                if message != '' and message['user'] in self.authnick:
-                        return 'PART ' + message['argv'][1] + '\r\n'
+		if '!leave' in data['recv']:
+			args = argv('!leave',data['recv'])
+			if args['nick'] in self.authnick:
+                        	return 'PART ' + args['argv'][1] + '\r\n'
 	def scoop(self, data):
 		if '!scoop ' in data['recv']:
 			args = argv('!scoop',data['recv'])

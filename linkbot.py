@@ -47,7 +47,7 @@ channelops = [
 		}
 
 	]
-loginmessage = "-- LinkBot v3.0 ONLINE --" #Leave blank for no message
+loginmessage = "-- LinkBot v3.5 ONLINE --" #Leave blank for no message
 recvbits = 512 #How many bits to wait for. This affects the max length of links.
 numr = 17 #Number of recvs to ignore on startup. This can be determined by running the script and checking when the
 	#last title was send to the chat by the number printed in square brackets.
