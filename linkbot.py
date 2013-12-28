@@ -25,6 +25,7 @@ channels = ["##426699k", "#33012013"]
 server = "irc.freenode.net"
 port = 6667 #6667 is the default irc port
 nick = "TaiiwoBot"
+#nick = "TaiiwoTest"
 user = "Taiiwo"
 maxspam = 6 #number of identical message people can send to the channel before being kicked. 1 for off.
 channelops = [
@@ -48,7 +49,7 @@ channelops = [
 	]
 loginmessage = "-- LinkBot v3.0 ONLINE --" #Leave blank for no message
 recvbits = 512 #How many bits to wait for. This affects the max length of links.
-numr = 27 #Number of recvs to ignore on startup. This can be determined by running the script and checking when the
+numr = 17 #Number of recvs to ignore on startup. This can be determined by running the script and checking when the
 	#last title was send to the chat by the number printed in square brackets.
 #### Preparing for loop ####
 s = socket.socket(socket.AF_INET,socket.SOCK_STREAM) #making socket
@@ -77,6 +78,7 @@ def runplugins():# This is for threading
 	for plugin in plugins.__dict__.values():
 		message = None
         	try:
+			#time.sleep(0.01)
         	        message = plugin(plugclass, data)
         	except Exception , err:
         	        errormsg = sys.exc_info()[1]

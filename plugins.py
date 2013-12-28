@@ -112,7 +112,7 @@ class plugins(object):
 					print args['channel']
         	        	        return 'PRIVMSG '+ args['channel'] +' :' + str(random.randint(1,int(message))) + '\r\n'
 	def linkbot(self,data):
-		args = argv(' :',data['recv'])
+		args = argv('@',data['recv'])
 		if not hasattr(self, "link"):# it doesn't exist yet, so initialize it
 			self.link2 = ''
 			self.nlink = ''
@@ -121,6 +121,8 @@ class plugins(object):
 	        try:#look for urls in recv
 	                self.link2 = self.link#make a backup of last url
 	                self.link = geturl(data['recv'])
+			if self.link == '':
+				raise Exception("No links found.")
 	                print self.link
 			error = 0
 	        except Exception , err:
@@ -146,6 +148,7 @@ class plugins(object):
 				error = 0
                		except:	
                 	        print "[E]No valid title"
+				urlsfound = False
                 	        error = 2
                 	#post title to irc
                 	if error == 0 and data['loop'] >= data['numr']:
@@ -155,7 +158,7 @@ class plugins(object):
 					return 'privmsg ' + args['channel'] + ' :^ ' + str(title) + " " + maketiny(self.nlink) + ' ^\r\n'
                         	else:
                                 	return 'privmsg ' + args['channel'] + ' :^ ' + str(title) + " ^\r\n"
-               		if error == 2 and urlsfound == True and self.nlink != "" and data['loop'] >= data['numr'] and len(self.nlink) >= 53:
+               		if error == 2 and urlsfound and self.nlink != "" and data['loop'] >= data['numr'] and len(self.nlink) >= 53:
                         	return 'privmsg ' + args['channel'] + ' : ^ ' + maketiny(self.nlink) + ' ^\r\n'
 			else:
 				return ''
