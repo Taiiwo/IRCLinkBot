@@ -8,9 +8,10 @@
 #  loop = The number of messages the bot has processed so far (int)
 #  numr = user specified value of how many links to ignore (int)
 #  channel = user specified channel name (str)
-from util import *
 import urllib, json
+from util import *
 from lxml import etree
+from shodan import WebAPI
 class plugins(object):
 	def __init__(self,data):
 		from util import *
@@ -354,3 +355,29 @@ class plugins(object):
 		if '!authme' in data['recv']:
 			args = argv('!authme',data['recv'])
 			return 'WHOIS ' + args['nick'] + '\r\n'
+	def locateip(self, data):
+		if '!locateip' in data['recv']:
+			args = argv('!locateip',data['recv'])
+			api = WebAPI("KpYC07EoGBtGarTFXCpjsspMVQ0a5Aus")#don look
+			query = args['argv'][1]
+			try:
+				socket.inet_aton(query)
+			except socket.error:
+				return None
+			results = api.host(query)
+			output = []
+			output.append('OS: ' + str(results['os']))
+			output.append('City: ' + str(results['city']) + '\tPostal code: ' + str(results['postal_code']))
+			output.append('Area code: ' + str(results['area_code']) + '\t\tCountry code: ' + str(results['country_code']))
+			output.append('Region name: ' + str(results['region_name']) + '\tCountry name: ' + str(results['country_name']))
+			output.append('Latitude: ' + str(results['latitude']) + '\tLongitude: ' + str(results['longitude']))
+			ports = []
+			for data in results['data']:
+				port = data['port']
+				if not str(port) in ports:
+					ports.append(str(port))
+			output.append('Open ports: ' + ', '.join(ports))
+			ircoutput = ''
+			for line in output:
+				ircoutput += say(args['channel'],line)
+			return ircoutput

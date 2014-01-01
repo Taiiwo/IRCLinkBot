@@ -73,7 +73,7 @@ time.sleep(1)
 recv = ""
 loop = 0
 plugclass = plugins('')
-f = open (nick + '.log','a')
+f = open (nick + 'Log.txt','a')
 #input("Logged in yet?")
 def runplugins():# This is for threading
 	for plugin in plugins.__dict__.values():
@@ -98,6 +98,7 @@ while loop >= 0:
 	print loop #print the number of times the script has looped
 	time.sleep(0.05)#space out the loop so as not to run too fast
 	print recv #prints everything received from freenode. Remove this to clean up the debugging
+	f.write(recv)# Log recv for later
 	#iterate through plugins executing all functions
 	data = {
 		's': s ,'recv': recv ,
@@ -121,4 +122,3 @@ while loop >= 0:
                 s.send(util.say(args['channel'],'Dynamic update: ' + status))
 	#get recv last. I thought this would be a good idea. I can't remember why, but there was a reason.
 	recv = s.recv(recvbits)	
-	f.write(recv)
