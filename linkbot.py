@@ -30,20 +30,24 @@ user = "Taiiwo"
 maxspam = 6 #number of identical message people can send to the channel before being kicked. 1 for off.
 channelops = [
 		{
-			"channel":"#33012013",
+			"channel":"#33012014",
 			"user":"Taiiwo"
 		},
 		{
-			"channel":"##426699k",
-			"user":"Taiiwo"
+			"channel":"#33012014",
+			"user":"Cosmo_Hill"
 		},
 		{
-			"channel":"#33012013",
+			"channel":"#33012014",
 			"user":"Surtri"
 		},
 		{
-			"channel":"##426699k",
-			"user":"Surtri"
+			"channel":"#33012014",
+			"user":"shadowwalker"
+		}
+		{
+			"channel":"#33012014",
+			"user":"shadowwalker1337"
 		}
 
 	]
