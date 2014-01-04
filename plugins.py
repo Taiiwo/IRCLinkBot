@@ -314,7 +314,7 @@ class plugins(object):
                 appendloop += 1
             return ''.join(retmeforrealthistime)
 	def wa(self, data):
-		if '!wa' in data['recv']:
+		if '!wa ' in data['recv']:
 			args = argv('!wa',data['recv'])
 			query = '%20'.join(args['argv'][1:])
 			response = urllib2.urlopen('http://api.wolframalpha.com/v2/query?input=' + query + '&appid=Y76J7A-WKLWTY7RKJ').read()
@@ -381,3 +381,36 @@ class plugins(object):
 			for line in output:
 				ircoutput += say(args['channel'],line)
 			return ircoutput
+	def timeuntil(self,data):
+		if not hasattr(self, "counttime"):
+			self.counttime = time.time()
+		if hasattr(self, "countdown") and (time.time() - self.counttime) > 20:
+			self.counttime - time.time()			
+			query = '%20'.join('Time Until ' + self.countdown['date'])
+			response = urllib2.urlopen('http://api.wolframalpha.com/v2/query?input=' + query + '&appid=Y76J7A-WKLWTY7RKJ').read()
+			tree = etree.XML(response)
+			answer = tree.findall('pod')[1].find('subpod').find('plaintext').text
+			answer = answer.split('\n')
+			toret = []
+			for i in answer:
+				print i
+				toret.append(say(self.countdown['channel'],i).encode('ascii', 'ignore'))
+			return ''.join(toret)
+	def setcountdown(self, data):
+		if '!setcountdown' in data['recv']:
+			args = argv('!setcountdown', data['recv'])
+			if args['nick'] in self.authnick:
+				if args['argv'][2] != 'none':
+					self.countdown = {'channel':args['argv'][1],
+							'date':' '.join(args['argv'][2:])}
+				else:
+					self.countdown = None
+	def uc(self, data):
+		if '!uc ' in data['recv']:
+			args = argv('!uc', data['recv'])
+			query = '%20'.join(args['argv'][1:])
+			wikiajson = urllib2.urlopen('http://uncovering-cicada.wikia.com/api/v1/Search/List?query=' + query).read()
+			wikiaobj = json.loads(wikiajson)
+			title = wikiaobj['items'][0]['title']
+			tiny = maketiny(wikiaobj['items'][0]['url'])
+			return say(args['channel'], title + ' - ' + tiny)
