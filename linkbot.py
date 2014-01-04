@@ -44,7 +44,7 @@ channelops = [
 		{
 			"channel":"#33012014",
 			"user":"shadowwalker"
-		}
+		},
 		{
 			"channel":"#33012014",
 			"user":"shadowwalker1337"
