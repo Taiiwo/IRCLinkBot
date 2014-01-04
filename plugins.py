@@ -414,3 +414,20 @@ class plugins(object):
 			title = wikiaobj['items'][0]['title']
 			tiny = maketiny(wikiaobj['items'][0]['url'])
 			return say(args['channel'], title + ' - ' + tiny)
+	def inform(self, data):
+		if '!inform ' in data['recv']:
+			args = argv('!inform', data['recv'])
+			toret = []
+			f = open (args['channel'] + '.inform','r')
+			toret.append('MODE ' + args['channel'] + ' +q ' + args['argv'][1] + '\r\n')
+			toret.append('PRIVMSG ' + args['argv'][1] + ' :' + f.read() + '\r\n')
+			if not hasattr(self, "informnick"):
+				self.informnick = {}
+			self.informnick[args['argv'][1]] = args['channel']
+			return '\r\n'.join(toret)
+		if 'I understand' in data['recv']:
+			args = argv('@', data['recv'])
+			if args['channel'] == data['nick']:
+				if args['nick'] in self.informnick:
+					toret = 'MODE ' + self.informnick[args['nick']] + ' -q ' + args['nick'] + '\r\n'
+					return toret
