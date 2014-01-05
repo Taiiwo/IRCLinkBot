@@ -56,9 +56,9 @@ class plugins(object):
         	        return 'privmsg ' + args['channel'] + ' :' + joke + '\r\n'
 		else:
 			return ''
-	def pong(self,data):#respond to ping req in a string --Not perfect, but works
+	def pong(self,data):#respond to ping req in a string
 	        if "ping" in data['recv'] or "PING" in data['recv']:
-	                url = str(geturl(str(data['recv'])))
+	                url = data['recv'].split(' ')[1]
 	                if url != "":
 	                        return "PONG " + url + "\n\r"
 			else:
