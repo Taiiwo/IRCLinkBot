@@ -94,7 +94,7 @@ def runplugins():# This is for threading
         	if message != '' and message != None:
         	        for msg in message.split('\n'):
 				s.send(str(msg))
-				time.sleep(0.2)
+				time.sleep(0.25)
 
 #### Begin loop ####
 while loop >= 0:
