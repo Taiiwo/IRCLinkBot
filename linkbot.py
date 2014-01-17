@@ -20,7 +20,7 @@ from plugins import *
 from BeautifulSoup import BeautifulSoup
 
 #Settings:
-channels = ["##426699k", "#33012013",'#3301ops','#cicada3301','#cicada14','#33012014']
+channels = ["##426699k", "#33012013",'#3301ops','#cicada3301','#cicada14','#33012014','#cicadasolvers','#3301hackers']
 #channels = ["##426699t"]
 server = "irc.freenode.net"
 port = 6667 #6667 is the default irc port
