@@ -1,6 +1,12 @@
 import socket, urllib2, sys, json, os, thread, re
-configFile = open ('./linkbot.conf','rw')#	Import settings file
-config = json.loads( configFile.read() )#	Parse config file
+from util import *
+def importConfig():
+	configFile = open ('./linkbot.conf','rw')#	Import settings file
+	config = json.loads( configFile.read() )#	Parse config file
+	configFile.close()
+	return config
+
+config = importConfig()
 # Creating socket
 s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 print "[-]Connecting to server..."
@@ -19,14 +25,23 @@ for channel in config['settings']['joinChannels']:#	Join all the channels
 def runPlugins(plugins, path, data):#	This function is for threading
 	global s
 	for plugin in plugins:
-		exec(path + plugin)
-		toSend = main(data)
-		if toSend and toSend != '' and toSend != None:
-			s.send(toSend)
+		if plugin[-3:] == '.py' and plugin[0] != '~':
+			try:
+				pluginFile = open (path + plugin,'r')
+				exec(pluginFile)
+				pluginFile.close()
+				toSend = main(data)
+				if toSend and toSend != '' and toSend != None:
+					if config['settings']['printSend'] == 'True':
+						s.send(toSend)
+			except Exception , err:
+				errormsg = sys.exc_info()[1]
+				if errormsg != None:
+					print errormsg
 
 loop = 0
 while 1:
-	config = configFile.open()#		Refresh the config file
+	config = importConfig()#		Refresh the config file
 	recvLen = int(config['settings']['recvLen'])
 	recvData = s.recv(recvLen)
 	data = {'recv' : recvData,#		Format data to send to the plugins.	
@@ -40,27 +55,30 @@ while 1:
 
 	'''Check if the recv is a privmsg from a channel (Not foolproof, you can involk this by privmsging
 	the bot with ":a!b@c PRIVMSG #d:e" for example.'''
-	if not re.find(':*!*@* PRIVMSG #*:*') == -1 or not re.find(':*!*@* privmsg #*:*') == -1:
+	if not re.match(':*!*@*.*PRIVMSG.#*.:*', recvData) == None:
 		#Run plugins from ./plugins/privmsg/*
 		privMsgChanPlugins = []
 		privMsgChanPaths = []
-		for root, subFolders, files in os.walk('./plugins/privmsg/'):#		Fetch plugins recurisively. This means
+		for root, subFolders, files in os.walk('./plugins/privmsg/',followlinks=True):#		Fetch plugins recurisively. This means
 			thread.start_new_thread( runPlugins, (files, root, data) )#	you can organize plugins in subfolders
 										#	however you'd like. eg. Have a folder
 										#	full of entertainment plugins that you
 										#	can easily disable by prepending '.'
 										#	to the folder name.
 	# If recv is a private message to the bot
-	elif not re.find(':*!*@* PRIVMSG ' + config['settings']['botNick'] + ' :*') == -1 or not re.find(':*!*@* privmsg ' + config['settings']['botNick'] + ' :*') == -1:
+	elif not re.match(':*!*@*.*PRIVMSG.' + config['settings']['botNick'] + '.:*',recvData) == None:
 		# Run plugins from ./plugins/privmsgbot/*
 		privMsgBotPlugins = []
 		privMsgBotPaths = []
-		for root, subFolders, files in os.walk('./plugins/privmsgbot/'):
+		for root, subFolders, files in os.walk('./plugins/privmsgbot/',followlinks=True):
 			thread.start_new_thread( runPlugins, (files, root, data) )
-	elif 'PING ' == recvData[0:4]:
+	elif recvData[0:5] == 'PING ':
 		s.send('PONG ' + recvData.split(' ')[1][1:] + '\r\n')
+		if config['settings']['printSend'] == 'True':
+			print 'PONG ' + recvData.split(' ')[1][1:] + '\r\n'
 		'''	I was thinking about making the bot run plugins from a 'PING' folder,
 			but saw very little point, other than possible data logging?. Regardless,
 			I left it out.	'''
-
+	if config['settings']['printRecv'] == 'True':
+		print recvData
 	loop += 1

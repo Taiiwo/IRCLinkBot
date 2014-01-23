@@ -2,16 +2,22 @@
     "settings": {
         "host": "irc.freenode.net",
         "port": "6667",
-        "botNick": "TaiiwoTest",
+        "botNick": "TaiiwoBot",
         "botUser": "Taiiwo",
         "botName": "Taiiwo Bot",
         "botIdent": "TaiiwoBot",
-        "joinMessage": "LinkBot v5.0b - I'm in beta. Insert plugins here.",
+        "joinMessage": "LinkBot v5.0a - I'm fresh off the press.",
         "recvLen": "512",
 	"printRecv":"True",
-	"printSend":"True",
         "joinChannels": [
-            "#426699t"
+            "##426699k",
+            "#33012013",
+            "#3301ops",
+            "#cicada3301",
+            "#cicada14",
+            "#33012014",
+            "#cicadasolvers",
+            "#3301hackers"
         ],
         "admins": [
             {
