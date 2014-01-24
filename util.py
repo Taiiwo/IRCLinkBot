@@ -4,6 +4,14 @@ import socket, sys, re, urllib2, time, os, random, json
 from plugins import *
 from BeautifulSoup import BeautifulSoup
 
+def modeCheck(mode, data):
+        args = argv('!mode', data['recv'])
+        for user in data['config']['userModes']:
+                if args['nick'] == user['nick'] and mode in user['modes']:
+                        if user['channel'] == args['channel'] or 'g' in user['modes']:
+                                return True
+        return False
+
 def saveConfigChanges(config):
 	f = open('linkbot.conf','w')
 	f.write(json.dumps(config, sort_keys=True, indent=4, separators=(',', ': ')))
