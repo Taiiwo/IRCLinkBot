@@ -1,13 +1,10 @@
 #util.py
 #This file contains fuctions available for the plugin developers.
-import socket, sys, re, urllib2, time, os, random, json
+import socket, sys, re, urllib2, time, os, random
 from plugins import *
 from BeautifulSoup import BeautifulSoup
 
-def saveConfigChanges(config):
-	f = open('linkbot.conf','w')
-	f.write(json.dumps(config, sort_keys=True, indent=4, separators=(',', ': ')))
-	f.close()
+#start functions
 def say(channel, message):# A quick way to make the bot say something. Use return say(argv['channel'],message)
 	return 'PRIVMSG ' + channel + ' :' + message + '\r\n'# (You need to define argv with the argv() function
 

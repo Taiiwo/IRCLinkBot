@@ -1,4 +1,4 @@
-import socket, urllib2, sys, json, os, thread, re
+import socket, urllib2, sys, json, os, thread, re, random
 from util import *
 def importConfig():
 	configFile = open ('./linkbot.conf','rw')#	Import settings file
