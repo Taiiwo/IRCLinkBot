@@ -1,4 +1,4 @@
-import socket, urllib2, sys, json, os, thread, re, random
+import socket, urllib2, sys, json, os, thread, re, random, time
 from util import *
 def importConfig():
 	configFile = open ('./linkbot.conf','rw')#	Import settings file
@@ -32,12 +32,15 @@ def runPlugins(plugins, path, data):#	This function is for threading
 				pluginFile.close()
 				toSend = main(data)
 				if toSend and toSend != '' and toSend != None:
+					for send in toSend.split('\n'):
+						s.send(send + '\n')
+						time.sleep(int(config['settings']['messageTimeSpacing']))
 					if config['settings']['printSend'] == 'True':
-						s.send(toSend)
+						print toSend
 			except Exception , err:
 				errormsg = sys.exc_info()[1]
 				if errormsg != None:
-					print plugin + str(errormsg)
+					print plugin + ' : ' + str(errormsg)
 
 loop = 0
 while 1:
