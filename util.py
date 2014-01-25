@@ -1,7 +1,6 @@
 #util.py
 #This file contains fuctions available for the plugin developers.
 import socket, sys, re, urllib2, time, os, random, json
-from plugins import *
 from BeautifulSoup import BeautifulSoup
 
 def modeCheck(mode, data):
