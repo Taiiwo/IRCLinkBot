@@ -21,7 +21,6 @@ How to run the bot:
 -------------------
 You will need the following libraries (Listed by their names in the debian repositories):
  - python-BeautifulSoup
- - python-lxml
 
 As mentioned before, the bot is running in it's current configuration.
 This means you'll need to change linkbot.conf.
