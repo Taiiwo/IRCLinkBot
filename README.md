@@ -29,8 +29,8 @@ Linkbot.conf is well commented, so that should walk you through the editing proc
 Once you have the config setup, you'll need to choose your plugins.
 Some plugins come preinstalled with TaiiwoBot, these cover a wide range of things, but feel free to disable them and add your own.
 (all plugins are ran within a 'try' statement, so there is no danger of crashing the bot with your experiments (Beware, however, of channel flooding))
-You can disable plugins by adding a '#' to the beginning of their filename.
-To disable wa.py for example (In /plugins/privmsg/information) type in the directory of wa.py(In *NIX): mv wa.py \#wa.py
+You can disable plugins by adding a '#' to the end of their filename.
+To disable wa.py for example (In /plugins/privmsg/information) type in the directory of wa.py(In *NIX): mv wa.py wa.py\\#
 
 Now you're ready to boot up TaiiwoBot!
 Simply type: python main.py
