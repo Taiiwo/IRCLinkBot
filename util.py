@@ -4,8 +4,8 @@ import socket, sys, re, urllib2, time, os, random, json
 from BeautifulSoup import BeautifulSoup
 
 def modeCheck(mode, data):
-        args = argv('!mode', data['recv'])
-        for user in data['config']['userModes']:
+        args = argv('@', data['recv'])
+        for user in data['config']['settings']['userModes']:
                 if args['nick'] == user['nick'] and mode in user['modes']:
                         if user['channel'] == args['channel'] or 'g' in user['modes']:
                                 return True

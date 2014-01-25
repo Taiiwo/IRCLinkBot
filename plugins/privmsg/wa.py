@@ -11,4 +11,3 @@ def main(data):
 		for i in answer:
 			toret.append(say(args['channel'],i).encode('ascii', 'ignore'))
 		return ''.join(toret)
-

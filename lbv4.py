@@ -34,7 +34,7 @@ def runPlugins(plugins, path, data):#	This function is for threading
 				if toSend and toSend != '' and toSend != None:
 					for send in toSend.split('\n'):
 						s.send(send + '\n')
-						time.sleep(int(config['settings']['messageTimeSpacing']))
+						time.sleep(float(config['settings']['messageTimeSpacing']))
 					if config['settings']['printSend'] == 'True':
 						print toSend
 			except Exception , err:
