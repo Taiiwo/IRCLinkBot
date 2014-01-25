@@ -37,7 +37,7 @@ def runPlugins(plugins, path, data):#	This function is for threading
 			except Exception , err:
 				errormsg = sys.exc_info()[1]
 				if errormsg != None:
-					print errormsg
+					print plugin + str(errormsg)
 
 loop = 0
 while 1:
