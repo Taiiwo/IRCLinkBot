@@ -27,7 +27,6 @@ def main(data):
                 print title
                 error = 0
         except:
-                print "[E]No valid title"
                 if not 'http' in data['recv']:
                         urlsfound = False
                 error = 2
@@ -39,7 +38,7 @@ def main(data):
                         return 'privmsg ' + args['channel'] + ' :^ ' + str(title) + " " + maketiny(nlink) + ' ^\r\n'
                 else:
                         return 'privmsg ' + args['channel'] + ' :^ ' + str(title) + " ^\r\n"
-        if error == 2 and urlsfound and nlink != "" and data['loop'] >= data['numr'] and len(nlink) >= 53:
+        if error == 2 and urlsfound and nlink != "" and data['loop'] >= data['config']['variables']['numr'] and len(nlink) >= 53:
                 return 'privmsg ' + args['channel'] + ' : ^ ' + maketiny(nlink) + ' ^\r\n'
         else:
                 return ''
