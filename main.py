@@ -21,7 +21,7 @@ s.send('user ' + config['settings']['botIdent'] + ' * ' + config['settings']['bo
 for channel in config['settings']['joinChannels']:#	Join all the channels
         s.send('join ' + channel + '\r\n')
         s.send('privmsg ' + channel + ' :' + config['settings']['joinMessage'] + "\n\r")
-
+sending = 0
 def runPlugins(plugins, path, data):#	This function is for threading
 	global s
 	for plugin in plugins:
@@ -32,19 +32,31 @@ def runPlugins(plugins, path, data):#	This function is for threading
 				pluginFile.close()
 				toSend = main(data)
 				if toSend and toSend != '' and toSend != None:
-					for send in toSend.split('\n'):
-						s.send(send + '\n')
-						time.sleep(float(config['settings']['messageTimeSpacing']))
+					global sending
+					while 1:
+						if sending == 0:
+							sending = 1
+							for send in toSend.split('\n'):
+								s.send(send + '\n')
+								time.sleep(float(config['settings']['messageTimeSpacing']))
+							sending = 0
+							break
+						else:
+							continue
 					if config['settings']['printSend'] == 'True':
 						print toSend
 			except Exception , err:
+				sending = 0
 				errormsg = sys.exc_info()[1]
 				if errormsg != None:
 					print plugin + ' : ' + str(errormsg)
 
 loop = 0
 while 1:
-	config = importConfig()#		Refresh the config file
+	try:
+		config = importConfig()#		Refresh the config file
+	except:
+		print "[E] Failed to read config"
 	recvLen = int(config['settings']['recvLen'])
 	recvData = s.recv(recvLen)
 	data = {'recv' : recvData,#		Format data to send to the plugins.	
