@@ -12,9 +12,13 @@ def modeCheck(mode, data):
         return False
 
 def saveConfigChanges(config):
-	f = open('linkbot.conf','w')
-	f.write(json.dumps(config, sort_keys=True, indent=4, separators=(',', ': ')))
-	f.close()
+	try:
+		f = open('linkbot.conf','w')
+		f.write(json.dumps(config, sort_keys=True, indent=4, separators=(',', ': ')))
+		f.close()
+	except:
+		print "[E] Could not save to config file"
+
 def say(channel, message):# A quick way to make the bot say something. Use return say(argv['channel'],message)
 	return 'PRIVMSG ' + channel + ' :' + message + '\r\n'# (You need to define argv with the argv() function
 
