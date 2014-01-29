@@ -1,11 +1,9 @@
 def main(data):
         args = argv('@',data['recv'])
 	#look for URL
-	try:
-		link = geturl(data['recv'])[0]
-	except:
-		link = False
+	link = geturl(data['recv'])
 	if link and link != '':
+		link = link[0]
 		#look for title
 		badext = ('.cgi','.CGI','.jpg','.png','.gif','.bmp')
 		if not link[-4:] in badext:
