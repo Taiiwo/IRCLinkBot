@@ -7,7 +7,7 @@ def main(data):
 		#look for title
 		badext = ('.cgi','.CGI','.jpg','.png','.gif','.bmp')
 		if not link[-4:] in badext:
-			title = gettitle(nlink)
+			title = gettitle(link)
 			if title and title != '':
 				title = title.replace('\n',' ')
 				if len(title) >= 150:
@@ -22,7 +22,7 @@ def main(data):
 					return say(args['channel'], '^ ' + title + + ' ^')
 			if len(link) > int(data['config']['settings']['maxLinkLen']):
 				#post tiny only
-				return say(args['channel'], '^ ' + maketiny(link) + + ' ^')
+				return say(args['channel'], '^ ' + maketiny(link) + ' ^')
 			else:
 				#nothing
 				return False
