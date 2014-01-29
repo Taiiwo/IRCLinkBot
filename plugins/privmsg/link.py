@@ -20,9 +20,9 @@ def main(data):
 				else:
 					#post title only
 					return say(args['channel'], '^ ' + title + + ' ^')
-			if len(link) > int(data['config']['settings']['maxLinkLen']):
-				#post tiny only
-				return say(args['channel'], '^ ' + maketiny(link) + ' ^')
-			else:
-				#nothing
-				return False
+		if len(link) > int(data['config']['settings']['maxLinkLen']):
+			#post tiny only
+			return say(args['channel'], '^ ' + maketiny(link) + ' ^')
+		else:
+			#nothing
+			return False
