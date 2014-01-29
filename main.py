@@ -34,19 +34,19 @@ def runPlugins(plugins, path, data):#	This function is for threading
 				if toSend and toSend != '' and toSend != None:
 					global sending
 					while 1:
-						if sending == 0:
-							sending = 1
+						if sending <= 2:
+							sending += 1
 							for send in toSend.split('\n'):
 								s.send(send + '\n')
 								time.sleep(float(config['settings']['messageTimeSpacing']))
-							sending = 0
+							sending -= 1
 							break
 						else:
 							continue
 					if config['settings']['printSend'] == 'True':
 						print toSend
 			except Exception , err:
-				sending = 0
+				sending -= 1
 				errormsg = sys.exc_info()[1]
 				if errormsg != None:
 					print plugin + ' : ' + str(errormsg)
