@@ -65,11 +65,21 @@ def argv(gcommand,recv):# returns a named, multidimentional array of on recv inf
 		argv.append(i)
 	return {'nick' : nick, 'user' : user,'channel' : channel, 'argv' : argv}
 def gettitle(url):#get the page title of an URL
-        soup = BeautifulSoup(urllib2.urlopen(url))
-        return soup.title.string
+	try:
+        	soup = BeautifulSoup(urllib2.urlopen(url))
+        	return soup.title.string
+	except:
+		return False
 def geturl(recv):#parse an URL from a string
-        return re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', recv)
+        url = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', recv)
+	if url and url != '':
+		return url
+	else:
+		return False
 def maketiny(url):# make a tinyurl from a string
-        html = urllib2.urlopen("http://tinyurl.com/api-create.php?url=" + url)
-        tiny = str(html.read())
-        return tiny
+	try:
+        	html = urllib2.urlopen("http://tinyurl.com/api-create.php?url=" + url)
+        	tiny = str(html.read())
+        	return tiny
+	except:
+		return False
