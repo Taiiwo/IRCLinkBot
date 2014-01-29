@@ -8,7 +8,7 @@ def main(data):
 		badext = ('.cgi','.CGI','.jpg','.png','.gif','.bmp')
 		if not link[-4:] in badext:
 			title = gettitle(link)
-			if title and title != '':
+			if title:
 				title = title.replace('\n',' ')
 				if len(title) >= 150:
 					title = title[:150]
