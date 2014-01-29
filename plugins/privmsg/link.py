@@ -19,7 +19,7 @@ def main(data):
 					return say(args['channel'], '^ ' + title + ' ' + maketiny(link) + ' ^')
 				else:
 					#post title only
-					return say(args['channel'], '^ ' + title + + ' ^')
+					return say(args['channel'], '^ ' + title + ' ^')
 		if len(link) > int(data['config']['settings']['maxLinkLen']):
 			#post tiny only
 			return say(args['channel'], '^ ' + maketiny(link) + ' ^')
