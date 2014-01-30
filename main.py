@@ -94,6 +94,13 @@ while 1:
 		'''	I was thinking about making the bot run plugins from a 'PING' folder,
 			but saw very little point, other than possible data logging?. Regardless,
 			I left it out.	'''
+	else:
+		#run plugins from the directory named 'root'
+		rootBotPlugins = []
+		rootBotPaths = []
+		for root, subFolders, files in os.walk('./plugins/root/',followlinks=True):
+			thread.start_new_thread( runPlugins, (files, root, data) )
+		
 	if config['settings']['printRecv'] == 'True':
 		print recvData
 	loop += 1
