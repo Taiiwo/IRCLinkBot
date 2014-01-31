@@ -7,7 +7,7 @@ def importConfig():
 	return config
 
 config = importConfig()
-# Creating socket
+# Creating socket   
 s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 print "[-]Connecting to server..."
 try:
@@ -22,12 +22,13 @@ for channel in config['settings']['joinChannels']:#	Join all the channels
         s.send('join ' + channel + '\r\n')
         s.send('privmsg ' + channel + ' :' + config['settings']['joinMessage'] + "\n\r")
 sending = 0
+
 def runPlugins(plugins, path, data):#	This function is for threading
-	global s
+	global sending
 	for plugin in plugins:
 		if plugin[-3:] == '.py' and plugin[0] != '~':
 			try:
-				pluginFile = open (path + plugin,'r')
+				pluginFile = open (path + '/' + plugin,'r')
 				exec(pluginFile)
 				pluginFile.close()
 				toSend = main(data)
@@ -72,8 +73,6 @@ while 1:
 	the bot with ":a!b@c PRIVMSG #d:e" for example.'''
 	if not re.match(':*!*@*.*PRIVMSG.#*.:*', recvData) == None:
 		#Run plugins from ./plugins/privmsg/*
-		privMsgChanPlugins = []
-		privMsgChanPaths = []
 		for root, subFolders, files in os.walk('./plugins/privmsg/',followlinks=True):#		Fetch plugins recurisively. This means
 			thread.start_new_thread( runPlugins, (files, root, data) )#	you can organize plugins in subfolders
 										#	however you'd like. eg. Have a folder
@@ -83,8 +82,6 @@ while 1:
 	# If recv is a private message to the bot
 	elif not re.match(':*!*@*.*PRIVMSG.' + config['settings']['botNick'] + '.:*',recvData) == None:
 		# Run plugins from ./plugins/privmsgbot/*
-		privMsgBotPlugins = []
-		privMsgBotPaths = []
 		for root, subFolders, files in os.walk('./plugins/privmsgbot/',followlinks=True):
 			thread.start_new_thread( runPlugins, (files, root, data) )
 	elif recvData[0:5] == 'PING ':
@@ -94,12 +91,10 @@ while 1:
 		'''	I was thinking about making the bot run plugins from a 'PING' folder,
 			but saw very little point, other than possible data logging?. Regardless,
 			I left it out.	'''
-	else:
 		#run plugins from the directory named 'root'
-		rootBotPlugins = []
-		rootBotPaths = []
-		for root, subFolders, files in os.walk('./plugins/root/',followlinks=True):
-			thread.start_new_thread( runPlugins, (files, root, data) )
+
+	for root, subFolders, files in os.walk('./plugins/root/',followlinks=True):
+		thread.start_new_thread( runPlugins, (files, root, data) )
 		
 	if config['settings']['printRecv'] == 'True':
 		print recvData
