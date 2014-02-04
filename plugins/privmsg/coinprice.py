@@ -20,7 +20,7 @@ def main(data):
 			ticker = prices['ticker']
 			timeDiff = data['config']['settings']['hoursDiffGMT']
 			if timeDiff[0] == '-':
-				timeDiff = abs(int(timeDiff[1:])*60*60)
+				timeDiff = -int(timeDiff[1:])*60*60
 			elif timeDiff[0] == '+':
 				timeDiff = int(timeDiff[1:])*60*60
 			time = datetime.fromtimestamp(int(ticker['updated'] - timeDiff)).strftime('%d-%m-%y %H:%M:%S')

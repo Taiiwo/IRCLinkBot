@@ -15,11 +15,14 @@ try:
 
 except:
         print "[E]Could not connect to server."
-
+time.sleep(0.2)
 s.send('nick ' + config['settings']['botNick'] + '\r\n')
+time.sleep(0.2)
 s.send('user ' + config['settings']['botIdent'] + ' * ' + config['settings']['botUser'] + ' ' + config['settings']['botName'] + '\r\n')
+time.sleep(0.2)
 for channel in config['settings']['joinChannels']:#	Join all the channels
         s.send('join ' + channel + '\r\n')
+	time.sleep(0.2)
         s.send('privmsg ' + channel + ' :' + config['settings']['joinMessage'] + "\n\r")
 sending = 0
 
