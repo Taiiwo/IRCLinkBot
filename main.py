@@ -29,7 +29,7 @@ sending = 0
 def runPlugins(plugins, path, data):#	This function is for threading
 	global sending
 	for plugin in plugins:
-		if plugin[-3:] == '.py' and plugin[0] != '~':
+		if plugin[-3:] == '.py' and plugin[0:2] != 'lib':
 			try:
 				pluginFile = open (path + '/' + plugin,'r')
 				exec(pluginFile)
@@ -74,7 +74,7 @@ while 1:
 
 	'''Check if the recv is a privmsg from a channel (Not foolproof, you can involk this by privmsging
 	the bot with ":a!b@c PRIVMSG #d:e" for example.'''
-	if not re.match(':*!*@*.*PRIVMSG.#*.:*', recvData) == None:
+	if not re.match('^:*!*@*.*PRIVMSG.#*.:*', recvData) == None:
 		#Run plugins from ./plugins/privmsg/*
 		for root, subFolders, files in os.walk('./plugins/privmsg/',followlinks=True):#		Fetch plugins recurisively. This means
 			thread.start_new_thread( runPlugins, (files, root, data) )#	you can organize plugins in subfolders
@@ -83,7 +83,7 @@ while 1:
 										#	can easily disable by prepending '.'
 										#	to the folder name.
 	# If recv is a private message to the bot
-	elif not re.match(':*!*@*.*PRIVMSG.' + config['settings']['botNick'] + '.:*',recvData) == None:
+	elif not re.match('^:*!*@*.*PRIVMSG.' + config['settings']['botNick'] + '.:*',recvData) == None:
 		# Run plugins from ./plugins/privmsgbot/*
 		for root, subFolders, files in os.walk('./plugins/privmsgbot/',followlinks=True):
 			thread.start_new_thread( runPlugins, (files, root, data) )

@@ -1,0 +1,14 @@
+def main(data):
+	if '!wk ' in data['recv']:
+		args = argv('!wk',data['recv'])
+		query = ' '.join(args['argv'][1:])
+		url = 'http://en.wikipedia.org/w/api.php?
+				action=query&
+				prop=revisions&
+				rvprop=content&
+				titles=' + query + '&
+				format=json'
+		jsonData = urllib2.urlopen(url).read()
+		results = json.loads(jsonData)
+		summary = results['query']['pages'][0]['revisions']['*']
+		
