@@ -10,6 +10,7 @@ def main(data):
 			title = gettitle(link)
 			if title:
 				title = title.replace('\n',' ')
+				title = title.replace('\r',' ')
 				if len(title) >= 150:
 					title = title[:150]
 				title = html_decode(title)

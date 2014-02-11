@@ -19,6 +19,13 @@ time.sleep(0.2)
 s.send('nick ' + config['settings']['botNick'] + '\r\n')
 time.sleep(0.2)
 s.send('user ' + config['settings']['botIdent'] + ' * ' + config['settings']['botUser'] + ' ' + config['settings']['botName'] + '\r\n')
+if config['settings']['authenticate'] == 'True':
+    try:
+        passFile = open('pass','r')
+        password = passFile.read()
+        s.send('PRIVMSG nickserv :identify ' + password + '\r\n')
+    except:
+        print "[E] Password not found. Continuing without authentication."
 time.sleep(0.2)
 for channel in config['settings']['joinChannels']:#	Join all the channels
         s.send('join ' + channel + '\r\n')
