@@ -81,7 +81,7 @@ while 1:
 
 	'''Check if the recv is a privmsg from a channel (Not foolproof, you can involk this by privmsging
 	the bot with ":a!b@c PRIVMSG #d:e" for example.'''
-	if not re.match('^:*!*@*.*PRIVMSG.#*.:*', recvData) == None:
+	if not re.match('^:*!*@*.*PRIVMSG.#*.:*', recvData) == None and re.match('^:*!*@*.*PRIVMSG.' + config['settings']['botNick'] + '.:*',recvData) == None:
 		#Run plugins from ./plugins/privmsg/*
 		for root, subFolders, files in os.walk('./plugins/privmsg/',followlinks=True):#		Fetch plugins recurisively. This means
 			thread.start_new_thread( runPlugins, (files, root, data) )#	you can organize plugins in subfolders
@@ -109,3 +109,4 @@ while 1:
 	if config['settings']['printRecv'] == 'True':
 		print recvData
 	loop += 1
+
