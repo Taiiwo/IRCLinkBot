@@ -15,11 +15,21 @@ try:
 
 except:
         print "[E]Could not connect to server."
-
+time.sleep(0.2)
 s.send('nick ' + config['settings']['botNick'] + '\r\n')
+time.sleep(0.2)
 s.send('user ' + config['settings']['botIdent'] + ' * ' + config['settings']['botUser'] + ' ' + config['settings']['botName'] + '\r\n')
+if config['settings']['authenticate'] == 'True':
+    try:
+        passFile = open('pass','r')
+        password = passFile.read()
+        s.send('PRIVMSG nickserv :identify ' + password + '\r\n')
+    except:
+        print "[E] Password not found. Continuing without authentication."
+time.sleep(0.2)
 for channel in config['settings']['joinChannels']:#	Join all the channels
         s.send('join ' + channel + '\r\n')
+	time.sleep(0.2)
         s.send('privmsg ' + channel + ' :' + config['settings']['joinMessage'] + "\n\r")
 sending = 0
 
@@ -71,7 +81,7 @@ while 1:
 
 	'''Check if the recv is a privmsg from a channel (Not foolproof, you can involk this by privmsging
 	the bot with ":a!b@c PRIVMSG #d:e" for example.'''
-	if not re.match('^:*!*@*.*PRIVMSG.#*.:*', recvData) == None:
+	if not re.match('^:*!*@*.*PRIVMSG.#*.:*', recvData) == None and re.match('^:*!*@*.*PRIVMSG.' + config['settings']['botNick'] + '.:*',recvData) == None:
 		#Run plugins from ./plugins/privmsg/*
 		for root, subFolders, files in os.walk('./plugins/privmsg/',followlinks=True):#		Fetch plugins recurisively. This means
 			thread.start_new_thread( runPlugins, (files, root, data) )#	you can organize plugins in subfolders
@@ -99,3 +109,4 @@ while 1:
 	if config['settings']['printRecv'] == 'True':
 		print recvData
 	loop += 1
+
