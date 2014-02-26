@@ -12,10 +12,11 @@ def main(data):
 		query = query.replace(data['config']['settings']['botNick'] + ':','')
 		query = query.replace(data['config']['settings']['botNick'],'Jorn')
 		answer = bot.think(query)
-		answer = answer.replace('George',data['config']['settings']['botNick'])
+		answer = answer.replace('PandoraBot',data['config']['settings']['botNick'])
 		answer = answer.replace('God','Taiiwo')
 		answer = answer.replace('&ouml;', 'o')
 		debug = 'Query: ' + query + ' -- Answer: "' + answer + '"'
-		#return say(args['channel'],args['nick'] + ': ' + debug)
+		print debug
+		
 		return say(args['channel'],args['nick'] + ': ' + answer)
 		
