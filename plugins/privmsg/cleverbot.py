@@ -1,9 +1,12 @@
 def main(data):
 	if data['config']['settings']['botNick'] in data['recv'] or data['config']['settings']['botNick'].lower() in data['recv']:
 		from libchatterbot import ChatterBotFactory, ChatterBotType
-		factory = ChatterBotFactory()
-		botfac = factory.create(ChatterBotType.JABBERWACKY)
-		bot = botfac.create_session()
+		if not 'bot' in globals():
+			factory = ChatterBotFactory()
+			botfac = factory.create(ChatterBotType.CLEVERBOT)#JABBERWACKY
+			bot = botfac.create_session()
+		else:
+			global bot
 		args = argv('@', data['recv'])
 		junk = ':' + textbetween(':',' :', data['recv']) + ' :'
 		query = data['recv'].replace(junk, '')
