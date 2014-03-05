@@ -1,7 +1,9 @@
 List of plugin commands for TaiiwoBot
 =====================================
+
 Plugins that don't require a command
 ------------------------------------
+
 ###LinkBot - This will post a title if:
 - The link is not to the following filetypes: '.cgi','.CGI','.jpg','.png','.gif','.bmp'
 TinyURL if:
@@ -10,13 +12,16 @@ TinyURL if:
 Both TinyURL and title if:
 - The link is longer than data['config']['settings']['maxLinkLen']
 - The link has a valid title and is not of invalid filetype
+
 ###CleverBot - Will open a cleverbot session on start up, and reply to any post mentioning
 data['config']['settings']['botNick'] or data['config']['settings']['botNick'].lower()
 (TaiiwoBot or taiiwobot, but not Taiiwobot, for example)
-Plugins that require commands to initialize
 ###Whois on join - WHOIS scans every user that joins that has user modes
 ###Authenticate - Checks ALL WHOIS outputs for authentication
+
+Plugins that require commands to initialize
 -------------------------------------------
+
 | Name    	| Command	| Description					| Usage			| Example 			|
 |:-------------:|:--------------|:----------------------------------------------|:----------------------|:------------------------------|
 
