@@ -18,6 +18,7 @@ Plugins that require commands to initialize
 ###Authenticate - Checks ALL WHOIS outputs for authentication
 -------------------------------------------
 | Name    	| Command	| Description					| Usage			| Example 			|
+|:-------------:|:--------------|:----------------------------------------------|:----------------------|:------------------------------|
 | Coinprice	| !coinprice	| Will fetch data from the BTC-e API		| [com] CUR1 CUR2	| !coinprice btc ltc		|
 | FindIP	| !findip	| Searches an IP or hostname in the http://ip-api.com DB| [com] IP/hostname| !findip google.com		|
 | LocateIP	| !locateip	| Uses the shodan library to  pull down a host scan from ShodanHQ DBs. Includes ports 80,21,22,161,5060 and a GeoIP. Only works if the IP has been scanned by shodan| [com] IP| !locateip 173.194.34.166|
