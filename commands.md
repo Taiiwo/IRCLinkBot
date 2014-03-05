@@ -4,20 +4,29 @@ List of plugin commands for TaiiwoBot
 Plugins that don't require a command
 ------------------------------------
 
-###LinkBot - This will post a title if:
+###LinkBot
+This will post a title if:
 - The link is not to the following filetypes: '.cgi','.CGI','.jpg','.png','.gif','.bmp'
+
 TinyURL if:
 - The link is longer than data['config']['settings']['maxLinkLen']
 - The link has no title or is of invalid filetype
+
 Both TinyURL and title if:
+
 - The link is longer than data['config']['settings']['maxLinkLen']
 - The link has a valid title and is not of invalid filetype
 
-###CleverBot - Will open a cleverbot session on start up, and reply to any post mentioning
+###CleverBot
+Will open a cleverbot session on start up, and reply to any post mentioning
 data['config']['settings']['botNick'] or data['config']['settings']['botNick'].lower()
 (TaiiwoBot or taiiwobot, but not Taiiwobot, for example)
-###Whois on join - WHOIS scans every user that joins that has user modes
-###Authenticate - Checks ALL WHOIS outputs for authentication
+
+###Whois on join
+WHOIS scans every user that joins that has user modes
+
+###Authenticate
+Checks ALL WHOIS outputs for authentication
 
 Plugins that require commands to initialize
 -------------------------------------------
@@ -55,6 +64,7 @@ Plugins that require commands to initialize
 
 Admin only plugins
 ------------------
+
 ###Requires +a in given channel or ga
 | Name		| Command	| Description					| Usage			| Example 			|
 |:-------------:|:--------------|:----------------------------------------------|:----------------------|:------------------------------|
@@ -65,7 +75,7 @@ Admin only plugins
 
 | Leave		| !leave	| Parts a channel				| [com] channel		| !leave #cicadasolvers		|
 
-| Mode		| !mode		| Changes a user's/users' bot modes. '[]' is a binary option field. '()*' symbolises an argument that can be repeated infinitly| [com] ([+/-]MODE)* (nick )*| !mode +o-b Taiiwo Surtri|
+| Mode		| !mode		| Changes a user's/users' bot modes. '[]' is a binary option field. '()\*' symbolises an argument that can be repeated infinitly| [com] ([+/-]MODE)\* (nick )*| !mode +o-b Taiiwo Surtri|
 
 | Send		| !send		| Enter an IRC command manaully. cannot run multiple commands| [com] command| !send privmsg Taiiwo :Nice Bot!|
 
