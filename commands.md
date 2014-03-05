@@ -57,6 +57,6 @@ Admin only plugins
 | Auth me	| !authme	| Forces an authentication, needed when the bot Boots up after you log in. | [com] | !authme		|
 | Join		| !join		| Joins a channel				| [com] channel		| !join #cicadasolvers		|
 | Leave		| !leave	| Parts a channel				| [com] channel		| !leave #cicadasolvers		|
-| Mode		| !mode		| Changes a user's/users' bot modes. '[]' is a binary option field. '()\*' symbolises an argument that can be repeated infinitly| [com] ([+/-]MODE)\* (nick )*| !mode +o-b Taiiwo Surtri |
+| Mode		| !mode		| Changes a user's/users' bot modes. '[]' is a binary option field. '()\*' symbolises an argument that can be repeated infinitly| \[com\] (\[+/-\]MODE)\* (nick )*| !mode +o-b Taiiwo Surtri |
 | Send		| !send		| Enter an IRC command manaully. cannot run multiple commands | [com] command | !send privmsg Taiiwo :Nice Bot! |
 | Say		| !say		| Sends a message to argv[1]. Can be channel or nick | [com] channel message | !say Taiiwo Nice Bot! 	|
