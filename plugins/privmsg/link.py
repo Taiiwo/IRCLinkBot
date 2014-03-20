@@ -14,6 +14,7 @@ def main(data):
 				if len(title) >= 150:
 					title = title[:150]
 				title = html_decode(title)
+				title = " ".join(title.split())
 				title = title.encode('ascii', 'ignore')
 				if len(link) > int(data['config']['settings']['maxLinkLen']):
 					#post title + tiny
