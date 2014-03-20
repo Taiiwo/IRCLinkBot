@@ -48,6 +48,8 @@ Plugins that require commands to initialize
 | Roll usage1	| !r		| Gives a simulated output of an argv[1] sided dice being rolled. | [com] argv[1] | !r 20			|
 | Roll usage2	| !r		| Gives a sumulated output of an X sided dice being rolled Y times. 'd' stands for 'dice' | [com] XdY | !r 2d20 |
 | WYR	    	| !wyr		| Gets a random 'Would you rather?' question from http://rrrather.com| [com] | !wyr			|
+| Scoop		| !scoop	| Summarizes any article by URL and sends to PM | com me URL (Ratio)	| !scoop me http://tinyurl.com/article 70 |
+
 Admin only plugins
 ------------------
 
@@ -60,3 +62,5 @@ Admin only plugins
 | Mode		| !mode		| Changes a user's/users' bot modes. '[]' is a binary option field. '()\*' symbolises an argument that can be repeated infinitly| \[com\] (\[+/-\]MODE)\* (nick )*| !mode +o-b Taiiwo Surtri |
 | Send		| !send		| Enter an IRC command manaully. cannot run multiple commands | [com] command | !send privmsg Taiiwo :Nice Bot! |
 | Say		| !say		| Sends a message to argv[1]. Can be channel or nick | [com] channel message | !say Taiiwo Nice Bot! 	|
+| Scoop		| !scoop	| Summarizes any article by URL and sends to chan or PM | com [me/chan/nick] URL (Ratio) | !scoop #freenode http://tinyurl.com/article 70 |
+
