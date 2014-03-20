@@ -1,4 +1,3 @@
-#util.py
 #This file contains fuctions available for the plugin developers.
 import socket, sys, re, urllib2, time, os, random, json
 from BeautifulSoup import BeautifulSoup
@@ -20,19 +19,21 @@ def saveConfigChanges(config):
 		print "[E] Could not save to config file"
 
 def say(channel, message):# A quick way to make the bot say something. Use return say(argv['channel'],message)
-	return 'PRIVMSG ' + channel + ' :' + message + '\r\n'# (You need to define argv with the argv() function
+	if len(message) > 430:
+		messages = [message[i:i+430] for i in range(0, len(message), 430)]
+		retme = []
+		for message in messages:
+			retme.append('PRIVMSG ' + channel + ' :' + message + '\r\n')
+		return '\n'.join(retme)
+	else:
+		return "PRIVMSG " + channel + " :" + message + "\r\n"
 
 def html_strip(s):
-	tags = ['p','b','ul','ln','div']
-	for tag in tags:
-		s.remove('<'+tag+'>')
-		s.remove('</'+tag+'>')
+	return re.sub('<[^<]+?>', '', s)
 
 def html_decode(s):# Replaces some HTML codes with normal text ones.
-        htmlCodes = (("'", '&#39;'),('"', '&quot;'),('>', '&gt;'),('<', '&lt;'),('&', '&amp;'))
-        for code in htmlCodes:
-                s = s.replace(code[1], code[0])
-        return s
+	s = BeautifulSoup(s,convertEntities=BeautifulSoup.HTML_ENTITIES)
+        return str(s)
 def textbetween(str1,str2,text):# returns the text between str1 and str2 in text. This is usefull for parsing data.
         posstr1 = text.find(str1)
         posstr2 = text.find(str2)
