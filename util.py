@@ -23,11 +23,7 @@ def say(channel, message):# A quick way to make the bot say something. Use retur
 	return 'PRIVMSG ' + channel + ' :' + message + '\r\n'# (You need to define argv with the argv() function
 
 def html_strip(s):
-	tags = ['p','b','ul','ln','div']
-	for tag in tags:
-		s.remove('<'+tag+'>')
-		s.remove('</'+tag+'>')
-
+	return re.sub('<[^<]+?>', '', s)
 def html_decode(s):# Replaces some HTML codes with normal text ones.
         htmlCodes = (("'", '&#39;'),('"', '&quot;'),('>', '&gt;'),('<', '&lt;'),('&', '&amp;'))
         for code in htmlCodes:
