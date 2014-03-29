@@ -5,6 +5,6 @@ def main(data):
                         if args['nick'] == user['nick'] and modeCheck('a',data):
                                 if 'g' in user['modes'] or args['channel'] == user['channel']:
                                         if 'a' in user['modes']:
-                                                return 'JOIN ' + args['argv'][1] + '\r\n'
                                                 data['config']['channels'].append(args['argv'][1])
                                                 saveConfigChanges(data['config'])
+                                                return 'JOIN ' + args['argv'][1] + '\r\n'
