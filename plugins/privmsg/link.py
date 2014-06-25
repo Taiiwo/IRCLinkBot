@@ -2,7 +2,7 @@ def main(data):
         args = argv('@',data['recv'])
 	#look for URL
 	link = geturl(data['recv'])
-	if link and link != '':
+	if link and link != "" and not modeCheck('b',data):
 		link = link[0]
 		#look for title
 		badext = ('.cgi','.CGI','.jpg','.png','.gif','.bmp')
@@ -13,9 +13,9 @@ def main(data):
 				title = title.replace('\r',' ')
 				if len(title) >= 150:
 					title = title[:150]
+				title = title.encode('ascii', 'ignore')
 				title = html_decode(title)
 				title = " ".join(title.split())
-				title = title.encode('ascii', 'ignore')
 				if len(link) > int(data['config']['settings']['maxLinkLen']):
 					#post title + tiny
 					return say(args['channel'], '^ ' + title + ' ' + maketiny(link) + ' ^')

@@ -9,30 +9,37 @@ def importConfig():
 config = importConfig()
 # Creating socket   
 s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-print "[-]Connecting to server..."
-try:
-        s.connect(( config['settings']['host'] , int(config['settings']['port']))) #connect to server
-
-except:
-        print "[E]Could not connect to server."
-time.sleep(0.2)
-s.send('nick ' + config['settings']['botNick'] + '\r\n')
-time.sleep(0.2)
-s.send('user ' + config['settings']['botIdent'] + ' * ' + config['settings']['botUser'] + ' ' + config['settings']['botName'] + '\r\n')
-if config['settings']['authenticate'] == 'True':
-    try:
-        passFile = open('pass','r')
-        password = passFile.read()
-        s.send('PRIVMSG nickserv :identify ' + password + '\r\n')
-    except:
-        print "[E] Password not found. Continuing without authentication."
-time.sleep(0.2)
-for channel in config['settings']['joinChannels']:#	Join all the channels
-        s.send('join ' + channel + '\r\n')
+def connect(s):
+	print "[-]Connecting to server..."
+	while 1:
+		try:
+		        s.connect(( config['settings']['host'] , int(config['settings']['port']))) #connect to server
+			break
+		except:
+		        print "[E]Could not connect to server."
 	time.sleep(0.2)
-        s.send('privmsg ' + channel + ' :' + config['settings']['joinMessage'] + "\n\r")
+	s.send('nick ' + config['settings']['botNick'] + '\r\n')
+	time.sleep(0.2)
+	s.send('user ' + config['settings']['botIdent'] + ' * ' + config['settings']['botUser'] + ' ' + config['settings']['botName'] + '\r\n')
+	if config['settings']['authenticate'] == 'True':
+	    try:
+	        passFile = open('pass','r')
+	        password = passFile.read()
+	        s.send('PRIVMSG nickserv :identify ' + password + '\r\n')
+	    except:
+	        print "[E] Password not found. Continuing without authentication."
+	while 1:
+		recvData = s.recv(512)
+		if config['settings']['printRecv'] == 'True':
+			print recvData
+		if ":You are now identified for" in recvData:
+			break
+	for channel in config['settings']['joinChannels']:#	Join all the channels
+	        s.send('join ' + channel + '\r\n')
+		time.sleep(0.5)
+	        s.send('privmsg ' + channel + ' :' + config['settings']['joinMessage'] + "\n\r")
+connect(s)
 sending = 0
-
 def runPlugins(plugins, path, data):#	This function is for threading
 	global sending
 	for plugin in plugins:
@@ -70,6 +77,10 @@ while 1:
 		print "[E] Failed to read config"
 	recvLen = int(config['settings']['recvLen'])
 	recvData = s.recv(recvLen)
+	if recvData == "":
+		s.close()
+		s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+		connect(s)
 	data = {'recv' : recvData,#		Format data to send to the plugins.	
 			'config' : config,
 			'loop' : loop } 

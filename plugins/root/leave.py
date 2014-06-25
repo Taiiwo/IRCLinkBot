@@ -6,5 +6,5 @@ def main(data):
 				if 'g' in user['modes'] or args['channel'] == user['channel']:
 					if 'a' in user['modes']:
 		                        	return 'PART ' + args['argv'][1] + '\r\n'
-						data['config']['channels'].remove(args['argv'][1])
+						data['config']['settings']['joinChannels'].remove(args['argv'][1].lower())
 						saveConfigChanges(data['config'])

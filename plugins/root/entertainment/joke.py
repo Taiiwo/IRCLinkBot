@@ -18,7 +18,7 @@ def main(data):
                         joke = soup.find('section', attrs={'class':'jokeText'}).string #div -> section. It works.
 			"""
                         #   joke = unicode(joke) 1 problem I've found - jokes are not nearly as funny as they used to be
-                        if len(joke) <= 250:
+                        if len(joke) <= 500:
                                 joke = joke.replace('\n', ' ')
                                 joke = joke.decode("utf-8")
                                 joke = html_decode(joke.encode("ascii","ignore"))
