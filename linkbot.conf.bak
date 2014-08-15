@@ -1,25 +1,22 @@
 {
     "settings": {
+        "authenticate": "False",
         "botIdent": "TaiiwoBot",
         "botName": "Taiiwo Bot",
-        "botNick": "TaiiwoBot",
-        "botUser": "Taiiwo",
+        "botNick": "TaiiwoTest",
+        "botUser": "TaiiwoTest",
         "host": "irc.freenode.net",
+        "hoursDiffGMT": "-4",
         "joinChannels": [
-            "##426699k",
-            "#33012014",
-            "#cicadasolvers",
-            "#3301hackers",
-            "#cicada3301",
-            "#3301ops"
+            "#TaiiwoTest"
         ],
-        "joinMessage": "LinkBot v4.2b - I'm in beta. Crash me.",
-        "messageTimeSpacing": "0.2",
+        "joinMessage": "LinkBot v4.3b - It's lonely in here, add more plugins!.",
+        "maxLinkLen": "53",
+        "messageTimeSpacing": "0.4",
         "port": "6667",
         "printRecv": "True",
         "printSend": "True",
         "recvLen": "512",
-	"maxLinkLen" : "53",
         "userModes": [
             {
                 "channel": "##426699k",
@@ -40,10 +37,40 @@
                 "nick": "Beato"
             },
             {
+                "channel": "##426699k",
+                "isAuth": "True",
+                "modes": "gao",
+                "nick": "Gauja"
+            },
+            {
+                "channel": "##426699k",
+                "isAuth": "True",
+                "modes": "oga",
+                "nick": "Surtri"
+            },
+            {
+                "channel": "##426699k",
+                "isAuth": "True",
+                "modes": "bg",
+                "nick": "Nessun0"
+            },
+            {
                 "channel": "##426699t",
+                "isAuth": "True",
+                "modes": "gao",
+                "nick": "onering"
+            },
+            {
+                "channel": "##426699k",
+                "isAuth": "True",
+                "modes": "goa",
+                "nick": "Schizoid"
+            },
+            {
+                "channel": "#cicadasolvers",
                 "isAuth": "False",
-                "modes": "t",
-                "nick": "TaiiwoTest"
+                "modes": "bg",
+                "nick": "e0"
             }
         ]
     },
