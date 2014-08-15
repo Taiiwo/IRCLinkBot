@@ -32,7 +32,7 @@ def connect(s):
 		recvData = s.recv(512)
 		if config['settings']['printRecv'] == 'True':
 			print recvData
-		if ":You are now identified for" in recvData:
+		if ":You are now identified for" in recvData or config['settings']['authenticate'] != 'True':
 			break
 	for channel in config['settings']['joinChannels']:#	Join all the channels
 	        s.send('join ' + channel + '\r\n')
