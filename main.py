@@ -105,10 +105,12 @@ while 1:
 		# Run plugins from ./plugins/privmsgbot/*
 		for root, subFolders, files in os.walk('./plugins/privmsgbot/',followlinks=True):
 			thread.start_new_thread( runPlugins, (files, root, data) )
-	elif recvData[0:5] == 'PING ':
-		s.send('PONG ' + recvData.split(' ')[1][1:] + '\r\n')
-		if config['settings']['printSend'] == 'True':
-			print 'PONG ' + recvData.split(' ')[1][1:] + '\r\n'
+	else:
+		for line in recvData.splitlines():
+			if line[0:5] == 'PING ':
+				s.send('PONG ' + recvData.split(' ')[1][1:] + '\r\n')
+				if config['settings']['printSend'] == 'True':
+					print 'PONG ' + recvData.split(' ')[1][1:] + '\r\n'
 		'''	I was thinking about making the bot run plugins from a 'PING' folder,
 			but saw very little point, other than possible data logging?. Regardless,
 			I left it out.	'''
