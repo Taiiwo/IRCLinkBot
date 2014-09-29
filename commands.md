@@ -49,11 +49,12 @@ Plugins that require commands to initialize
 | Roll usage2	| !r		| Gives a sumulated output of an X sided dice being rolled Y times. 'd' stands for 'dice' | [com] XdY | !r 2d20 |
 | WYR	    	| !wyr		| Gets a random 'Would you rather?' question from http://rrrather.com| [com] | !wyr			|
 | Scoop		| !scoop	| Summarizes any article by URL and sends to PM | com me URL (Ratio)	| !scoop me http://tinyurl.com/article 70 |
+| uc wiki | !uc | Searches the Uncovering-cicada wikia and returns a title and a tinyURL | [com] query | !uc runes |
 
 Admin only plugins
 ------------------
 
-###Requires +a in given channel or ga
+###Requires +a in given channel or +ga
 | Name		| Command	| Description					| Usage			| Example 			|
 |:-------------:|:--------------|:----------------------------------------------|:----------------------|:------------------------------|
 | Auth me	| !authme	| Forces an authentication, needed when the bot Boots up after you log in. | [com] | !authme		|
