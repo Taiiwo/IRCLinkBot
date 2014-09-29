@@ -16,6 +16,7 @@ def main(data):
 		query = query.replace(data['config']['settings']['botNick'],'CleverBot')
 		answer = bot.think(query)
 		answer = answer.replace('CleverBot',data['config']['settings']['botNick'])
+		answer = answer.replace('Cleverbot',data['config']['settings']['botNick'])
 		answer = answer.replace('God','Taiiwo')
 		answer = answer.replace('god','Taiiwo')
 		answer = answer.replace('&ouml;', 'o')
