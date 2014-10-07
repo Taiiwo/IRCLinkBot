@@ -32,6 +32,7 @@ def html_strip(s):
 	return re.sub('<[^<]+?>', '', s)
 
 def html_decode(s):# Replaces some HTML codes with normal text ones.
+	s = s.replace("&amp;", "&")
 	s = BeautifulSoup(s,convertEntities=BeautifulSoup.HTML_ENTITIES)
         return str(s)
 def textbetween(str1,str2,text):# returns the text between str1 and str2 in text. This is usefull for parsing data.
@@ -59,6 +60,7 @@ def argv(gcommand,recv):# returns a named, multidimentional array of on recv inf
 	else:
 		nick = 'Unknown'
 		user = 'Unknown'
+		channel = None
 	argc = gcommand.split()
 	argv = []
 	argv.append(com)
