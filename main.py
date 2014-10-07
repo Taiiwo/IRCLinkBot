@@ -44,30 +44,36 @@ def runPlugins(plugins, path, data):#	This function is for threading
 	global sending
 	for plugin in plugins:
 		if plugin[-3:] == '.py' and plugin[0:2] != 'lib':
-			try:
-				pluginFile = open (path + '/' + plugin,'r')
-				exec(pluginFile)
-				pluginFile.close()
-				toSend = main(data)
-				if toSend and toSend != '' and toSend != None:
-					global sending
-					while 1:
-						if sending <= 2:
-							sending += 1
-							for send in toSend.split('\n'):
-								s.send(send + '\n')
-								time.sleep(float(config['settings']['messageTimeSpacing']))
-							sending -= 1
-							break
-						else:
-							continue
-					if config['settings']['printSend'] == 'True':
-						print toSend
+			pluginFile = open (path + '/' + plugin,'r')
+			exec(pluginFile)
+			pluginFile.close()
+			args = argv(':', data['recv'])
+			if args['channel'] in config['settings']['pluginIgnoreChannels']:
+				if not plugin in config['settings']['pluginIgnoreChannels'][args['channel']]:
+					toSend = main(data)
+					if toSend and toSend != '' and toSend != None:
+						global sending
+						while 1:
+							if sending <= 2:
+								sending += 1
+								for send in toSend.split('\n'):
+									s.send(send + '\n')
+									time.sleep(float(config['settings']['messageTimeSpacing']))
+								sending -= 1
+								break
+							else:
+								continue
+						if config['settings']['printSend'] == 'True':
+							print toSend
+				else:
+					print "[D] " + plugin + " is disabled in this channel"
+			"""
 			except Exception , err:
 				sending -= 1
 				errormsg = sys.exc_info()[1]
 				if errormsg != None:
 					print plugin + ' : ' + str(errormsg)
+			"""
 
 loop = 0
 while 1:
