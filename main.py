@@ -49,24 +49,23 @@ def runPlugins(plugins, path, data):#	This function is for threading
 			pluginFile.close()
 			args = argv(':', data['recv'])
 			if args['channel'] in config['settings']['pluginIgnoreChannels']:
-				if not plugin in config['settings']['pluginIgnoreChannels'][args['channel']]:
-					toSend = main(data)
-					if toSend and toSend != '' and toSend != None:
-						global sending
-						while 1:
-							if sending <= 2:
-								sending += 1
-								for send in toSend.split('\n'):
-									s.send(send + '\n')
-									time.sleep(float(config['settings']['messageTimeSpacing']))
-								sending -= 1
-								break
-							else:
-								continue
-						if config['settings']['printSend'] == 'True':
-							print toSend
-				else:
-					print "[D] " + plugin + " is disabled in this channel"
+				if plugin in config['settings']['pluginIgnoreChannels'][args['channel']]:
+					toSend = None
+			toSend = main(data)
+			if toSend and toSend != '' and toSend != None:
+				global sending
+				while 1:
+					if sending <= 2:
+						sending += 1
+						for send in toSend.split('\n'):
+							s.send(send + '\n')
+							time.sleep(float(config['settings']['messageTimeSpacing']))
+						sending -= 1
+						break
+					else:
+						continue
+				if config['settings']['printSend'] == 'True':
+					print toSend
 			"""
 			except Exception , err:
 				sending -= 1
