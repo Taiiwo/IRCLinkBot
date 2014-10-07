@@ -134,7 +134,7 @@ def main(data):
 	                remark += " AND HAILING"
 	
 	        if int(tempf) == 69:
-	                remark = "IT'S FUCKING SEXY TIME"
+	                remark = "IT'S FUCKING SEXY TIME (69F)"
 	                flavors = [
 	                        "Why is 77 better than 69? You get eight more.",
 	                        "What comes after 69? Mouthwash.",
