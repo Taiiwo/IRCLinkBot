@@ -69,8 +69,8 @@ def argv(gcommand,recv):# returns a named, multidimentional array of on recv inf
 	return {'nick' : nick, 'user' : user,'channel' : channel, 'argv' : argv}
 def gettitle(url):#get the page title of an URL
 	try:
-        	soup = BeautifulSoup(urllib2.urlopen(url))
-        	return soup.title.string
+		soup = BeautifulSoup(urllib2.urlopen(url).read(1024 * 1024))
+		return soup.title.string
 	except:
 		return False
 def geturl(recv):#parse an URL from a string
