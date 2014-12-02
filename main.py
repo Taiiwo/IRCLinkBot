@@ -48,10 +48,10 @@ def runPlugins(plugins, path, data):#	This function is for threading
 			exec(pluginFile)
 			pluginFile.close()
 			args = argv(':', data['recv'])
+			toSend = main(data)
 			if args['channel'] in config['settings']['pluginIgnoreChannels']:
 				if plugin in config['settings']['pluginIgnoreChannels'][args['channel']]:
 					toSend = None
-			toSend = main(data)
 			if toSend and toSend != '' and toSend != None:
 				global sending
 				while 1:
