@@ -21,7 +21,7 @@ def main(url):
 
     paste_regex_to_func = {
         '^.*https?://pastebin\.com/[^ ]+': pastebin.get_content,
-        '^.*https?://p.pomf\.se/\d+': ppomf.get_content,
+        '^.*https?://p\.pomf\.se/\d+': ppomf.get_content,
         '^.*https?://infotomb\.com/[0-9a-zA-Z]+': infotomb.get_content,
         '^.*https?://prntscr\.com/[0-9a-zA-Z]+': prntscrn.get_content 
     }
