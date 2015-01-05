@@ -1,6 +1,7 @@
 def main(data):
 	url = geturl(data['recv'])
 	if url:# if there's a url in something someone says
+		import urlLurker
 		timestamp = time.now()
 		if re.match("^https?://infotomb\.com/.*$", url):
 			url = urlLurker.infotomb(url)
