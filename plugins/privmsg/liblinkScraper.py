@@ -22,7 +22,8 @@ def main(url):
         '^.*https?://pastebin\.com/[^ ]+': pastebin.get_content,
         '^.*https?://p\.pomf\.se/\d+': ppomf.get_content,
         '^.*https?://infotomb\.com/[0-9a-zA-Z]+': infotomb.get_content,
-        '^.*https?://prntscr\.com/[0-9a-zA-Z]+': prntscrn.get_content 
+        '^.*https?://prntscr\.com/[0-9a-zA-Z]+': prntscrn.get_content,
+        '^.*https?://(i\.)?cubeupload\.com/(im/)?[a-zA-Z0-9]+': cubeupload.get_content
     }
     for regex, func in paste_regex_to_func.iteritems():
         res = re.match(regex, url)
