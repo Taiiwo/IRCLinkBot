@@ -79,9 +79,11 @@ Simularly, the plugins that you intend to run in response to things said in chan
 
 The structure is fairly simple. Below is a commented directory tree.
 
-/plugins/ 		- Python files placed here will have main() executed when ever a message is received from IRC.
-/plugins/privmsg/ 	- Python files placed here will have main() executed when a private message is sent to one of the channels that TaiiwoBot has joined.
-/plugins/privmsgbot/	- These scripts will have main() executed whenever TaiiwoBot receives a private message is send directly to TaiiwoBot (/msg TaiiwoBot !help)
+| dir name 		| description |
+|-----------------------|-------------|
+| /plugins/		| Python files placed here will have main() executed when ever a message is received from IRC. |
+| /plugins/privmsg/	| Python files placed here will have main() executed when a private message is sent to one of the channels that TaiiwoBot has joined. |
+| /plugins/privmsgbot/	| These scripts will have main() executed whenever TaiiwoBot receives a private message is send directly to TaiiwoBot (/msg TaiiwoBot !help) |
 
 All new folders with these directories will we dropped into, and all plugins within them will be executed in separite threads.
 This allows you to separate plugins by speed, or by category, or however you'd like.
