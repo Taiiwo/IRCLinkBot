@@ -39,7 +39,7 @@ Note note, you should disable the output options of TaiiwoBot in the config file
 
 Developing Plugins
 ------------------
-###The Plugin Code
+### The Plugin Code
 The main() function of the plugin will be run.
 Feel free to import external libraries in your plugin (Duplicate importations are handled by Python).
 main() is run as: main(data)
@@ -71,7 +71,7 @@ def main(data):
 
 ```
 
-###Plugin Placement
+### Plugin Placement
 One of the 2 main ways that TaiiwoBot boast speed, is because his plugins are ran situationally.
 Most IRC bots simply run every plugin for every received message from IRC.
 TaiiwoBot, on the other hand, uses the plugins location to determine when the plugin is run. so, for example, your plugins waiting for a command via private message to itself, aren't run until the bot receives a private message addressed to itsself.
@@ -81,11 +81,11 @@ The structure is fairly simple. Below is a commented directory tree.
 
 | dir name 		| description |
 |-----------------------|-------------|
-| /plugins/		| Python files placed here will have main() executed when ever a message is received from IRC. |
+| /plugins/root/	| Python files placed here will have main() executed when ever a message is received from IRC. |
 | /plugins/privmsg/	| Python files placed here will have main() executed when a private message is sent to one of the channels that TaiiwoBot has joined. |
 | /plugins/privmsgbot/	| These scripts will have main() executed whenever TaiiwoBot receives a private message is send directly to TaiiwoBot (/msg TaiiwoBot !help) |
 
-All new folders with these directories will we dropped into, and all plugins within them will be executed in separite threads.
+All new folders with these directories will we dropped into, and all plugins within them will be executed in separate threads.
 This allows you to separate plugins by speed, or by category, or however you'd like.
 You can ignore a directory by prepending '#' to it's name.
 This is useful for quickly disabling large groups of plugins.
