@@ -5,7 +5,6 @@ import hashlib
 from time import time
 
 import ppomf
-import bpaste
 import dpaste
 import infotomb
 import prntscrn
@@ -22,16 +21,15 @@ def main(url):
     paste_regex_to_func = {
         '^.*https?://pastebin\.com/[^ ]+': pastebin.get_content,
         '^.*https?://p\.pomf\.se/\d+': ppomf.get_content,
-        # TODO: add infotomb short link
         '^.*https?://infotomb\.com/[0-9a-zA-Z]+': infotomb.get_content,
         '^.*https?://prntscr\.com/[0-9a-zA-Z]+': prntscrn.get_content,
         # dpaste doesnt get along with https, so we're not gonna bother
-        '^.*http://dpaste\.com/[0-9a-zA-Z]+': dpaste.get_content,
-        '^.*https?://bpaste\.net/(raw|show)/[0-9a-zA-Z]+': bpaste.get_content,
+        '^.*http://dpaste.com/[0-9a-zA-Z]+': dpaste.get_content,
         '^.*https?://(i\.)?cubeupload\.com/(im/)?[a-zA-Z0-9]+': cubeupload.get_content
     }
     for regex, func in paste_regex_to_func.iteritems():
-        if re.match(regex, url) is None:
+        res = re.match(regex, url)
+        if res is None:
             continue
 
         paste_data = func(url)
@@ -65,7 +63,6 @@ def main(url):
             dat = [paste_data]
     with open(archive_json, 'w+') as fj:
         json.dump(dat,fj)
-
     return
 
     if url:# if there's a url in something someone says
@@ -81,12 +78,11 @@ def main(url):
 
 
 urls = [
-    "https://bpaste.net/raw/31f01443d2b1"
-#    "http://dpaste.com/03N0Y7Z",
-#    "http://p.pomf.se/5504", 
-#    "http://pastebin.com/raw.php?i=gpRREVYd",
-#    "http://prntscr.com/5o2enp", 
-#    "https://infotomb.com/y53jc",
+    "http://dpaste.com/03N0Y7Z",
+    "http://p.pomf.se/5504", 
+    "http://pastebin.com/raw.php?i=gpRREVYd",
+    "http://prntscr.com/5o2enp", 
+    "https://infotomb.com/y53jc",
 ]
 for u in urls:
     main(u)
