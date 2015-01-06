@@ -4,11 +4,13 @@ import json
 import hashlib
 from time import time
 
+import imgur
 import ppomf
 import bpaste
 import dpaste
 import infotomb
 import prntscrn
+import hastebin
 import pastebin
 import cubeupload
 
@@ -28,6 +30,9 @@ def main(url):
         # dpaste doesnt get along with https, so we're not gonna bother
         '^.*http://dpaste\.com/[0-9a-zA-Z]+': dpaste.get_content,
         '^.*https?://bpaste\.net/(raw|show)/[0-9a-zA-Z]+': bpaste.get_content,
+        '^.*https?://hastebin\.com/.+': hastebin.get_content,
+
+        # here come the image hosters
         '^.*https?://(i\.)?cubeupload\.com/(im/)?[a-zA-Z0-9]+': cubeupload.get_content,
         '^.*https?://(i\.)?imgur\.com/(gallery/)?[a-zA-Z0-9]+': imgur.get_content
     }
@@ -43,18 +48,20 @@ def main(url):
 
     paste_data['md5'] = hashlib.md5(paste_data['content']).hexdigest()
     paste_data['timestamp'] = timestamp
-    paste_data['location'] = (
+    final_folder = (
         archive_dir + os.sep + paste_data['site'])
 
-    if not os.path.exists(paste_data['location']):
-        os.makedirs(paste_data['location'])
+    if not os.path.exists(final_folder):
+        os.makedirs(final_folder)
 
     filename = str(timestamp) + "_" + paste_data['orig_filename']
     filename += ".%s" % paste_data['ext'] if paste_data['ext'] else ""
 
-    file_location = paste_data['location'] + os.sep + filename
+    file_location = final_folder + os.sep + filename
+    paste_data['location'] = file_location
+
     with open(file_location, 'w') as f:
-        f.write(file_location)
+        f.write(paste_data['content'])
 
     del paste_data['content']
 
@@ -82,12 +89,15 @@ def main(url):
 
 
 urls = [
-    "https://bpaste.net/raw/31f01443d2b1"
-#    "http://dpaste.com/03N0Y7Z",
-#    "http://p.pomf.se/5504", 
-#    "http://pastebin.com/raw.php?i=gpRREVYd",
-#    "http://prntscr.com/5o2enp", 
-#    "https://infotomb.com/y53jc",
+    "http://i.imgur.com/aChgMdG.gif",
+    "http://hastebin.com/zebihupixo.hs",
+    "http://hastebin.com/raw/zebihupixo",
+    "https://bpaste.net/show/31f01443d2b1",
+    "http://dpaste.com/03N0Y7Z",
+    "http://p.pomf.se/5504",
+    "http://pastebin.com/raw.php?i=gpRREVYd",
+    "http://prntscr.com/5o2enp",
+    "https://infotomb.com/y53jc",
 ]
 for u in urls:
     main(u)
