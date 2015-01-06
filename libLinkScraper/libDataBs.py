@@ -32,7 +32,7 @@ class DataBs:
             return True
 
     def upCount(self,hash,count):
-        if self.check(hash):
+        if not self.check(hash):
             return False
         else:
             self.curse.execute("UPDATE harvs SET count=? WHERE hash = ?", [count,hash])
