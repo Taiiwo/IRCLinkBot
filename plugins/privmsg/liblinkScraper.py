@@ -5,17 +5,17 @@ import hashlib
 from time import time
 
 import ppomf
+import dpaste
 import infotomb
 import prntscrn
 import pastebin
+import cubeupload
 
 def main(url):
     archive_dir = os.environ['HOME'] + os.sep + "archive"
     archive_json = archive_dir + os.sep + "archive.json"
 
     # url = geturl(data['recv'])
-    print url
-
     timestamp = int(time())
 
     paste_regex_to_func = {
@@ -23,6 +23,8 @@ def main(url):
         '^.*https?://p\.pomf\.se/\d+': ppomf.get_content,
         '^.*https?://infotomb\.com/[0-9a-zA-Z]+': infotomb.get_content,
         '^.*https?://prntscr\.com/[0-9a-zA-Z]+': prntscrn.get_content,
+        # dpaste doesnt get along with https, so we're not gonna bother
+        '^.*http://dpaste.com/[0-9a-zA-Z]+': dpaste.get_content,
         '^.*https?://(i\.)?cubeupload\.com/(im/)?[a-zA-Z0-9]+': cubeupload.get_content
     }
     for regex, func in paste_regex_to_func.iteritems():
@@ -31,8 +33,10 @@ def main(url):
             continue
 
         paste_data = func(url)
-        if paste_data is None:
-            return
+
+    # either no regex was found to match or no content could be pulled
+    if not "paste_data" in locals() or paste_data is None:
+        return
 
     paste_data['md5'] = hashlib.md5(paste_data['content']).hexdigest()
     paste_data['timestamp'] = timestamp
@@ -50,6 +54,7 @@ def main(url):
         f.write(file_location)
 
     del paste_data['content']
+
     with open(archive_json, "a+") as fj:
         try:
             dat = json.load(fj)
@@ -73,6 +78,7 @@ def main(url):
 
 
 urls = [
+    "http://dpaste.com/03N0Y7Z",
     "http://p.pomf.se/5504", 
     "http://pastebin.com/raw.php?i=gpRREVYd",
     "http://prntscr.com/5o2enp", 
