@@ -28,7 +28,8 @@ def main(url):
         # dpaste doesnt get along with https, so we're not gonna bother
         '^.*http://dpaste\.com/[0-9a-zA-Z]+': dpaste.get_content,
         '^.*https?://bpaste\.net/(raw|show)/[0-9a-zA-Z]+': bpaste.get_content,
-        '^.*https?://(i\.)?cubeupload\.com/(im/)?[a-zA-Z0-9]+': cubeupload.get_content
+        '^.*https?://(i\.)?cubeupload\.com/(im/)?[a-zA-Z0-9]+': cubeupload.get_content,
+        '^.*https?://(i\.)?imgur\.com/(gallery/)?[a-zA-Z0-9]+': imgur.get_content
     }
     for regex, func in paste_regex_to_func.iteritems():
         if re.match(regex, url) is None:
