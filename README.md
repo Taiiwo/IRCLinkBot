@@ -49,14 +49,21 @@ It is because of this however, that it's difficult to keep the documentation up 
 If you want to take a look at what is definitely being passed inside data, I reccomend you have a read through main.py
 Otherwise, here is a list of the most useful information passed inside data:
 
-data['recv'] - This contains the latest data pulled from IRC, delivered in a maximum size specified by 'recvLen' in the config.
-	For examples of output, check the logs (If logging is enabled)
-data['config'] - This is a JSON DOM, parsed from the config file.
-	This DOM is updated every time a new message is sent, so there is no need to manually reimport it.
-	You can change it with updateConf(data['config']).
-	This will write any changes you have made to the physical file.
-	This is recomended if you ever change the data, as un'updated' data will not be present when the bot is rebooted. 
-data['loop'] - This is simply the amount of messages received from IRC.
+data['recv'] 
+
+- This contains the latest data pulled from IRC, delivered in a maximum size specified by 'recvLen' in the config. 
+- For examples of output, check the logs (If logging is enabled)
+
+data['config'] 
+
+- This is a JSON DOM, parsed from the config file.
+- This DOM is updated every time a new message is sent, so there is no need to manually reimport it.
+- You can change it with updateConf(data['config']).
+- This will write any changes you have made to the physical file.
+- This is recomended if you ever change the data, as un'updated' data will not be present when the bot is rebooted.
+
+data['loop']
+- This is simply the amount of messages received from IRC.
 
 The only other important(restrictive) thing is what to return.
 Each plugin must return a string, '', None, , False, or just not return anything (You theoretically could return an integer. It would be converted to a string, but I don't see why you'd want to, as there are no integer only IRC commands)
