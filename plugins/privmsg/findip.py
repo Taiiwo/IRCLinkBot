@@ -6,7 +6,9 @@ def main(data):
         args = argv('!findip',data['recv'])
         
 		# GET whois data
-        query = '%20'.join(args['argv'][1:] )
+        query = ' '.join(args['argv'][1:] )
+        import urllib
+        query = urllib.quote(query)
         try:
             whois = urllib2.urlopen('http://ip-api.com/json/' + query) # This service can take up to 14k requests per hour. Try not to overuse it.
             answ = json.load(whois)
