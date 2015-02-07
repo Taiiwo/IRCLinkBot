@@ -30,7 +30,7 @@ Once you have the config setup, you'll need to choose your plugins.
 Some plugins come preinstalled with TaiiwoBot, these cover a wide range of things, but feel free to disable them and add your own.
 (all plugins are ran within a 'try' statement, so there is no danger of crashing the bot with your experiments (Beware, however, of channel flooding))
 You can disable plugins by adding a '#' to the end of their filename.
-To disable wa.py for example (In /plugins/privmsg/information) type in the directory of wa.py(In *NIX): mv wa.py wa.py\\#
+To disable wa.py for example (In /plugins/privmsg/information) type in the directory of wa.py(In *NIX): ```mv wa.py wa.py\#```
 
 Now you're ready to boot up TaiiwoBot!
 Simply type: python main.py
@@ -39,7 +39,7 @@ Note note, you should disable the output options of TaiiwoBot in the config file
 
 Developing Plugins
 ------------------
-###The Plugin Code
+### The Plugin Code
 The main() function of the plugin will be run.
 Feel free to import external libraries in your plugin (Duplicate importations are handled by Python).
 main() is run as: main(data)
@@ -49,14 +49,21 @@ It is because of this however, that it's difficult to keep the documentation up 
 If you want to take a look at what is definitely being passed inside data, I reccomend you have a read through main.py
 Otherwise, here is a list of the most useful information passed inside data:
 
-data['recv'] - This contains the latest data pulled from IRC, delivered in a maximum size specified by 'recvLen' in the config.
-	For examples of output, check the logs (If logging is enabled)
-data['config'] - This is a JSON DOM, parsed from the config file.
-	This DOM is updated every time a new message is sent, so there is no need to manually reimport it.
-	You can change it with updateConf(data['config']).
-	This will write any changes you have made to the physical file.
-	This is recomended if you ever change the data, as un'updated' data will not be present when the bot is rebooted. 
-data['loop'] - This is simply the amount of messages received from IRC.
+data['recv'] 
+
+- This contains the latest data pulled from IRC, delivered in a maximum size specified by 'recvLen' in the config. 
+- For examples of output, check the logs (If logging is enabled)
+
+data['config'] 
+
+- This is a JSON DOM, parsed from the config file.
+- This DOM is updated every time a new message is sent, so there is no need to manually reimport it.
+- You can change it with updateConf(data['config']).
+- This will write any changes you have made to the physical file.
+- This is recomended if you ever change the data, as un'updated' data will not be present when the bot is rebooted.
+
+data['loop']
+- This is simply the amount of messages received from IRC.
 
 The only other important(restrictive) thing is what to return.
 Each plugin must return a string, '', None, , False, or just not return anything (You theoretically could return an integer. It would be converted to a string, but I don't see why you'd want to, as there are no integer only IRC commands)
@@ -71,7 +78,7 @@ def main(data):
 
 ```
 
-###Plugin Placement
+### Plugin Placement
 One of the 2 main ways that TaiiwoBot boast speed, is because his plugins are ran situationally.
 Most IRC bots simply run every plugin for every received message from IRC.
 TaiiwoBot, on the other hand, uses the plugins location to determine when the plugin is run. so, for example, your plugins waiting for a command via private message to itself, aren't run until the bot receives a private message addressed to itsself.
@@ -79,11 +86,13 @@ Simularly, the plugins that you intend to run in response to things said in chan
 
 The structure is fairly simple. Below is a commented directory tree.
 
-/plugins/ 		- Python files placed here will have main() executed when ever a message is received from IRC.
-/plugins/privmsg/ 	- Python files placed here will have main() executed when a private message is sent to one of the channels that TaiiwoBot has joined.
-/plugins/privmsgbot/	- These scripts will have main() executed whenever TaiiwoBot receives a private message is send directly to TaiiwoBot (/msg TaiiwoBot !help)
+| dir name 		| description |
+|-----------------------|-------------|
+| /plugins/root/	| Python files placed here will have main() executed when ever a message is received from IRC. |
+| /plugins/privmsg/	| Python files placed here will have main() executed when a private message is sent to one of the channels that TaiiwoBot has joined. |
+| /plugins/privmsgbot/	| These scripts will have main() executed whenever TaiiwoBot receives a private message is send directly to TaiiwoBot (/msg TaiiwoBot !help) |
 
-All new folders with these directories will we dropped into, and all plugins within them will be executed in separite threads.
+All new folders with these directories will we dropped into, and all plugins within them will be executed in separate threads.
 This allows you to separate plugins by speed, or by category, or however you'd like.
 You can ignore a directory by prepending '#' to it's name.
 This is useful for quickly disabling large groups of plugins.
