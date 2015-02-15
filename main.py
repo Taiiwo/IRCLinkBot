@@ -54,24 +54,20 @@ class botApi:
                 time.sleep(5)
         time.sleep(0.2)
         # set nick
-        self.s.send('nick ' + self.config['settings']['botNick'] + '\r\n')
+        self.s.send('nick %s\r\n' % (self.config['settings']['botNick']))
         time.sleep(0.2)
         # set user
-        self.s.send(
-            'user ' +
-            self.config['settings']['botIdent'] +
-            ' * ' +
-            self.config['settings']['botUser'] +
-            ' ' +
-            self.config['settings']['botName'] +
-            '\r\n'
-        )
+        self.s.send("user %s * %s %s\r\n" % (
+            self.config['settings']['botIdent'],
+            self.config['setttings']['botUser'],
+            self.config['settings']['botName']
+        ))
         # authenticate
         if self.config['settings']['authenticate'] == 'True':
             try:
                 passFile = open('pass', 'r')
                 password = passFile.read()
-                self.say('nickserv', 'identify ' + password)
+                self.say('nickserv', 'identify %s' % (password))
             except:
                 print "[E] Password not found. Continuing without \
                         authentication."
@@ -84,7 +80,7 @@ class botApi:
                 break
         # Join all the channels
         for channel in self.config['settings']['joinChannels']:
-            self.s.send('join ' + channel + '\r\n')
+            self.s.send('join %s\r\n' % (channel))
             time.sleep(0.5)
             self.say(channel, self.config['settings']['joinMessage'])
 
@@ -112,9 +108,9 @@ class botApi:
                     # split into a group of messages 430 chars long
                     msgs = [msg[i:i+430] for i in range(0, len(msg), 430)]
                     for msg in msgs:
-                        retme += 'PRIVMSG ' + target + ' :' + msg + '\r\n'
+                        retme += 'PRIVMSG %s :%s\r\n' % (target, msg)
                 else:
-                    retme += ("PRIVMSG " + target + " :" + msg + "\r\n")
+                    retme += 'PRIVMSG %s :%s\r\n' % (target, msg)
         self.s.send(retme)
         # I don't know why you'd want this, but
         # better to return something than nothing.
@@ -153,8 +149,8 @@ class botApi:
                 # prepending '.' to the folder name.
                 self.pluginList.append({"nameList": files, "path": root})
         # If recv is a private message to the bot
-        elif not re.match('^:[^!]*![^@]*@[^\s]\s(PRIVMSG|privmsg)\s' +
-                          self.config['settings']['botNick'] + ':.*',
+        elif not re.match('^:[^!]*![^@]*@[^\s]\s(PRIVMSG|privmsg)\s%s:.*'
+                          % (self.config['settings']['botNick']),
                           self.recvData) == None:
             # Run plugins from ./plugins/privmsgbot/*
             for root, subFolders, files in os.walk('./plugins/privmsgbot/',
@@ -172,7 +168,7 @@ class botApi:
 
     def runPlugin(self, plugin, path, data):  # runs a single plugin
         if plugin[-3:] == '.py' and plugin[0:2] != 'lib':
-            pluginFile = open(path + '/' + plugin, 'r')
+            pluginFile = open('%s/%s' % (path, plugin), 'r')
             exec(pluginFile)
             pluginFile.close()
             args = argv(':', data['recv'])
@@ -204,7 +200,7 @@ class botApi:
                                 self.sending -= 1
                                 errormsg = sys.exc_info()[1]
                                 if errormsg is not None:
-                                    print plugin + ' : ' + str(errormsg)
+                                    print '%s : %s' % (str(errormsg), plugin)
                         self.sending -= 1
                         break
                     else:
@@ -218,9 +214,9 @@ class botApi:
         # logging?. Regardless, I left it out.
         for line in self.recvData.splitlines():
             if line[0:5] == 'PING ':
-                self.s.send('PONG ' + self.recvData.split(' ')[1][1:] + '\r\n')
+                self.s.send('PONG %s\r\n' % (self.recvData.split(' ')[1][1:]))
                 if self.config['settings']['printSend'] == 'True':
-                    print 'PONG ' + self.recvData.split(' ')[1][1:] + '\r\n'
+                    print 'PONG %s\r\n' % (self.recvData.split(' ')[1][1:])
 
 bot = botApi()
 bot.connect()
