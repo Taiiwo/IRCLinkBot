@@ -17,13 +17,13 @@ def main(data):
 				toret.append(say(args['channel'],i).encode('ascii', 'ignore'))
 			return ''.join(toret)
 		except:
-			global bot
+			global cleverbot
 			query = ' '.join(args['argv'][1:])
 			query = query.replace('\n','')
 	                query = query.replace('\r','')
 	                query = query.replace(data['config']['settings']['botNick'] + ':','')
 	                query = query.replace(data['config']['settings']['botNick'],'CleverBot')
-	                answer = bot.think(query)
+	                answer = cleverbot.think(query)
 	                answer = answer.replace('CleverBot',data['config']['settings']['botNick'])
 	                answer = answer.replace('Cleverbot',data['config']['settings']['botNick'])
 	                answer = answer.replace('God','Taiiwo')
