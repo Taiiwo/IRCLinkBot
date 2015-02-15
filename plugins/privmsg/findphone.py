@@ -1,4 +1,4 @@
-def main(self):
+def main(data):
 	if "!findphone" in data['recv']:
 		args = argv("!findphone",data['recv'])
 		number = args['argv'][1]
