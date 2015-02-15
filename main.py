@@ -26,6 +26,7 @@ class botApi:
 					else:
 						raise Exception(error)
 						break
+
 	def connect(self):
 		print "[-]Connecting to server..."
 		while 1:
@@ -59,6 +60,21 @@ class botApi:
 			self.s.send('join ' + channel + '\r\n')
 			time.sleep(0.5)
 			self.say(channel, self.config['settings']['joinMessage'])
+			
+	def do(self):
+		self.importConfig(submissive = True)#	Refresh the config file
+		recvData = bot.recv()
+		bot.runPlugins()
+		bot.handlePing()
+		
+	def recv(self):
+		bot.loop += 1
+		recvLen = int(self.config['settings']['recvLen'])
+		self.recvData = self.s.recv(recvLen)
+		if self.config['settings']['printRecv'] == 'True':
+			print self.recvData
+		return self.recvData
+		
 	def say(self, target, message):
 		# send multiple messages by splitting with \n
 		# It is this way to help stop IRC injection
@@ -76,7 +92,43 @@ class botApi:
 		# I don't know why you'd want this, but better to return something than nothing.
 		return retme
 
-	def runPlugin(self, plugin, path, data):
+	def runPlugins(self):# run all plugins in threads
+		self.indexPlugins()
+		data = {'recv' : self.recvData,#	Format data to send to the plugins.	
+			'config' : self.config,#	json object of config file
+			'loop' : self.loop,#		number of messages received
+			'api' : self }#		The bot object used to interface with IRC
+		for pluginFolder in self.pluginList:
+			thread.start_new_thread(self.pluginThread, (pluginFolder['nameList'], pluginFolder['path'], data))
+
+	def indexPlugins(self):
+		self.pluginList = []
+		path = './plugins/'
+		rootPlugins = os.listdir('./plugins/')# 	Get plugin filenames only from the plugins directory
+							#	This runs the plugins no matter what.
+		self.pluginList.append({"nameList" : rootPlugins, "path": path})#	Run the root plugins in a new thread
+
+		# Check if the recv is a privmsg from a channel
+		if not re.match('^:[^!]*![^@]*@[^\s]\s(PRIVMSG|privmsg)\s#[^:]*:.*', self.recvData) == None:
+			#Run plugins from ./plugins/privmsg/*
+			for root, subFolders, files in os.walk('./plugins/privmsg/',followlinks=True):#		Fetch plugins recurisively. This means
+				self.pluginList.append({"nameList" : files, "path": root})#	you can organize plugins in subfolders however you'd like. eg. Have a folder
+											#	full of entertainment plugins that you can easily disable by prepending '.' to the folder name.
+		# If recv is a private message to the bot
+		elif not re.match('^:[^!]*![^@]*@[^\s]\s(PRIVMSG|privmsg)\s' + self.config['settings']['botNick'] + ':.*', self.recvData) == None:
+			# Run plugins from ./plugins/privmsgbot/*
+			for root, subFolders, files in os.walk('./plugins/privmsgbot/',followlinks=True):
+				self.pluginList.append({"nameList" : files, "path": root})
+		
+		# run plugins from the directory named 'root'
+		for root, subFolders, files in os.walk('./plugins/root/',followlinks=True):
+			self.pluginList.append({"nameList" : files, "path": root})
+
+	def pluginThread(self, plugins, path, data):#	This function is for threading
+		for plugin in plugins:
+			self.runPlugin(plugin, path, data)
+
+	def runPlugin(self, plugin, path, data):# runs a single plugin
 		if plugin[-3:] == '.py' and plugin[0:2] != 'lib':
 			pluginFile = open (path + '/' + plugin,'r')
 			exec(pluginFile)
@@ -108,51 +160,7 @@ class botApi:
 						continue
 				if self.config['settings']['printSend'] == 'True':
 					print toSend
-			
-	def pluginThread(self, plugins, path, data):#	This function is for threading
-		for plugin in plugins:
-			self.runPlugin(plugin, path, data)
-			
-	def runPlugins(self):
-		self.indexPlugins()
-		data = {'recv' : self.recvData,#	Format data to send to the plugins.	
-			'config' : self.config,#	json object of config file
-			'loop' : self.loop,#		number of messages received
-			'api' : self }#		The bot object used to interface with IRC
-		for pluginFolder in self.pluginList:
-			thread.start_new_thread(self.pluginThread, (pluginFolder['nameList'], pluginFolder['path'], data))
-	
-	def recv(self):
-		bot.loop += 1
-		recvLen = int(self.config['settings']['recvLen'])
-		self.recvData = self.s.recv(recvLen)
-		if self.config['settings']['printRecv'] == 'True':
-			print self.recvData
-		return self.recvData
-		
-	def indexPlugins(self):
-		self.pluginList = []
-		path = './plugins/'
-		rootPlugins = os.listdir('./plugins/')# 	Get plugin filenames only from the plugins directory
-							#	This runs the plugins no matter what.
-		self.pluginList.append({"nameList" : rootPlugins, "path": path})#	Run the root plugins in a new thread
 
-		# Check if the recv is a privmsg from a channel
-		if not re.match('^:[^!]*![^@]*@[^\s]\s(PRIVMSG|privmsg)\s#[^:]*:.*', self.recvData) == None:
-			#Run plugins from ./plugins/privmsg/*
-			for root, subFolders, files in os.walk('./plugins/privmsg/',followlinks=True):#		Fetch plugins recurisively. This means
-				self.pluginList.append({"nameList" : files, "path": root})#	you can organize plugins in subfolders however you'd like. eg. Have a folder
-											#	full of entertainment plugins that you can easily disable by prepending '.' to the folder name.
-		# If recv is a private message to the bot
-		elif not re.match('^:[^!]*![^@]*@[^\s]\s(PRIVMSG|privmsg)\s' + self.config['settings']['botNick'] + ':.*', self.recvData) == None:
-			# Run plugins from ./plugins/privmsgbot/*
-			for root, subFolders, files in os.walk('./plugins/privmsgbot/',followlinks=True):
-				self.pluginList.append({"nameList" : files, "path": root})
-		
-		# run plugins from the directory named 'root'
-		for root, subFolders, files in os.walk('./plugins/root/',followlinks=True):
-			self.pluginList.append({"nameList" : files, "path": root})
-		
 	def handlePing(self):
 		for line in self.recvData.splitlines():
 			if line[0:5] == 'PING ':
@@ -162,11 +170,7 @@ class botApi:
 		'''	I was thinking about making the bot run plugins from a 'PING' folder,
 			but saw very little point, other than possible data logging?. Regardless,
 			I left it out.	'''
-	def do(self):
-		self.importConfig(submissive = True)#	Refresh the config file
-		recvData = bot.recv()
-		bot.runPlugins()
-		bot.handlePing()
+	
 bot = botApi()
 bot.connect()
 while 1:
