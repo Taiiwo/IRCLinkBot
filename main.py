@@ -189,7 +189,7 @@ class botApi:
                         self.sending += 1
                         for send in toSend.split('\n'):
                             try:
-                                self.s.send(send + '\n')
+                                self.s.send(send.encode('utf-8') + '\n')
                                 time.sleep(
                                     float(
                                         self.config['settings']
