@@ -93,7 +93,7 @@ class botApi:
     def recv(self):
         bot.loop += 1
         recvLen = int(self.config['settings']['recvLen'])
-        self.recvData = self.s.recv(recvLen)
+        self.recvData = self.s.recv(recvLen).decode('utf-8')
         if self.config['settings']['printRecv'] == 'True':
             print self.recvData
         return self.recvData
@@ -101,17 +101,19 @@ class botApi:
     def say(self, target, message):
         # send multiple messages by splitting with \n
         # It is this way to help stop IRC injection
-        retme = ""
+        retme = u""
         for msg in message.split('\n'):
             if msg and msg != '':
                 if len(msg) > 430:
                     # split into a group of messages 430 chars long
                     msgs = [msg[i:i+430] for i in range(0, len(msg), 430)]
                     for msg in msgs:
-                        retme += 'PRIVMSG %s :%s\r\n' % (target, msg)
+                        retme += u'PRIVMSG %s :%s\r\n' % (target, msg)
                 else:
-                    retme += 'PRIVMSG %s :%s\r\n' % (target, msg)
-        self.s.send(retme)
+                    retme += u'PRIVMSG %s :%s\r\n' % (target, msg)
+        if self.config['settings']['printSend'] == 'True':
+            print retme
+        self.s.send(retme.encode('utf-8'))
         # I don't know why you'd want this, but
         # better to return something than nothing.
         return retme
@@ -171,7 +173,7 @@ class botApi:
             pluginFile = open('%s/%s' % (path, plugin), 'r')
             exec(pluginFile)
             pluginFile.close()
-            args = argv(':', data['recv'])
+            args = argv('', self.recvData)
             toSend = main(data)
             if args['channel'] in \
                     self.config['settings']['pluginIgnoreChannels']:
