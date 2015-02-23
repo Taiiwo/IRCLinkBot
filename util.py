@@ -1,5 +1,5 @@
 #This file contains fuctions available for the plugin developers.
-import socket, sys, re, urllib2, time, os, random, json
+import socket, sys, re, urllib2, time, os, random, json, htmlentitydefs
 from BeautifulSoup import BeautifulSoup
 
 def modeCheck(mode, data):
@@ -31,30 +31,51 @@ def say(channel, message):# A quick way to make the bot say something. Use retur
 def html_strip(s):
     return re.sub('<[^<]+?>', '', s)
 
-def html_decode(s):# Replaces some HTML codes with normal text ones.
-    s = s.replace("&amp;", "&")
-    s = BeautifulSoup(s,convertEntities=BeautifulSoup.HTML_ENTITIES)
-    return str(s)
-def textbetween(str1,str2,text):# returns the text between str1 and str2 in text. This is usefull for parsing data.
+def html_decode(text):
+    def fixup(m):
+        text = m.group(0)
+        if text[:2] == "&#":
+            # character reference
+            try:
+                if text[:3] == "&#x":
+                    return unichr(int(text[3:-1], 16))
+                else:
+                    return unichr(int(text[2:-1]))
+            except ValueError:
+                pass
+        else:
+            # named entity
+            try:
+                if text[1:-1] == "apos":
+                    text = u"'"
+                else:
+                    text = unichr(htmlentitydefs.name2codepoint[text[1:-1]])
+            except KeyError:
+                pass
+        return text # leave as is
+    return re.sub("&#?\w+;", fixup, text)
+def textbetween(str1,str2,text):# returns the text between str1 and str2 in text. This is useful for parsing data.
         posstr1 = text.find(str1)
         posstr2 = text.find(str2)
         between = text[posstr1 + len(str1):posstr2]
         return between
 def command(command,recv): #finds the argument for a command.
-        if command in recv:
+        if command in recv and command != '':
             num = recv.find(command)
-            message = recv[num + len(command):]
+            message = recv[num + len(command) + 1:]
             if message == '':
                 return None
             else:
-                return str(message[1:])
+                return message
         else:
-            message = "None"
+            return None
 def argv(com,recv):# returns a named, multidimensional array of on recv
     # info [nick, user, channel, [argv[0], argv[1], etc..]] (Args are in
     # a separate array)
-    # :(Taiiwo)!~(Taiiwo)@(unaffiliated/taiiwo) (PRIVMSG) (##426699k) :(Hi TaiiwoBot)
-    m = re.match("^:([^!]*)!~([^@]*)@([^\s]*)\s(PRIVMSG|privmsg)\s(#?[^\s]*)\s:(.*)", recv)
+    m = re.match(
+        "^:([^!]*)!~([^@]*)@([^\s]*)\s(PRIVMSG|privmsg)\s(#?[^\s]*)\s:(.*)",
+        recv
+    )
     if m is not None:
         nick = m.group(1)
         user = nick
