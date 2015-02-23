@@ -1,32 +1,44 @@
-from BeautifulSoup import BeautifulSoup
 def main(data):
-	if '!wa ' in data['recv']:
-		import urllib
-		args = argv('!wa',data['recv'])
-		query = ' '.join(args['argv'][1:])
-		query = {'input': query, 'appid': 'QPEPAR-TKWEJ3W7VA'}
-		query = urllib.urlencode(query)
-		response = urllib2.urlopen('http://api.wolframalpha.com/v2/query?' + query).read()
-		soup = BeautifulSoup(response)
-		try:
-			interp = soup.queryresult.findAll('pod')[0].subpod.plaintext.string
-			answer = soup.queryresult.findAll('pod')[1].subpod.plaintext.string
-			answer = answer.split('\n')
-			toret = [say(args['channel'], interp + ' :').encode('ascii', 'ignore'),]
-			for i in answer:
-				toret.append(say(args['channel'],i).encode('ascii', 'ignore'))
-			return ''.join(toret)
-		except:
-			global cleverbot
-			query = ' '.join(args['argv'][1:])
-			query = query.replace('\n','')
-	                query = query.replace('\r','')
-	                query = query.replace(data['config']['settings']['botNick'] + ':','')
-	                query = query.replace(data['config']['settings']['botNick'],'CleverBot')
-	                answer = cleverbot.think(query)
-	                answer = answer.replace('CleverBot',data['config']['settings']['botNick'])
-	                answer = answer.replace('Cleverbot',data['config']['settings']['botNick'])
-	                answer = answer.replace('God','Taiiwo')
-	                answer = answer.replace('god','Taiiwo')
-	                answer = answer.replace('&ouml;', 'o')
-			return say(args['channel'], args['nick'] + ": " + answer)
+    if '!wa ' in data['recv']:
+        import urllib
+        from BeautifulSoup import BeautifulSoup
+        args = argv('!wa',data['recv'])
+        # Having to re-encode into UTF-8 because of ' '.join(). Thanks Obama.
+        query = ' '.join(args['argv'][1:]).encode('utf-8')
+        # URL escape query
+        query = {'input': query, 'appid': 'QPEPAR-TKWEJ3W7VA'}
+        query = urllib.urlencode(query)
+        baseUrl = 'http://api.wolframalpha.com/v2/query?'
+        response = urllib2.urlopen(baseUrl + query).read()
+        soup = BeautifulSoup(response)
+        pods = soup.queryresult.findAll('pod')
+        if pods and len(pods) >= 2:  # if we got an answer
+            # Grab what they thought the question was (Interpretation)
+            interp = pods[0].subpod.plaintext.string
+            # Grab the answer to the question
+            answer = pods[1].subpod.plaintext.string
+            # Strip html entities from the response
+            interp = html_decode(interp)
+            answer = html_decode(answer)
+            # Iterate the interpretation and answer
+            for each in (interp, answer):
+                # Iterate each found instance of WA's Unicode escape format
+                for match in re.finditer(r"\\:([a-f|A-F|0-9]{4})", each):
+                    # Replace it with its corresponding Unicode character
+                    each = each.replace(
+                        match.group(0),
+                        unichr(int(match.group(1), 16))
+                    )
+                # Send the result to the channel
+                data['api'].say(args['channel'], each)
+        else:
+            # We didn't get an answer, make cleverbot reply instead
+            # Construct the string that makes the cleverbot plugin respond
+            cleverBotFlag = data['config']['settings']['botNick'] + ":"
+            # edit the data variable to flag the cleverbot plugin
+            data['recv'] = data['recv'].replace("!wa", cleverBotFlag)
+            # emulate how cleverbot would have been run if invoked normally
+            data['api'].runPlugin("cleverbot.py", "./plugins/privmsg/", data)
+
+        # kill plugin
+        return None
