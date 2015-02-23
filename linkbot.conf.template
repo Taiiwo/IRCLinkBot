@@ -1,0 +1,37 @@
+{
+    "settings": {
+        "authenticate": "False",
+        "botIdent": "IRCLinkBot",
+        "botName": "IRCLinkBot",
+        "botNick": "IRCLinkBot",
+        "botUser": "IRCLinkBot",
+        "host": "irc.freenode.net",
+        "port": "6667",
+        "hoursDiffGMT": "-4",
+        "joinChannels": [
+            "#IRCLinkBot"
+        ],
+        "joinMessage": "LinkBot v4.4b - Now with more code!",
+        "maxLinkLen": "53",
+        "messageTimeSpacing": "0.4",
+        "pluginIgnoreChannels": {
+            "#freenode": [
+                "link.py"
+            ]
+        },
+        "printRecv": "True",
+        "printSend": "True",
+        "recvLen": "512",
+        "userModes": [
+            {
+                "channel": "#IRCLinkBot",
+                "isAuth": "True",
+                "modes": "gao",
+                "nick": "Taiiwo"
+            }
+        ]
+    },
+    "variables": {
+        "numr": "20"
+    }
+}

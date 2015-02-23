@@ -6,9 +6,11 @@ def main(data):
         args = argv('!findip',data['recv'])
         
 		# GET whois data
-        query = '%20'.join(args['argv'][1:] )
+        query = ' '.join(args['argv'][1:] )
+        import urllib
+        query = urllib.quote(query)
         try:
-            whois = urllib2.urlopen('http://ip-api.com/json/' + query) # This service can take up to 14k requests per hour. Try not to overuse it.
+            whois = urllib2.urlopen('http://ip-api.com/json/' + query + '?fields=65535') # This service can take up to 15k requests per hour. Try not to overuse it.
             answ = json.load(whois)
         except:
             return say( args['channel'], 'API Error.' ) 
@@ -22,16 +24,9 @@ def main(data):
         
         output = []
         if answ['status']  == 'success':
-            # Reverse IP lookup
-            try:
-                reverse = urllib2.urlopen('http://restdns.net/' + query + '/x') # Sadly ip-api only provides reverse IP lookup through their website
-                answ2 = json.load(reverse)
-                answ2 = ''.join(answ2['PTR'])
-            except:
-                answ2 = query
                 
             # prepare output     
-            output.append( say( args['channel'], 'Lookup for IP: ' + answ['query'] + ' (' + answ2 + ')\n' ) )
+            output.append( say( args['channel'], 'Lookup for IP: ' + answ['query'] + ' (' + answ['reverse'] + ')\n' ) )
             output.append( say( args['channel'], 'ISP: ' + answ['isp'] + '(' + answ['org'] + ') - ' + answ['as'] + '\n' ) )
             output.append( say( args['channel'], 'Country: ' + answ['country'] + ' (' + answ['countryCode'] + '); Time zone: ' + answ['timezone'] + '\n' ) )
             output.append( say( args['channel'], 'Region: ' + answ['regionName'] + '(' + answ['region'] + ')' + '; City: ' + answ['city'] + '; zipcode: ' + answ['zip'] + '\n' ) ) # zipcode is always empty, but for the offchance that it isn't...

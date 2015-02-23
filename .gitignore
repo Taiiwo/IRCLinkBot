@@ -1,5 +1,6 @@
 *.log
 linkbot.conf
+linkbot.conf.bak
 *.pyc
 auth.include
 pass
