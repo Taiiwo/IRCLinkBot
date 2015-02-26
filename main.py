@@ -95,7 +95,7 @@ class botApi:
         recvLen = int(self.config['settings']['recvLen'])
         self.recvData = self.s.recv(recvLen).decode('utf-8')
         if self.config['settings']['printRecv'] == 'True':
-            print self.recvData
+            print self.recvData.encode('utf-8')
         return self.recvData
 
     def say(self, target, message):
@@ -112,7 +112,7 @@ class botApi:
                 else:
                     retme += u'PRIVMSG %s :%s\r\n' % (target, msg)
         if self.config['settings']['printSend'] == 'True':
-            print retme
+            print retme.encode('utf-8')
         self.s.send(retme.encode('utf-8'))
         # I don't know why you'd want this, but
         # better to return something than nothing.
