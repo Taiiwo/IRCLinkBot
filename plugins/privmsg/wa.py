@@ -35,10 +35,12 @@ def main(data):
             # We didn't get an answer, make cleverbot reply instead
             # Construct the string that makes the cleverbot plugin respond
             cleverBotFlag = data['config']['settings']['botNick'] + ":"
-            # edit the data variable to flag the cleverbot plugin
-            data['recv'] = data['recv'].replace("!wa", cleverBotFlag)
+            # create a copy of data so we can modify it without affecting other scripts
+            data2 = data.copy()
+            # edit the new data variable to flag the cleverbot plugin
+            data2['recv'] = data2['recv'].replace("!wa", cleverBotFlag)
             # emulate how cleverbot would have been run if invoked normally
-            data['api'].runPlugin("cleverbot.py", "./plugins/privmsg/", data)
+            data['api'].runPlugin("cleverbot.py", "./plugins/privmsg/", data2)
 
         # kill plugin
         return None
