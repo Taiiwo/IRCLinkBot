@@ -73,7 +73,7 @@ def argv(com,recv):# returns a named, multidimensional array of on recv
     # info [nick, user, channel, [argv[0], argv[1], etc..]] (Args are in
     # a separate array)
     m = re.match(
-        "^:([^!]*)!~([^@]*)@([^\s]*)\s(PRIVMSG|privmsg)\s(#?[^\s]*)\s:(.*)",
+        "^:([^!]*)!~?([^@]*)@([^\s]*)\s(PRIVMSG|privmsg)\s(#?[^\s]*)\s:(.*)",
         recv
     )
     if m is not None:
