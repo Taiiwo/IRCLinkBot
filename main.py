@@ -93,9 +93,9 @@ class botApi:
     def recv(self):
         bot.loop += 1
         recvLen = int(self.config['settings']['recvLen'])
-        self.recvData = self.s.recv(recvLen).decode('utf-8')
+        self.recvData = self.s.recv(recvLen)
         if self.config['settings']['printRecv'] == 'True':
-            print self.recvData.encode('utf-8')
+            print self.recvData.decode('utf-8')
         return self.recvData
 
     def say(self, target, message):
@@ -140,7 +140,7 @@ class botApi:
         # Run the root plugins in a new thread
         self.pluginList.append({"nameList": rootPlugins, "path": path})
         # Check if the recv is a privmsg from a channel
-        if re.match('^:[^!]*!~[^@]*@[^\s]*\s(PRIVMSG|privmsg)\s#[^:]*\s:.*',
+        if re.match('^:[^!]*!~?[^@]*@[^\s]*\s(PRIVMSG|privmsg)\s#[^:]*\s:.*',
                         self.recvData) is not None:
             # Run plugins from ./plugins/privmsg/*
             for root, subFolders, files in os.walk('./plugins/privmsg/',
@@ -151,7 +151,7 @@ class botApi:
                 # prepending '.' to the folder name.
                 self.pluginList.append({"nameList": files, "path": root})
         # If recv is a private message to the bot
-        elif not re.match('^:[^!]*![^@]*@[^\s]*\s(PRIVMSG|privmsg)\s%s:.*'
+        elif not re.match('^:[^!]*!~?[^@]*@[^\s]*\s(PRIVMSG|privmsg)\s%s:.*'
                           % (self.config['settings']['botNick']),
                           self.recvData) == None:
             # Run plugins from ./plugins/privmsgbot/*
