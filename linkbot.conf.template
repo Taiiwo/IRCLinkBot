@@ -13,7 +13,7 @@
         ],
         "joinMessage": "LinkBot v4.4b - Now with more code!",
         "maxLinkLen": "53",
-        "messageTimeSpacing": "0.4",
+        "messageTimeSpacing": "0.5",
         "pluginIgnoreChannels": {
             "#freenode": [
                 "link.py"
