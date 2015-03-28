@@ -181,7 +181,10 @@ class botApi:
                               [args['channel']]):
                     toSend = None
             if toSend and toSend != '' and toSend is not None:
-                self.send(toSend)
+                sendStatus = self.send(toSend)
+                if type(sendStatus) == str():
+                    print '%s : %s' % (str(sendStatus), plugin)
+
     def send(self, message):
         while 1:
             # this is so the bot can only send 1 message at a time
@@ -202,13 +205,14 @@ class botApi:
                         self.sending -= 1
                         errormsg = sys.exc_info()[1]
                         if errormsg is not None:
-                            print '%s : %s' % (str(errormsg), plugin)
+                            return errormsg
                 self.sending -= 1
                 break
             else:
                 continue
         if self.config['settings']['printSend'] == 'True':
             print message
+        return True
 
     def handlePing(self):
         # I was thinking about making the bot run plugins from a 'PING'
