@@ -95,7 +95,7 @@ class botApi:
         recvLen = int(self.config['settings']['recvLen'])
         self.recvData = self.s.recv(recvLen)
         if self.config['settings']['printRecv'] == 'True':
-            print self.recvData.decode('utf-8')
+            print self.recvData
         return self.recvData
 
     def say(self, target, message):
@@ -111,9 +111,7 @@ class botApi:
                         retme += u'PRIVMSG %s :%s\r\n' % (target, msg)
                 else:
                     retme += u'PRIVMSG %s :%s\r\n' % (target, msg)
-        if self.config['settings']['printSend'] == 'True':
-            print retme.encode('utf-8')
-        self.s.send(retme.encode('utf-8'))
+        self.send(retme.encode('utf-8'))
         # I don't know why you'd want this, but
         # better to return something than nothing.
         return retme
@@ -183,32 +181,34 @@ class botApi:
                               [args['channel']]):
                     toSend = None
             if toSend and toSend != '' and toSend is not None:
-                while 1:
-                    # this is so the bot can only send 2 messages at a time
-                    # (Since we're threading), so as not to get us kicked for
-                    # excess flood
-                    if self.sending <= 2:
-                        self.sending += 1
-                        for send in toSend.split('\n'):
-                            try:
-                                self.s.send(send.encode('utf-8') + '\n')
-                                time.sleep(
-                                    float(
-                                        self.config['settings']
-                                        ['messageTimeSpacing']
-                                    )
-                                )
-                            except Exception:
-                                self.sending -= 1
-                                errormsg = sys.exc_info()[1]
-                                if errormsg is not None:
-                                    print '%s : %s' % (str(errormsg), plugin)
+                self.send(toSend)
+    def send(self, message):
+        while 1:
+            # this is so the bot can only send 1 message at a time
+            # (Since we're threading), so as not to get us kicked for
+            # excess flood
+            if self.sending < 1:
+                self.sending += 1
+                for send in message.split('\n'):
+                    try:
+                       self.s.send(send.encode('utf-8') + '\n')
+                       time.sleep(
+                            float(
+                                self.config['settings']
+                                ['messageTimeSpacing']
+                            )
+                       )
+                    except Exception:
                         self.sending -= 1
-                        break
-                    else:
-                        continue
-                if self.config['settings']['printSend'] == 'True':
-                    print toSend
+                        errormsg = sys.exc_info()[1]
+                        if errormsg is not None:
+                            print '%s : %s' % (str(errormsg), plugin)
+                self.sending -= 1
+                break
+            else:
+                continue
+        if self.config['settings']['printSend'] == 'True':
+            print message
 
     def handlePing(self):
         # I was thinking about making the bot run plugins from a 'PING'
