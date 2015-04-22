@@ -12,6 +12,45 @@ class botApi:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     loop = 0
     sending = 0
+    lastPingTime = time.time()
+    defaultConfig = {
+        "settings": {
+            "authenticate": "False",
+            "botIdent": "IRCLinkBot",
+            "botName": "IRCLinkBot",
+            "botNick": "IRCLinkBot",
+            "botUser": "IRCLinkBot",
+            "host": "irc.freenode.net",
+            "port": "6667",
+            "hoursDiffGMT": "-4",
+            "pingTimeout": "300",
+            "joinChannels": [
+                "#IRCLinkBot"
+            ],
+            "joinMessage": "LinkBot v5.3 - Welcome to TaiiwoCorp.",
+            "maxLinkLen": "53",
+            "messageTimeSpacing": "0.5",
+            "pluginIgnoreChannels": {
+                "#freenode": [
+                    "link.py"
+                ]
+            },
+            "printRecv": "True",
+            "printSend": "True",
+            "recvLen": "512",
+            "userModes": [
+                {
+                    "channel": "#IRCLinkBot",
+                    "isAuth": "True",
+                    "modes": "gao",
+                    "nick": "Taiiwo"
+                }
+            ]
+        },
+        "variables": {
+            "numr": "20"
+        }
+    }
 
     def __init__(self):
         self.importConfig()
@@ -23,7 +62,10 @@ class botApi:
                 # Import settings file
                 configFile = open('./linkbot.conf', 'rw')
                 # Parse config file
-                self.config = json.loads(configFile.read())
+                self.config = dictUpdate(
+                    self.defaultConfig,
+                    json.loads(configFile.read())
+                )
                 configFile.close()
                 return self.config
                 break
@@ -93,7 +135,7 @@ class botApi:
     def recv(self):
         bot.loop += 1
         recvLen = int(self.config['settings']['recvLen'])
-        self.recvData = self.s.recv(recvLen)
+        self.recvData = self.s.recv(recvLen).decode('utf-8')
         if self.config['settings']['printRecv'] == 'True':
             print self.recvData
         return self.recvData
@@ -220,9 +262,14 @@ class botApi:
         # logging?. Regardless, I left it out.
         for line in self.recvData.splitlines():
             if line[0:5] == 'PING ':
+                self.lastPingTime = time.time()
                 self.s.send('PONG %s\r\n' % (self.recvData.split(' ')[1][1:]))
                 if self.config['settings']['printSend'] == 'True':
                     print 'PONG %s\r\n' % (self.recvData.split(' ')[1][1:])
+	if self.lastPingTime - time.time() > self.config['settings']['pingTimeout']:
+            # We timed out, reconnect
+            self.s.close()
+            self.connect()
 
 bot = botApi()
 bot.connect()
