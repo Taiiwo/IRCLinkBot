@@ -1,5 +1,14 @@
 #This file contains fuctions available for the plugin developers.
-import socket, sys, re, urllib2, time, os, random, json, htmlentitydefs
+import socket
+import sys
+import re
+import urllib2
+import time
+import os
+import random
+import json
+import htmlentitydefs
+import collections
 from BeautifulSoup import BeautifulSoup
 
 def modeCheck(mode, data):
@@ -110,3 +119,12 @@ def maketiny(url):# make a tinyurl from a string
         return tiny
     except:
         return False
+
+def dictUpdate(d, u):
+    for k, v in u.iteritems():
+        if isinstance(v, collections.Mapping):
+            r = dictUpdate(d.get(k, {}), v)
+            d[k] = r
+        else:
+            d[k] = u[k]
+    return d
