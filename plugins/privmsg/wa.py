@@ -4,7 +4,7 @@ def main(data):
         from BeautifulSoup import BeautifulSoup
         args = argv('!wa',data['recv'])
         # Having to re-encode into UTF-8 because of ' '.join(). Thanks Obama.
-        query = ' '.join(args['argv'][1:]).encode('utf-8')
+        query = ' '.join(args['argv'][1:])
         # URL escape query
         query = {'input': query, 'appid': 'QPEPAR-TKWEJ3W7VA'}
         query = urllib.urlencode(query)

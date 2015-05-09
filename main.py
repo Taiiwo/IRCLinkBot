@@ -9,7 +9,6 @@ from util import *
 
 
 class botApi:
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     loop = 0
     sending = 0
     lastPingTime = time.time()
@@ -85,6 +84,7 @@ class botApi:
 
     def connect(self):
         print "[-]Connecting to server..."
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         while 1:
             try:
                 # connect to server
@@ -135,7 +135,10 @@ class botApi:
     def recv(self):
         bot.loop += 1
         recvLen = int(self.config['settings']['recvLen'])
-        self.recvData = self.s.recv(recvLen).decode('utf-8')
+        self.recvData = self.s.recv(recvLen)
+        if self.recvData == '' or not self.recvData:
+            self.s.close()
+            self.connect()
         if self.config['settings']['printRecv'] == 'True':
             print self.recvData
         return self.recvData
@@ -153,7 +156,7 @@ class botApi:
                         retme += u'PRIVMSG %s :%s\r\n' % (target, msg)
                 else:
                     retme += u'PRIVMSG %s :%s\r\n' % (target, msg)
-        self.send(retme.encode('utf-8'))
+        self.send(retme)
         # I don't know why you'd want this, but
         # better to return something than nothing.
         return retme
@@ -266,7 +269,7 @@ class botApi:
                 self.s.send('PONG %s\r\n' % (self.recvData.split(' ')[1][1:]))
                 if self.config['settings']['printSend'] == 'True':
                     print 'PONG %s\r\n' % (self.recvData.split(' ')[1][1:])
-	if self.lastPingTime - time.time() > self.config['settings']['pingTimeout']:
+        if self.lastPingTime - time.time() > self.config['settings']['pingTimeout']:
             # We timed out, reconnect
             self.s.close()
             self.connect()
