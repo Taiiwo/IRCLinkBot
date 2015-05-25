@@ -20,17 +20,32 @@ def main(data):
             # Strip html entities from the response
             interp = html_decode(interp)
             answer = html_decode(answer)
+            for match in re.finditer(r"\\:([a-f|A-F|0-9]{4})", answer):
+                # Replace it with its corresponding Unicode character
+                each = each.replace(
+                    match.group(0),
+                    unichr(int(match.group(1), 16))
+                )
             # Iterate the interpretation and answer
-            for each in (interp, answer):
-                # Iterate each found instance of WA's Unicode escape format
-                for match in re.finditer(r"\\:([a-f|A-F|0-9]{4})", each):
-                    # Replace it with its corresponding Unicode character
-                    each = each.replace(
-                        match.group(0),
-                        unichr(int(match.group(1), 16))
-                    )
-                # Send the result to the channel
-                data['api'].say(args['channel'], each)
+            if len(answer) > 430:
+                # upload to pastebin
+                data = {
+                    "api_dev_key": "00b92ae7e09af03e0eb077143ee24403",
+                    "api_option": "paste",
+                    "api_paste_name": interp,
+                    "api_user_key": '',
+                    "api_paste_code": interp + '\n' + answer
+                }
+                url = 'http://pastebin.com/api/api_post.php'
+                pasteLink = urllib2.urlopen(url, data)
+                data['api'].say(interp)
+                data['api'].say(''.join(answer[0:430]))
+                data['api'].say("More: " + pasteLink)
+            else:
+                for each in (interp, answer):
+                    # Iterate each found instance of WA's Unicode escape format
+                    # Send the result to the channel
+                    data['api'].say(args['channel'], each)
         else:
             # We didn't get an answer, make cleverbot reply instead
             # Construct the string that makes the cleverbot plugin respond
