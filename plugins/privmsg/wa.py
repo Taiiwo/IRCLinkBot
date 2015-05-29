@@ -4,9 +4,9 @@ def main(data):
         from BeautifulSoup import BeautifulSoup
         args = argv('!wa',data['recv'])
         # Having to re-encode into UTF-8 because of ' '.join(). Thanks Obama.
-        query = ' '.join(args['argv'][1:])
+        oQuery = ' '.join(args['argv'][1:])
         # URL escape query
-        query = {'input': query, 'appid': 'QPEPAR-TKWEJ3W7VA'}
+        query = {'input': oQuery, 'appid': 'QPEPAR-TKWEJ3W7VA'}
         query = urllib.urlencode(query)
         baseUrl = 'http://api.wolframalpha.com/v2/query?'
         response = urllib2.urlopen(baseUrl + query).read()
@@ -18,8 +18,8 @@ def main(data):
             # Grab the answer to the question
             answer = pods[1].subpod.plaintext.string
             # Strip html entities from the response
-            interp = html_decode(interp)
-            answer = html_decode(answer)
+            interp = html_decode(str(interp))
+            answer = html_decode(str(answer))
             for match in re.finditer(r"\\:([a-f|A-F|0-9]{4})", answer):
                 # Replace it with its corresponding Unicode character
                 each = each.replace(
@@ -27,20 +27,20 @@ def main(data):
                     unichr(int(match.group(1), 16))
                 )
             # Iterate the interpretation and answer
-            if len(answer) > 430:
+            if len(answer) > 430 and oQuery != "pumpkin":
                 # upload to pastebin
-                data = {
-                    "api_dev_key": "00b92ae7e09af03e0eb077143ee24403",
+                postData = {
                     "api_option": "paste",
+                    "api_dev_key": "00b92ae7e09af03e0eb077143ee24403",
                     "api_paste_name": interp,
-                    "api_user_key": '',
                     "api_paste_code": interp + '\n' + answer
                 }
+                postData = urllib.urlencode(postData)
                 url = 'http://pastebin.com/api/api_post.php'
-                pasteLink = urllib2.urlopen(url, data)
-                data['api'].say(interp)
-                data['api'].say(''.join(answer[0:430]))
-                data['api'].say("More: " + pasteLink)
+                pasteLink = urllib2.urlopen(url, postData).read()
+                data['api'].say(args['channel'], interp)
+                data['api'].say(args['channel'], ''.join(answer[0:430]))
+                data['api'].say(args['channel'], "More: " + pasteLink)
             else:
                 for each in (interp, answer):
                     # Iterate each found instance of WA's Unicode escape format
