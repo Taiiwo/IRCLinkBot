@@ -269,10 +269,6 @@ class botApi:
                 self.s.send('PONG %s\r\n' % (self.recvData.split(' ')[1][1:]))
                 if self.config['settings']['printSend'] == 'True':
                     print 'PONG %s\r\n' % (self.recvData.split(' ')[1][1:])
-        if self.lastPingTime - time.time() > self.config['settings']['pingTimeout']:
-            # We timed out, reconnect
-            self.s.close()
-            self.connect()
 
 bot = botApi()
 bot.connect()
