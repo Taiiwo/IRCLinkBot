@@ -65,6 +65,8 @@ class botApi:
                     self.defaultConfig,
                     json.loads(configFile.read())
                 )
+                # Convert each value of the dict to a byte string. We will encode this later.
+                dictUnicodeToByte(self.config)
                 configFile.close()
                 return self.config
                 break
@@ -146,8 +148,9 @@ class botApi:
     def say(self, target, message):
         # send multiple messages by splitting with \n
         # It is this way to help stop IRC injection
-        retme = u""
+        retme = ""
         for msg in message.split('\n'):
+            msg = msg.decode("utf-8", "ignore")
             if msg and msg != '':
                 if len(msg) > 430:
                     # split into a group of messages 430 chars long

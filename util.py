@@ -128,3 +128,12 @@ def dictUpdate(d, u):
         else:
             d[k] = u[k]
     return d
+def dictUnicodeToByte(input):# recurively change unicode values of a dict to byte
+    if isinstance(input, dict):
+        return {dictUnicodeToByte(key):dictUnicodeToByte(value) for key,value in input.iteritems()}
+    elif isinstance(input, list):
+        return [dictUnicodeToByte(element) for element in input]
+    elif isinstance(input, unicode):
+        return input.encode('utf-8')
+    else:
+        return input
