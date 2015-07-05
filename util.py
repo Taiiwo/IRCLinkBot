@@ -63,11 +63,13 @@ def html_decode(text):
                 pass
         return text # leave as is
     return re.sub("&#?\w+;", fixup, text)
+
 def textbetween(str1,str2,text):# returns the text between str1 and str2 in text. This is useful for parsing data.
         posstr1 = text.find(str1)
         posstr2 = text.find(str2)
         between = text[posstr1 + len(str1):posstr2]
         return between
+
 def command(command,recv): #finds the argument for a command.
         if command in recv and command != '':
             num = recv.find(command)
@@ -78,6 +80,7 @@ def command(command,recv): #finds the argument for a command.
                 return message
         else:
             return None
+
 def argv(com,recv):# returns a named, multidimensional array of on recv
     # info [nick, user, channel, [argv[0], argv[1], etc..]] (Args are in
     # a separate array)
@@ -100,18 +103,21 @@ def argv(com,recv):# returns a named, multidimensional array of on recv
         argv += argc.split()
     return {'nick' : nick, 'user' : user,'channel' : channel, 'argv' : argv,
             'ident': ident, 'hostname': host, 'message': message}
+
 def gettitle(url):#get the page title of an URL
     try:
         soup = BeautifulSoup(urllib2.urlopen(url).read(1024 * 1024))
         return soup.title.string
     except:
         return False
+
 def geturl(recv):#parse an URL from a string
     url = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', recv)
     if url and url != '':
         return url
     else:
         return False
+
 def maketiny(url):# make a tinyurl from a string
     try:
         html = urllib2.urlopen("http://tinyurl.com/api-create.php?url=" + url)
@@ -128,6 +134,7 @@ def dictUpdate(d, u):
         else:
             d[k] = u[k]
     return d
+
 def dictUnicodeToByte(input):# recurively change unicode values of a dict to byte
     if isinstance(input, dict):
         return {dictUnicodeToByte(key):dictUnicodeToByte(value) for key,value in input.iteritems()}

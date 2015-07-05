@@ -14,14 +14,12 @@ def main(data):
         query = query.replace('\r','')
         query = query.replace(data['config']['settings']['botNick'] + ':','')
         query = query.replace(data['config']['settings']['botNick'],'CleverBot')
-        query = query.encode('utf-8')
         answer = html_decode(cleverbot.think(query))
         answer = answer.replace('CleverBot',data['config']['settings']['botNick'])
         answer = answer.replace('Cleverbot',data['config']['settings']['botNick'])
         answer = answer.replace('God','Taiiwo')
         answer = answer.replace('god','Taiiwo')
-        debug = 'Query: ' + query.decode('utf-8') + ' -- Answer: "' + answer + '"'
+        debug = 'Query: ' + query + ' -- Answer: "' + answer + '"'
         print debug
-        
+
         data['api'].say(args['channel'], args['nick'] + ': ' + answer)
-        
