@@ -13,7 +13,6 @@ def main(data):
         images = json.loads(urllib2.urlopen(baseUrl + query).read())
         n = random.randint(0, len(images['responseData']['results']) - 1)
         image = images['responseData']['results'][n]['url']
-        print image
         baseUrl = "http://mustachify.me/?"
         query = {"src": image}
         query = urllib.urlencode(query)

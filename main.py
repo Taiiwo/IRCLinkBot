@@ -65,6 +65,8 @@ class botApi:
                     self.defaultConfig,
                     json.loads(configFile.read())
                 )
+                # Convert each value of the dict to a byte string. We will encode this later.
+                self.config = dictUnicodeToByte(self.config)
                 configFile.close()
                 return self.config
                 break
@@ -135,7 +137,9 @@ class botApi:
     def recv(self):
         bot.loop += 1
         recvLen = int(self.config['settings']['recvLen'])
-        self.recvData = self.s.recv(recvLen)
+        # make sure recv data is decoded into a bytestring
+        self.recvData = self.s.recv(recvLen).decode('utf-8', 'ignore').encode('utf-8')
+        #print type(self.recvData)
         if self.recvData == '' or not self.recvData:
             self.s.close()
             self.connect()
@@ -146,16 +150,20 @@ class botApi:
     def say(self, target, message):
         # send multiple messages by splitting with \n
         # It is this way to help stop IRC injection
-        retme = u""
+        retme = ""
+        if type(target) == unicode:
+            target = target.encode('utf-8')
         for msg in message.split('\n'):
+            if type(msg) == unicode:
+                msg = msg.encode('utf-8')
             if msg and msg != '':
                 if len(msg) > 430:
                     # split into a group of messages 430 chars long
                     msgs = [msg[i:i+430] for i in range(0, len(msg), 430)]
                     for msg in msgs:
-                        retme += u'PRIVMSG %s :%s\r\n' % (target, msg)
+                        retme += 'PRIVMSG %s :%s\r\n' % (target, msg)
                 else:
-                    retme += u'PRIVMSG %s :%s\r\n' % (target, msg)
+                    retme += 'PRIVMSG %s :%s\r\n' % (target, msg)
         self.send(retme)
         # I don't know why you'd want this, but
         # better to return something than nothing.
@@ -239,7 +247,7 @@ class botApi:
                 self.sending += 1
                 for send in message.split('\n'):
                     try:
-                       self.s.send(send.encode('utf-8') + '\n')
+                       self.s.send(send + '\n')
                        time.sleep(
                             float(
                                 self.config['settings']
