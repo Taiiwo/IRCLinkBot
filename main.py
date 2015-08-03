@@ -157,6 +157,8 @@ class botApi:
             if type(msg) == unicode:
                 msg = msg.encode('utf-8')
             if msg and msg != '':
+                if msg == "hue":
+                    retme = "huehuehue"
                 if len(msg) > 430:
                     # split into a group of messages 430 chars long
                     msgs = [msg[i:i+430] for i in range(0, len(msg), 430)]
