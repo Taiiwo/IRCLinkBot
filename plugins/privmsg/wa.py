@@ -3,8 +3,12 @@ def main(data):
         import urllib
         from BeautifulSoup import BeautifulSoup
         args = argv('!wa',data['recv'])
-        # Having to re-encode into UTF-8 because of ' '.join(). Thanks Obama.
-        oQuery = ' '.join(args['argv'][1:])
+        if args['argv'][1] == "-q":
+            quietMode = True
+            oQuery = ' '.join(args['argv'][2:])
+        else:
+            quietMode = False
+            oQuery = ' '.join(args['argv'][1:])
         # URL escape query
         query = {'input': oQuery, 'appid': 'QPEPAR-TKWEJ3W7VA'}
         query = urllib.urlencode(query)
@@ -13,39 +17,43 @@ def main(data):
         soup = BeautifulSoup(response)
         pods = soup.queryresult.findAll('pod')
         if pods and len(pods) >= 2:  # if we got an answer
-            # Grab what they thought the question was (Interpretation)
-            interp = pods[0].subpod.plaintext.string
-            # Grab the answer to the question
-            answer = pods[1].subpod.plaintext.string
-            # Strip html entities from the response
-            interp = html_decode(str(interp))
-            answer = html_decode(str(answer))
-            for match in re.finditer(r"\\:([a-f|A-F|0-9]{4})", answer):
-                # Replace it with its corresponding Unicode character
-                each = each.replace(
-                    match.group(0),
-                    unichr(int(match.group(1), 16))
-                )
-            # Iterate the interpretation and answer
-            if len(answer) > 430 and oQuery != "pumpkin":
-                # upload to pastebin
-                postData = {
-                    "api_option": "paste",
-                    "api_dev_key": "00b92ae7e09af03e0eb077143ee24403",
-                    "api_paste_name": interp,
-                    "api_paste_code": interp + '\n' + answer
-                }
-                postData = urllib.urlencode(postData)
-                url = 'http://pastebin.com/api/api_post.php'
-                pasteLink = urllib2.urlopen(url, postData).read()
-                data['api'].say(args['channel'], interp)
-                data['api'].say(args['channel'], ''.join(answer[0:430]))
-                data['api'].say(args['channel'], "More: " + pasteLink)
-            else:
-                for each in (interp, answer):
-                    # Iterate each found instance of WA's Unicode escape format
-                    # Send the result to the channel
-                    data['api'].say(args['channel'], each)
+            answers = []
+            # Iterate the results
+            for pod in pods:
+                # Grab plaintext of the result
+                answer = pod.subpod.plaintext.string
+                if answer == None:                   
+                    continue
+                # Strip html entities from the response
+                answer = html_decode(str(answer))
+                for match in re.finditer(r"\\:([a-f|A-F|0-9]{4})", answer):
+                    # Replace it with its corresponding Unicode character
+                    answer = answer.replace(
+                        match.group(0),
+                        unichr(int(match.group(1), 16))
+                    )
+                if type(answer) == unicode:
+                    answer = answer.encode('utf-8')
+                answers.append(answer)
+            # Prepare these answers for IRC
+            ircAnswersString = ""
+            lines = '\n'.join(answers).splitlines()
+            postShortLink = False
+            if len(lines) > 5:
+                lines = lines[:5]
+                postShortLink = True
+            if quietMode:
+                lines = lines[:2]
+                postShortLink = False
+            for line in lines:
+                if len(line) > 430:
+                    ircAnswersString += "".join(line[:427]) + '...\n'
+                else:
+                    ircAnswersString += line + '\n'
+            data['api'].say(args['channel'], ircAnswersString)
+            if postShortLink:
+                shortLink = maketiny("http://www.wolframalpha.com/input/?i=" + urllib.quote_plus(oQuery))
+                data['api'].say(args['channel'], "More: " + shortLink)
         else:
             # We didn't get an answer, make cleverbot reply instead
             # Construct the string that makes the cleverbot plugin respond
