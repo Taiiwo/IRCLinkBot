@@ -11,6 +11,7 @@ def main(data):
             if title:
                 title = title.replace('\n',' ')
                 title = title.replace('\r',' ')
+                title = title.strip()
                 if len(title) >= 150:
                     title = title[:150]
                 title = title.encode('utf-8')
