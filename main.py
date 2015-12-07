@@ -4,6 +4,7 @@ import json
 import os
 import thread
 import re
+import ssl
 import time
 from util import *
 
@@ -21,6 +22,7 @@ class botApi:
             "botUser": "IRCLinkBot",
             "host": "irc.freenode.net",
             "port": "6667",
+            "ssl": "NO",
             "hoursDiffGMT": "-4",
             "pingTimeout": "300",
             "joinChannels": [
@@ -90,8 +92,13 @@ class botApi:
         while 1:
             try:
                 # connect to server
-                self.s.connect((self.config['settings']['host'],
-                                int(self.config['settings']['port'])))
+                if self.config['settings']['ssl'] == 'YES':
+                    self.s.connect(self.config['settings']['host'],
+                                    int(self.config['settings']['port']))
+                    self.s = ssl.wrap_socket(self.s)
+                else:
+                    self.s.connect(self.config['settings']['host'],
+                                    int(self.config['settings']['port']))
                 break
             except:
                 print "[E]Could not connect to server, trying again..."
