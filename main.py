@@ -1,10 +1,10 @@
 import socket
 import sys
+import ssl
 import json
 import os
 import thread
 import re
-import ssl
 import time
 from util import *
 
@@ -22,11 +22,11 @@ class botApi:
             "botUser": "IRCLinkBot",
             "host": "irc.freenode.net",
             "port": "6667",
-            "ssl": "NO",
+            "ssl": "yes",
             "hoursDiffGMT": "-4",
             "pingTimeout": "300",
             "joinChannels": [
-                "#IRCLinkBot"
+                "#temp"
             ],
             "joinMessage": "LinkBot v5.3 - Welcome to TaiiwoCorp.",
             "maxLinkLen": "53",
@@ -91,23 +91,26 @@ class botApi:
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         while 1:
             try:
-                # connect to server
-                if self.config['settings']['ssl'] == 'YES':
-                    self.s.connect(self.config['settings']['host'],
-                                    int(self.config['settings']['port']))
+               # connect to server
+                if self.config['settings']['ssl'].lower() == 'yes':
+                    self.s.connect((self.config['settings']['host'],
+                                    int(self.config['settings']['port'])))
                     self.s = ssl.wrap_socket(self.s)
                 else:
-                    self.s.connect(self.config['settings']['host'],
-                                    int(self.config['settings']['port']))
+                    self.s.connect((self.config['settings']['host'],
+                                    int(self.config['settings']['port'])))
                 break
             except:
                 print "[E]Could not connect to server, trying again..."
+                print "Please check your host and port number if this error continues."
                 time.sleep(5)
         time.sleep(0.2)
         # set nick
+        print("Sending nicks")
         self.s.send('nick %s\r\n' % (self.config['settings']['botNick']))
         time.sleep(0.2)
         # set user
+        print('Sending idents and shit')
         self.s.send("user %s * %s %s\r\n" % (
             self.config['settings']['botIdent'],
             self.config['settings']['botUser'],
