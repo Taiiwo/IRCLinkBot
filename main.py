@@ -26,7 +26,7 @@ class botApi:
             "hoursDiffGMT": "-4",
             "pingTimeout": "300",
             "joinChannels": [
-                "#temp"
+                "#IRCLinkBot"
             ],
             "joinMessage": "LinkBot v5.3 - Welcome to TaiiwoCorp.",
             "maxLinkLen": "53",
@@ -106,11 +106,9 @@ class botApi:
                 time.sleep(5)
         time.sleep(0.2)
         # set nick
-        print("Sending nicks")
         self.s.send('nick %s\r\n' % (self.config['settings']['botNick']))
         time.sleep(0.2)
         # set user
-        print('Sending idents and shit')
         self.s.send("user %s * %s %s\r\n" % (
             self.config['settings']['botIdent'],
             self.config['settings']['botUser'],
