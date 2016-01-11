@@ -28,10 +28,13 @@ def main(data):
                 answer = html_decode(str(answer))
                 for match in re.finditer(r"\\:([a-f|A-F|0-9]{4})", answer):
                     # Replace it with its corresponding Unicode character
-                    answer = answer.replace(
-                        match.group(0),
-                        unichr(int(match.group(1), 16))
-                    )
+                    try:
+                        answer = answer.replace(
+                            match.group(0),
+                            unichr(int(match.group(1), 16))
+                        )
+                    except:
+                        pass
                 if type(answer) == unicode:
                     answer = answer.encode('utf-8')
                 answers.append(answer)
