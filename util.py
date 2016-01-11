@@ -14,7 +14,7 @@ from BeautifulSoup import BeautifulSoup
 def modeCheck(mode, data):
         args = argv('@', data['recv'])
         for user in data['config']['settings']['userModes']:
-            if args['nick'] == user['nick'] and mode in user['modes']:
+            if args['nick'] == user['nick'] and mode in user['modes'] and user['isAuth']:
                 if user['channel'] == args['channel'] or 'g' in user['modes']:
                     return True
         return False
@@ -62,7 +62,15 @@ def html_decode(text):
             except KeyError:
                 pass
         return text # leave as is
+    text = makeByte(text)
+    fixup = makeByte(fixup)
     return re.sub("&#?\w+;", fixup, text)
+
+def makeByte(s):
+    if isinstance(s, unicode):
+        return s.encode('utf-8', 'ignore')
+    else:
+        return s
 
 def textbetween(str1,str2,text):# returns the text between str1 and str2 in text. This is useful for parsing data.
         posstr1 = text.find(str1)
