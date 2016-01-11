@@ -22,7 +22,7 @@ class botApi:
             "botUser": "IRCLinkBot",
             "host": "irc.freenode.net",
             "port": "6667",
-            "ssl": "yes",
+            "ssl": "no",
             "hoursDiffGMT": "-4",
             "pingTimeout": "300",
             "joinChannels": [
