@@ -7,6 +7,7 @@
         "botUser": "IRCLinkBot",
         "host": "irc.freenode.net",
         "port": "6667",
+        "ssl": "no",
         "hoursDiffGMT": "-4",
         "joinChannels": [
             "#IRCLinkBot"
