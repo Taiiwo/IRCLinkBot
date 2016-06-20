@@ -89,28 +89,31 @@ def command(command,recv): #finds the argument for a command.
         else:
             return None
 
-def argv(com,recv):# returns a named, multidimensional array of on recv
+def argv(user_com,recv):# returns a named, multidimensional array of on recv
     # info [nick, user, channel, [argv[0], argv[1], etc..]] (Args are in
     # a separate array)
     m = re.match(
-        "^:([^!]*)!~?([^@]*)@([^\s]*)\s(PRIVMSG|privmsg)\s(#?[^\s]*)\s:(.*)",
+        "^:([^!]*)!~?([^@]*)@([^\s]*)\s([^\s]*)\s([^\s:]*)\s?:?(.*)",
         recv
     )
     if m is not None:
         nick = m.group(1)
-        user = nick
         ident = m.group(2)
         host = m.group(3)
-        channel = m.group(5)
+        com = m.group(4)
+        target = m.group(5)
         message = m.group(6)
     else:
-        return {'nick': 'Unknown', 'user': 'Unknown', 'channel': 'Unknown'}
-    argc = command(com, message)
-    argv = [com,]
-    if argc is not None:
-        argv += argc.split()
-    return {'nick' : nick, 'user' : user,'channel' : channel, 'argv' : argv,
-            'ident': ident, 'hostname': host, 'message': message}
+        return {'nick': 'Unknown', 'channel': 'Unknown'}
+    if com.lower() == "privmsg":
+        argc = command(user_com, message)
+        argv = [user_com,]
+        if argc is not None:
+            argv += argc.split()
+    else:
+        argv = []
+    return {'nick' : nick,'channel' : target, 'argv' : argv,
+            'ident': ident, 'hostname': host, 'message': message, "command": com}
 
 def gettitle(url):#get the page title of an URL
     try:
