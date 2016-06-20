@@ -135,6 +135,8 @@ class botApi:
             self.s.send('join %s\r\n' % (channel))
             time.sleep(0.5)
             self.say(channel, self.config['settings']['joinMessage'])
+        self.time_of_last_message = time.time()
+        thread.start_new_thread(self.check_for_timeout, ())
 
     def do(self):
         self.importConfig(submissive=True)  # Refresh the config file
@@ -142,11 +144,19 @@ class botApi:
         bot.runPlugins()
         bot.handlePing()
 
+    def check_for_timeout(self):
+        while 1:
+            if time.time() - self.time_of_last_message > 300:
+                self.s.close()
+                self.connect()
+            time.sleep(10)
+
     def recv(self):
         bot.loop += 1
         recvLen = int(self.config['settings']['recvLen'])
         # make sure recv data is decoded into a bytestring
         self.recvData = self.s.recv(recvLen).decode('utf-8', 'ignore').encode('utf-8')
+        self.time_of_last_message = time.time()
         #print type(self.recvData)
         if self.recvData == '' or not self.recvData:
             self.s.close()
