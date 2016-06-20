@@ -1,16 +1,12 @@
 def main(data):
-    if ':End of /WHOIS list.' in data['recv']:
-        args = argv("", data['recv'])
-        if ':is logged in as' in data['recv']:
-            lastline = data['recv'].splitlines()[len(data['recv'].splitlines())-1]
-            supposedNick = textbetween(data['config']['settings']['botNick']+' ',' :End of /WHOIS list.',lastline)
-            for user in data['config']['settings']['userModes']:
-                if supposedNick == user['nick']:
+    #:NickServ!NickServ@services. NOTICE TaiiwoBot :Taiiwo ACC 3
+    args = argv(':', data['recv'])
+    if args['nick'].lower() == "nickserv" and args['command'].lower() == "notice":
+        msg_args = args['message'].split()
+        for user in data['config']['settings']['userModes']:
+            if msg_args[0] == user['nick']:
+                if msg_args[2] == "3":
                     user['isAuth'] = 'True'
-        else:
-            lastline = data['recv'].splitlines()[len(data['recv'].splitlines())-1]
-            supposedNick = textbetween(data['config']['settings']['botNick']+' ',' :End of /WHOIS list.',lastline)
-            for user in data['config']['settings']['userModes']:
-                if supposedNick == user['nick']:
+                else:
                     user['isAuth'] = 'False'
         saveConfigChanges(data['config'])
