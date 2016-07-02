@@ -18,9 +18,11 @@ class IRC:
             "port": 6697 if ssl else 6667,
             "recv_amount": 512,
             "autojoin": [],
-            "locale": "utf-8"
+            "locale": "utf-8",
+            "connection_timeout": 15
         }
-        self.config = defaults.update(config)
+        defaults.update(config)
+        self.config = defaults
         self.message_callbacks = []
         self.block_callbacks = []
         self.join_callbacks = []
@@ -29,20 +31,22 @@ class IRC:
 
         self.login()
 
-    def login(self, config):
+    def login(self):
         util.debug("[-] Connecting to server...")
         self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.connection.settimeout(self.config['connection_timeout'])
         while 1:
             try:
-                self.connection.connect((self.config['host'], self.config['host']))
+                print(self.config['host'])
+                self.connection.connect((self.config['host'], self.config['port']))
                 if self.config['ssl']:
                     import ssl
                     self.connection = ssl.wrap_socket(self.connection)
                 break
-            except Exception as e:
-                print (e)
-                self.debug("[E] Could not connect to server, trying again...")
-                self.debug("[i] Check connection information if error persists")
+            except socket.timeout:
+                util.debug("[E] Could not connect to server, trying again...")
+                util.debug("[i] Check connection information if error persists")
+                self.connection.close()
                 time.sleep(5)
         self.send("NICK %s\r\n" % self.config['nick'])
         self.send("USER %s * %s %s\r\n" % (
@@ -95,9 +99,10 @@ class IRC:
 
     def recv(self):
         while 1:
-            recv = self.connection.recv(self.recv_amount)
+            recv = self.connection.recv(self.config['recv_amount'])
             # convert to str, stripping unknown unicode characters
-            recv = recv.decode(self.locale, 'ignore')
+            recv = recv.decode(self.config['locale'], "ignore")
+            print(recv)
             self.last_pulse = time.time()
             self.recv_log.append([recv, self.last_pulse])
             yield recv
