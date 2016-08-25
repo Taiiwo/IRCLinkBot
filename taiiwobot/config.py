@@ -1,4 +1,5 @@
 import json
+from . import irc
 
 def get_config():
     config_location = "config.json"
@@ -6,7 +7,8 @@ def get_config():
         "server_config": {
             "host": "example.com",
             "user": "TaiiwoBot",
-            "nick": "TaiiwoBot"
+            "nick": "TaiiwoBot",
+            "autojoin": []
         }
     }
     try:
@@ -15,9 +17,9 @@ def get_config():
         answer = input(
             "No config file was found. Would you like to generate one? (y/N)"
         )
-        if answer[0].lower() == "y":
-            open(config_location, "w+").write(json.dumps(default_config))
-            print("[i] A config file was created. Edit it and try again")
+        if answer != "" and answer[0].lower() == "y":
+            open(config_location, "w+").write(json.dumps(default_config, indent=4))
+            print("[i] A config file was created. Edit it and re-run.")
         else:
             print("[i] A config file is required to run TaiiwoBot")
         quit()
