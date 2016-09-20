@@ -13,10 +13,13 @@ class TaiiwoBot:
         plugins = []
         for root, dirs, files in os.walk('plugins'):
             for file in files:
-                plugin = importlib.machinery.SourceFileLoader('Plugin',os.path.join(root,file)).load_module()
-                plugins.append(plugin.Plugin(self.irc))
+                if file[-3:] == ".py":
+                    plugin = __import__(os.path.join(root, file[:-3]).replace('/', '.'))
+                    plugin = getattr(plugin, file[:-3])
+                    plugins.append(plugin.Plugin(self.irc))
         return plugins
 
     def message_handler(self, message):
-        for plugin in self.plugin_list:
-            plugin.on_message(message)
+        if message:
+            for plugin in self.plugin_list:
+                plugin.on_message(message)
