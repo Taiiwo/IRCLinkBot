@@ -16,7 +16,9 @@ def get_config():
             "No config file was found. Would you like to generate one? (y/N)"
         )
         if answer[0].lower() == "y":
-            open(config_location, "w+").write(json.dumps(default_config))
+            open(config_location, "w+").write(
+                json.dumps(default_config, indent=4, separators=(',', ': '))
+            )
             print("[i] A config file was created. Edit it and try again")
         else:
             print("[i] A config file is required to run TaiiwoBot")
