@@ -9,7 +9,6 @@ class IRC:
         missing_keys = util.missing_keys(["user", "nick", "host"], config)
         if missing_keys:
             quit("[E] Missing args: %s" % (', ').join(missing_keys))
-        #host, port=False, ssl=False, recv_amount=512, autojoin=[]):
         ssl = config['ssl'] if 'ssl' in config else True
         defaults = {
             "ident": "TaiiwoBot",
