@@ -15,10 +15,9 @@ class IRC:
             "real_name": "TaiiwoBot",
             "ssl": ssl,
             "port": 6697 if ssl else 6667,
-            "recv_amount": 512,
-            "autojoin": [],
+            "recv_amount": 256,
             "locale": "utf-8",
-            "connection_timeout": 15
+            "connection_timeout": 300
         }
         defaults.update(config)
         self.config = defaults
@@ -55,7 +54,9 @@ class IRC:
         ))
         if 'password' in self.config:
             self.msg("nickserv", "identify %s" % (self.config['password']))
+        # listen forever
         util.thread(self.listen)
+        # check the server is alive forever
         util.thread(self.ECG)
         for channel in self.config['autojoin']:
             self.join(channel)
@@ -64,7 +65,7 @@ class IRC:
         bytes = string.encode(self.config['locale'], 'ignore')
         self.connection.send(bytes)
         util.callback(self.sent_callbacks, string)
-                
+
     def msg(self, target, message):
         if type(message) == str:
             message = message.splitlines()
@@ -108,12 +109,15 @@ class IRC:
 
     def listen(self):
         for block in self.recv():
+            # if the server stops responding, it sends us a blank string
+            if block == "":
+                self.reconnect()
+                break
             util.callback(self.block_callbacks, block)
             for message in block.splitlines():
                 message = self.format_message(message)
-                if message : util.debug(message)
                 util.callback(self.message_callbacks, message)
-            
+
     # Monitors the pulse of the connection, and restarts if it dies
     def ECG(self):
         try:
@@ -122,8 +126,7 @@ class IRC:
             self.last_pulse = time.time()
         while 1:
             if time.time() - self.last_pulse > 300:
-                self.connection.close()
-                self.run()
+                self.reconnect()
                 break
             time.sleep(10)
 
@@ -144,3 +147,6 @@ class IRC:
             "raw_message": raw_message,
             "timestamp": time.time()
         }
+    def reconnect(self):
+        self.connection.close()
+        self.login()

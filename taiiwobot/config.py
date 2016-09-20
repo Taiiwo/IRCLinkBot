@@ -1,4 +1,5 @@
 import json
+from . import irc
 
 def get_config():
     config_location = "config.json"
@@ -6,7 +7,8 @@ def get_config():
         "server_config": {
             "host": "example.com",
             "user": "TaiiwoBot",
-            "nick": "TaiiwoBot"
+            "nick": "TaiiwoBot",
+            "autojoin": []
         }
     }
     try:
