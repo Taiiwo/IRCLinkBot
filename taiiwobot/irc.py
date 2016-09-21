@@ -32,7 +32,7 @@ class IRC:
         util.debug("[-] Connecting to server...")
         self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connection.settimeout(self.config['connection_timeout'])
-        while 1:
+        while True:
             try:
                 print(self.config['host'])
                 self.connection.connect((self.config['host'], self.config['port']))
@@ -106,7 +106,7 @@ class IRC:
             self.callbacks[command].append(callback)
 
     def recv(self):
-        while 1:
+        while True:
             recv = self.connection.recv(self.config['recv_amount'])
             # convert to str, stripping unknown unicode characters
             recv = recv.decode(self.config['locale'], "ignore")
@@ -137,7 +137,7 @@ class IRC:
             self.last_pulse
         except AttributeError:
             self.last_pulse = time.time()
-        while 1:
+        while True:
             if time.time() - self.last_pulse > 300:
                 self.reconnect()
                 break
