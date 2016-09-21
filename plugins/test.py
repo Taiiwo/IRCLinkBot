@@ -1,6 +1,6 @@
-from taiiwobot.plugin import PluginBase
+class Plugin():
+    def __init__(self, bot):
 
-class Plugin(PluginBase):
-    @self.bot.on_message()
-    def on_message(message):
-        print("message")
+        @bot.on("message")
+        def on_message(message):
+            print(message)
