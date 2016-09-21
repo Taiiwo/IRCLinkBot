@@ -21,10 +21,9 @@ class IRC:
         }
         defaults.update(config)
         self.config = defaults
-        self.message_callbacks = []
-        self.block_callbacks = []
-        self.join_callbacks = []
-        self.sent_callbacks = []
+        self.callbacks = {
+            "SENT": []
+        }
         self.recv_log = []
 
         self.login()
@@ -64,7 +63,8 @@ class IRC:
     def send(self, string):
         bytes = string.encode(self.config['locale'], 'ignore')
         self.connection.send(bytes)
-        util.callback(self.sent_callbacks, string)
+        for callback in self.callbacks['SENT']:
+            util.callback(callback, string)
 
     def msg(self, target, message):
         if type(message) == str:
@@ -79,23 +79,31 @@ class IRC:
             channel = "#" + channel
         self.send("JOIN %s\r\n" % channel)
         util.debug("[-] Joining %s" % channel)
-        util.callback(self.join_callbacks, channel)
+    
+    def on(self, *commands):
+        def handler(f):
+            for command in commands:
+                if command == "message":
+                    self.add_callback(f, "PRIVMSG")
+                elif command == "join":
+                    self.add_callback(f, "JOIN")
+                elif command == "leave":
+                    self.add_callback(f, "PART")
+                elif command == "quit":
+                    self.add_callback(f, "QUIT")
+                elif command == "ping":
+                    self.add_callback(f, "PING")
+                elif command == "sent":
+                    self.add_callback(f, "SENT")
+        return handler
+                
 
     # Adds a callback for every message recieved
-    def add_message_callback(self, callback):
-        self.message_callbacks.append(callback)
-
-    # Adds a callback for each channel joined
-    def add_join_callback(self, callback):
-        self.join_callbacks.append(callback)
-
-    # Adds a callback for each message sent
-    def add_sent_callback(self, callback):
-        self.sent_callback.append(callback)
-
-    # Adds a callback for every block of lines recieved
-    def add_block_callback(self, callback):
-        self.block_callbacks.append(callback)
+    def add_callback(self, callback, *commands):
+        for command in commands:
+            if command not in self.callbacks:
+                self.callbacks[command] = []
+            self.callbacks[command].append(callback)
 
     def recv(self):
         while 1:
@@ -113,10 +121,15 @@ class IRC:
             if block == "":
                 self.reconnect()
                 break
-            util.callback(self.block_callbacks, block)
             for message in block.splitlines():
                 message = self.format_message(message)
-                util.callback(self.message_callbacks, message)
+                if message and message['command'] in self.callbacks:
+                    callback = self.callbacks[message['command']]
+                    util.callback(
+                        callback,
+                        message
+                    )
+                    
 
     # Monitors the pulse of the connection, and restarts if it dies
     def ECG(self):
