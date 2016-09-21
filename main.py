@@ -1,4 +1,8 @@
 import time
-from taiiwobot.taiiwobot import TaiiwoBot
+from taiiwobot import taiiwobot, irc, config
 
-bot = TaiiwoBot()
+config = config.get_config()
+# use IRC as our server protocol
+server = irc.IRC(config['irc_config'])
+# Start the bot!
+taiiwobot.TaiiwoBot(server, config)
