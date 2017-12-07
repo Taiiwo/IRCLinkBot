@@ -20,36 +20,19 @@ from plugins import *
 from BeautifulSoup import BeautifulSoup
 
 #Settings:
-channels = ["##426699k", "#33012013",'#3301ops','#cicada3301','#cicada14','#33012014','#cicadasolvers','#3301hackers']
-#channels = ["##426699t"]
+
+channels = ["#freenode"]
 server = "irc.freenode.net"
 port = 6667 #6667 is the default irc port
 nick = "TaiiwoBot"
 #nick = "TaiiwoTest"
-user = "Taiiwo"
+user = "IRCLinkBot"
 maxspam = 6 #number of identical message people can send to the channel before being kicked. 1 for off.
 channelops = [
-		{
-			"channel":"#33012014",
-			"user":"Taiiwo"
-		},
-		{
-			"channel":"#33012014",
-			"user":"Cosmo_Hill"
-		},
-		{
-			"channel":"#33012014",
-			"user":"Surtri"
-		},
-		{
-			"channel":"#33012014",
-			"user":"shadowwalker"
-		},
-		{
-			"channel":"#33012014",
-			"user":"shadowwalker1337"
-		}
-
+		# {
+		# 	"channel":"#somechannel",
+		# 	"user":"someuser"
+		# },
 	]
 loginmessage = "-- LinkBot v3.5 ONLINE --" #Leave blank for no message
 recvbits = 512 #How many bits to wait for. This affects the max length of links.
