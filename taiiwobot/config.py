@@ -11,6 +11,9 @@ def get_config():
             "nick": "TaiiwoBot",
             "ident": "TaiiwoBot",
             "autojoin": []
+        },
+        "discord_config": {
+            "api_key[REMOVE]": "Insert your api key here and remove the [REMOVE] tag from the key <--"
         }
     }
     try:

@@ -8,8 +8,13 @@ class TaiiwoBot:
         self.server = server
         self.config = config
         self.on = server.on
+        self.msg = server.msg
+        self.util = util
         # load our plugins
-        self.load_plugins()
+        self.plugins = self.load_plugins()
+        # run the blocking function
+        self.server.start()
+
 
     def load_plugins(self):
         # get all the plugins from the plugin folder
@@ -24,5 +29,3 @@ class TaiiwoBot:
                     plugin = plugin.Plugin(self)
                     plugins.append(plugin)
         return plugins
-
-    
