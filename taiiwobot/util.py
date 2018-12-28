@@ -29,12 +29,12 @@ def callback(callbacks, data):
 
 # universal message object
 class Message():
-    def __init__(self, nick=None, username=None, ident=None, host=None,
+    def __init__(self, nick=None, username=None, author_id=None, host=None,
                     type=None, target=None, content=None, raw_message=None,
                     timestamp=None, server_type=None, embeds=[], attachments=[]):
         self.nick = nick # display name of the user
         self.username = username # unique username of the user
-        self.ident = ident
+        self.author_id = author_id
         self.host = host
         self.type = type
         self.target = target
@@ -144,7 +144,8 @@ class Interface:
                         # skip processing on the next arg
                         i += 1
                         if i >= len(args):
-                            raise RuntimeError('Flag %s requires a value. Try %s="some value"')
+                            raise RuntimeError('Flag `%s` requires a value. Try -%s="some value"' %
+                                    (info[1], info[0]))
                         # set the value to that next arg
                         value = args[i]
                     else:
@@ -157,7 +158,7 @@ class Interface:
                         while i < len(args):
                             if args[i][-1] == '"':
                                 # we found the end
-                                quote = (value + " ".join(args[start+1:i]))[1:-1]
+                                quote = (value + " ".join(args[start+1:i+1]))[1:-1]
                                 break
                             i += 1
                         # did we find the end of the quote
@@ -224,6 +225,7 @@ class Error(Exception):
 
 class RuntimeError(Exception):
     def __init__(self, message, target, plugin):
+        self.text = message
         super().__init__(message)
         plugin.bot.server.msg(target, message)
 
