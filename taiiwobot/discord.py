@@ -2,6 +2,8 @@ import discord
 import time
 import re
 
+Empty = discord.Embed.Empty
+
 from . import util
 
 class Discord:
@@ -24,26 +26,40 @@ class Discord:
             self.trigger("message", message)
 
         @self.client.event
-        async def on_reaction_add(reaction, user):
+        async def on_reaction_add(reaction, reactor):
             # do we have any code to run in response to this?
             if reaction.message.id in self.reaction_callbacks:
-                user, reactions = self.reaction_callbacks(reaction.message.id)
-                if user.id != reaction.author.id:
+                user, reactions = self.reaction_callbacks[reaction.message.id]
+                if user != reactor.id:
                     return False
                 for reaction_emoji, function in reactions:
                     if reaction.emoji == reaction_emoji:
                         function()
+                        # remove reactions
+                        calls = []
+                        for reaction_emoji, x in reactions:
+                            calls.append([self.client.remove_reaction, (
+                                reaction.message, reaction_emoji, self.client.user
+                            ), {}])
+                        self.gaysyncio(calls)
+                        # remove callbacks
+                        del self.reaction_callbacks[reaction.message.id]
+                        break
 
     def start(self):
         self.client.run(self.config["api_key"])
 
-    def embed(self, title=None, url=None, desc=None, author_name=None,
-            author_url=None, author_icon=None, fields=[], footer=None):
-        e = discord.Embed(title=title, url=url, description=desc)
+    def embed(self, title=Empty, url=Empty, desc=Empty, author_name=Empty,
+            author_url=Empty, author_icon=Empty, fields=[], footer=Empty,
+            color=Empty, thumbnail=Empty):
+        e = discord.Embed(title=title, url=url, description=desc, color=int(color, 16))
+        if thumbnail:
+            e.set_thumbnail(url=thumbnail)
         for field in fields:
             e.add_field(name=field[0], value=field[1],
                         inline=field[2] if len(field) > 2 and not field[2] else True)
-        e.set_author(name=author_name, url=author_url, icon_url=author_icon)
+        if author_name or author_url or author_icon:
+            e.set_author(name=author_name, url=author_url, icon_url=author_icon)
         e.set_footer(text=footer)
         return e
 
@@ -64,12 +80,16 @@ class Discord:
                     "A maximum of 11 options are supported. You supplied %s" %
                     len(answers)
                 )
-            numbers = ["0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
-            reactions = numbers[0:len(answers)]
-            answers, functions = [a_f_tuple for a_f_tuple in zip(*answers)]
+            numbers = ["0⃣", "1⃣", "2⃣", "3⃣", "4⃣", "5⃣", "6⃣", "7⃣", "8⃣", "9⃣", "🔟"]
+            # if user supplies an icon to use, use that, else use a number icon
+            reactions = [numbers[i] if len(a) < 3 else a[0]
+                    for i, a in enumerate(zip(*answers))]
+            # parse the answers array, ignoring the supplied icon if supplied
+            answers, functions = [a_f_tuple if len(a_f_tuple) < 3 else a_f_tuple[1:3]
+                    for a_f_tuple in zip(*answers)]
         message = "%s\n\n%s\n\nReact to answer." % (
             question,
-            "\n".join(["[%s] - %s"] % (n, z) for n, r in zip(reactions, answers))
+            "\n".join(["[%s] - %s" % (r, a) for r, a in zip(reactions, answers)])
         )
         self.msg(target, message, reactions=zip(reactions, functions), user=user)
 
@@ -89,6 +109,7 @@ class Discord:
                 # sending the message
                 [self.client.send_message, (target, message), {"embed": embed}]
             ]
+            reactions = list(reactions)
             # add the reactions
             for r, f in reactions:
                 async_calls.append([self.client.add_reaction, ("$0", r), {}])
@@ -98,8 +119,8 @@ class Discord:
                 # the reaction callback function is run
                 self.reaction_callbacks[message.id] = (user, reactions)
             # finally, add the reactions callback if required
-            if len(reactions) > 0:
-                async_calls.append([add_reaction_callbacks, ("$0"), {}])
+            if reactions:
+                async_calls.append([add_reaction_callbacks, ("$0",), {}])
             self.gaysyncio(async_calls)
             self.trigger("sent", target, message, embed)
 
@@ -119,7 +140,10 @@ class Discord:
 
     def trigger(self, event, *data):
         if event in self.callbacks:
-            util.callback(self.callbacks[event], *data)
+            try:
+                util.callback(self.callbacks[event], *data)
+            except util.RuntimeError as e:
+                print(e.text)
 
     def add_callback(self, callback, command):
         if command not in self.callbacks:
@@ -129,7 +153,8 @@ class Discord:
     def format_message(self, m):
         return util.Message(
             nick=m.author.nick if hasattr(m.author, "nick") else m.author.name,
-            username=m.author.name,
+            username="%s#%s" % (m.author.name, m.author.discriminator),
+            author_id=m.author.id,
             type="message",
             target=m.channel.id,
             content=m.content,
