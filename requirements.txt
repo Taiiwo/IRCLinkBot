@@ -1,1 +1,3 @@
-importlib
+machinery
+pymongo
+feedparser
