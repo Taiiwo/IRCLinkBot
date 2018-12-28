@@ -7,8 +7,10 @@ class TaiiwoBot:
     def __init__(self, server, config):
         self.server = server
         self.config = config
+        # expose server functions
         self.on = server.on
         self.msg = server.msg
+        self.menu = server.menu
         self.util = util
         # load our plugins
         self.plugins = self.load_plugins()
