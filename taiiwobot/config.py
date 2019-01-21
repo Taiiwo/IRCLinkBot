@@ -4,10 +4,12 @@ from . import irc
 def get_config():
     config_location = "config.json"
     default_config = {
-        "server_config": {
+        "irc_config": {
+            "type": "irc",
             "host": "example.com",
             "user": "TaiiwoBot",
             "nick": "TaiiwoBot",
+            "ident": "TaiiwoBot",
             "autojoin": []
         }
     }
