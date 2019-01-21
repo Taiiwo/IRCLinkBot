@@ -1,0 +1,3 @@
+machinery
+pymongo
+feedparser
