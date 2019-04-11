@@ -61,7 +61,7 @@ class botApi:
         while 1:
             try:
                 # Import settings file
-                configFile = open('./linkbot.conf', 'rw')
+                configFile = open('./linkbot.test.conf', 'rw')
                 # Parse config file
                 self.config = dictUpdate(
                     self.defaultConfig,
@@ -243,7 +243,7 @@ class botApi:
             exec(pluginFile)
             pluginFile.close()
             args = argv('', self.recvData)
-            toSend = main(data)
+            toSend = True
             if args['channel'] in \
                     self.config['settings']['pluginIgnoreChannels']:
                 if plugin in (self.config
@@ -252,6 +252,7 @@ class botApi:
                               [args['channel']]):
                     toSend = None
             if toSend and toSend != '' and toSend is not None:
+                toSend = main(data)
                 sendStatus = self.send(toSend)
                 if type(sendStatus) == str():
                     print '%s : %s' % (str(sendStatus), plugin)
