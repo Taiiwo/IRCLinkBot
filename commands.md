@@ -55,6 +55,7 @@ Admin only plugins
 ------------------
 
 ###Requires +a in given channel or +ga
+
 | Name		| Command	| Description					| Usage			| Example 			|
 |:-------------:|:--------------|:----------------------------------------------|:----------------------|:------------------------------|
 | Auth me	| !authme	| Forces an authentication, needed when the bot Boots up after you log in. | [com] | !authme		|
