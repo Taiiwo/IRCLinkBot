@@ -81,8 +81,11 @@ class Discord:
         for field in fields:
             e.add_field(name=field[0], value=field[1],
                         inline=field[2] if len(field) > 2 and not field[2] else True)
-        if author_name or author_url or author_icon:
-            e.set_author(name=author_name, url=author_url, icon_url=author_icon)
+        if author_name:
+            e.set_author(
+                name=author_name,
+                url=author_link or Empty, icon_url=author_icon or Empty
+            )
         e.set_footer(text=footer)
         return e
 
