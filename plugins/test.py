@@ -23,7 +23,10 @@ class Plugin():
         ).listen()
 
     def some_func(self, message, output="output", force=False, quiet=False):
-        self.bot.msg(message.target, "%s %s %s" % (output, force, quiet))
+        self.bot.prompt(message.target, message.author_id,
+            "This is an example prompt: ",
+            lambda m: self.bot.msg(message.target, "Hello, " + m.content)
+        )
 
     def add(self, force=False):
         pass
