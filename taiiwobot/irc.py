@@ -118,7 +118,7 @@ class IRC:
     def listen(self):
         for block in self.recv():
             # if the server stops responding, it sends us a blank string
-            if not block:
+            if block == "":
                 self.reconnect()
                 break
             for message in block.splitlines():
