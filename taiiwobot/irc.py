@@ -124,8 +124,9 @@ class IRC:
             for message in block.splitlines():
                 message = self.format_message(message)
                 if message and message['command'] in self.callbacks:
+                    callback = self.callbacks[message['command']]
                     util.callback(
-                        self.callbacks[message['command']],
+                        callback,
                         message
                     )
                     
