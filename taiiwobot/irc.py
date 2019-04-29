@@ -3,8 +3,9 @@ import time
 import re
 
 from . import util
+from .server import Server
 
-class IRC:
+class IRC(Server):
     def __init__(self, config):
         missing_keys = util.missing_keys(["user", "nick", "host"], config)
         if missing_keys:
@@ -59,10 +60,6 @@ class IRC:
         util.thread(self.ECG)
         for channel in self.config['autojoin']:
             self.join(channel)
-
-    def code_block(self, text):
-        # no codeblocks in irc
-        return text
 
     def send(self, string):
         bytes = string.encode(self.config['locale'], 'ignore')

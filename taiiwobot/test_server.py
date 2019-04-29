@@ -3,11 +3,12 @@ import time
 import re
 
 from . import util
+from .server import Server
 
 """
  * Server for testing plugins
 """
-class TestServer:
+class TestServer(Server):
     def __init__(self, config):
         missing_keys = util.missing_keys([], config)
         if missing_keys:
@@ -55,25 +56,6 @@ class TestServer:
                     self.add_callback(f, "SENT")
         return handler
 
-    # removes an even handler
-    def off(self, f, command):
-        if command in self.callbacks:
-            self.callbacks[command].remove(f)
-
-    def trigger(self, event, *data):
-        if event in self.callbacks:
-            try:
-                util.callback(self.callbacks[event], *data)
-            except util.RuntimeError as e:
-                print(e.text)
-
-    # Adds a callback for every message recieved
-    def add_callback(self, callback, *commands):
-        for command in commands:
-            if command not in self.callbacks:
-                self.callbacks[command] = []
-            self.callbacks[command].append(callback)
-
     def menu(self, target, user, question, answers=None, ync=None, cancel=False):
         self.msg("JohnTester", "This would be a menu: %s\nanswers: %s\nync: %s" % (
             question, answers, ync
@@ -103,10 +85,6 @@ class TestServer:
                     # remove the message callback
                     del self.message_callbacks[callback_id]
             self.trigger("message", message)
-
-    def code_block(self, text):
-        # no codeblocks by default
-        return text
 
     def format_message(self, raw_message):
         return util.Message(
