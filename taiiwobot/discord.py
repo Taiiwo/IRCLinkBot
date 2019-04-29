@@ -134,7 +134,7 @@ class Discord:
         )
 
     # discord method wrappers
-    def msg(self, target, message, embed=None, reactions=tuple(), user=None):
+    def msg(self, target, message, embed=None, reactions=tuple(), user=None, callback=None):
         if type(target) == str:
             if target.isnumeric():
                 t = self.client.get_channel(target)
@@ -161,6 +161,8 @@ class Discord:
             # finally, add the reactions callback if required
             if reactions:
                 async_calls.append([add_reaction_callbacks, ("$0",), {}])
+            if callback:
+                async_calls.append(callback)
             self.gaysyncio(async_calls)
             self.trigger("sent", target, message, embed)
 
