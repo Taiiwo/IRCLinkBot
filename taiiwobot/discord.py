@@ -97,7 +97,6 @@ class Discord:
             reactions = ["👍", "👎", "❌"]
             answers = ["Yes", "No", "Cancel"]
             functions = ync
-
         else:
             if not answers:
                 raise util.Error("You can't call this function with no answers")
