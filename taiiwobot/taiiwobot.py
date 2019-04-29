@@ -1,5 +1,6 @@
 import os
 import time
+import importlib.machinery
 from . import util, config
 
 class TaiiwoBot:
