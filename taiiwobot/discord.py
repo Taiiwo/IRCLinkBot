@@ -118,6 +118,21 @@ class Discord:
         )
         self.msg(target, message, reactions=zip(reactions, functions), user=user)
 
+    def prompt(self, target, user, prompt, handler, cancel=False, timeout=60.0):
+        cancel = cancel if cancel else lambda r: None
+        def cancel_wrapper(r):
+            # stop listening for the next message
+            del self.message_callbacks[r.message.channel.id + user]
+            # run the user submitted cancel function if supplied
+            cancel(r)
+        async def f(a):
+            self.message_callbacks[a.channel.id + user] = [time.time(), handler, timeout]
+        self.msg(target, prompt,
+            reactions=[["❌", cancel_wrapper]],
+            callback=[f, ("$0",), {}],
+            user=user
+        )
+
     # discord method wrappers
     def msg(self, target, message, embed=None, reactions=tuple(), user=None):
         if type(target) == str:
