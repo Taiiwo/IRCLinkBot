@@ -26,7 +26,7 @@ class TaiiwoBot:
             for file in files:
                 if file[-3:] == ".py":
                     plugin = __import__(
-                        os.path.join(root, file[:-3]).replace('/', '.')
+                        os.path.join(root, file[:-3]).replace('/', '.').replace("\\", ".")
                     )
                     plugin = getattr(plugin, file[:-3])
                     plugin = plugin.Plugin(self)
