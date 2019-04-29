@@ -10,6 +10,7 @@ word corresponds to a different event handler assignment:
 
 `message`: When a user message is sent from another user
 
+
 `join`: When a user connects to a channel
 
 `leave`: When a user joins a channel
