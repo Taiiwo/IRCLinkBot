@@ -68,8 +68,9 @@ class Interface:
             self.subcommands.append(subcommand)
         self.is_subcommand = is_subcommand
         try:
-            self.flag_info = [[x[0], x[1], " ".join(x[2:-1]), int(x[-1])]
-                    for x in [b.split() for b in flag_info]]
+            self.flag_info = [[
+                x[0], x[1].replace("-", "_"), " ".join(x[2:-1]), int(x[-1])
+            ] for x in [b.split() for b in flag_info]]
         except ValueError as e:
             raise Error("The last word of a flag string must be an integer", e)
         self.flags = []
