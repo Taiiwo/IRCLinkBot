@@ -72,6 +72,9 @@ class Discord:
     def start(self):
         self.client.run(self.config["api_key"])
 
+    def code_block(self, text):
+        return "```" + text _ "```"
+
     def embed(self, title=Empty, url=Empty, desc=Empty, author_name=Empty,
             author_link=Empty, author_icon=Empty, fields=[], footer=Empty,
             color=Empty, thumbnail=Empty):

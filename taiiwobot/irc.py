@@ -60,6 +60,10 @@ class IRC:
         for channel in self.config['autojoin']:
             self.join(channel)
 
+    def code_block(self, text):
+        # no codeblocks in irc
+        return text
+
     def send(self, string):
         bytes = string.encode(self.config['locale'], 'ignore')
         self.connection.send(bytes)
@@ -79,7 +83,7 @@ class IRC:
             channel = "#" + channel
         self.send("JOIN %s\r\n" % channel)
         util.debug("[-] Joining %s" % channel)
-    
+
     def on(self, *commands):
         def handler(f):
             for command in commands:
@@ -96,7 +100,7 @@ class IRC:
                 elif command == "sent":
                     self.add_callback(f, "SENT")
         return handler
-                
+
 
     # Adds a callback for every message recieved
     def add_callback(self, callback, *commands):
@@ -129,7 +133,7 @@ class IRC:
                         callback,
                         message
                     )
-                    
+
 
     # Monitors the pulse of the connection, and restarts if it dies
     def ECG(self):

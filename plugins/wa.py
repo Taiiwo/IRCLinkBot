@@ -21,7 +21,7 @@ class Plugin():
         query = {'input': " ".join(args), 'appid': 'QPEPAR-TKWEJ3W7VA'}
         baseUrl = 'http://api.wolframalpha.com/v2/query?'
         response = requests.get(baseUrl, params=query).text
-        soup = BeautifulSoup(response, "lxml")
+        soup = BeautifulSoup(response, "html.parser")
         pods = soup.queryresult.findAll('pod')
         if pods and len(pods) >= 2:  # if we got an answer
             answers = []
@@ -44,7 +44,7 @@ class Plugin():
                         pass
                 answers.append(answer)
             # Prepare these answers for IRC
-            ircAnswersString = "```\n"
+            ircAnswersString = ""
             lines = '\n'.join(answers).splitlines()
             postShortLink = False
             if len(lines) > 5:
@@ -58,7 +58,7 @@ class Plugin():
                     ircAnswersString += "".join(line[:427]) + '...\n'
                 else:
                     ircAnswersString += line + '\n'
-            self.bot.msg(message.target, ircAnswersString + "```")
+            self.bot.msg(message.target, self.bot.server.code_block(ircAnswersString))
             if postShortLink:
                 shortLink = self.bot.util.maketiny("http://www.wolframalpha.com/input/?" + urlencode({"i": " ".join(args)}))
                 self.bot.msg(message.target, "More: " + shortLink)

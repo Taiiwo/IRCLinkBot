@@ -104,6 +104,10 @@ class TestServer:
                     del self.message_callbacks[callback_id]
             self.trigger("message", message)
 
+    def code_block(self, text):
+        # no codeblocks by default
+        return text
+
     def format_message(self, raw_message):
         return util.Message(
             nick="JohnTester",
