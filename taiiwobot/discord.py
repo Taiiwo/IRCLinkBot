@@ -57,7 +57,7 @@ class Discord:
                     return False
                 for reaction_emoji, function in reactions:
                     if reaction.emoji == reaction_emoji:
-                        function()
+                        function(reaction)
                         # remove reactions
                         calls = []
                         for reaction_emoji, x in reactions:
