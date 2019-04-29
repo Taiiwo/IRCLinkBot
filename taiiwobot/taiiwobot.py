@@ -28,6 +28,7 @@ class TaiiwoBot:
                     plugin = __import__(
                         os.path.join(root, file[:-3]).replace('/', '.')
                     )
-                    plugin.Plugin()
-                    #module = getattr(plugin, file[:-3])
+                    plugin = getattr(plugin, file[:-3])
+                    plugin = plugin.Plugin(self)
+                    plugins.append(plugin)
         return plugins
