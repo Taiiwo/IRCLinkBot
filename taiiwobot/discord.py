@@ -89,7 +89,7 @@ class Discord:
         e.set_footer(text=footer)
         return e
 
-    def menu(self, target, user, question, answers=None, ync=None):
+    def menu(self, target, user, question, answers=None, ync=None, cancel=False):
         if ync:
             if len(ync) != 3:
                 raise util.Error("ync must have 3 elements:"
