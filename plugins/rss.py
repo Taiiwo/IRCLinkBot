@@ -35,7 +35,11 @@ class Plugin():
                     "Edits the way a feed is managed. Usage $rss edit [flags] <url>",
                     [
                         "t target The channel that contains the feed to be edited 1",
-                        "d display Show the edit display menu 0"
+                        "d formatting Show the edit formatting menu 0",
+                        "ea edit-attribute The name of the embed attribute to be edited 1",
+                        "c conditions Show the condition editing menu 0",
+                        "cc create-condition Create a condition 1",
+                        "ec edit-condition Edit an existing condition 1"
                     ],
                     self.edit
                 )
@@ -120,7 +124,7 @@ class Plugin():
         # post a sample of the feed
         self.post_entry(destination, entry)
         # callback function for if the user hits "yes" in the following menu
-        def yes():
+        def yes(r):
             # the user decided the feed looked good
             if existing_feed:
                 # edit the existing feed
@@ -134,7 +138,7 @@ class Plugin():
         # ask the user if it needs editing
         self.bot.menu(message.target, message.author_id,
             "Does this look okay?",
-            ync=[yes, lambda:self.edit(message,url), lambda: None]
+            ync=[yes, lambda r:yes(r)+self.edit(message,url), lambda r: None]
         )
 
     def delete(self, message, url=None, target=None):
@@ -156,15 +160,27 @@ class Plugin():
                 "destination": {"target": target}
             }})
 
-    def edit(self, message, url=None, target=None, display=False):
+    def edit(self, message, url=None, target=None, formatting=False,
+            edit_attribute=None, conditions=False, create_condition=False,
+            edit_condition=None):
         # sanitize user input
-        if not url:
-            raise self.bot.util.RuntimeError(
-                "Missing argument: url. Usage: $rss delete [flags] <url>",
-                message.target, self
-            )
         target = target if target else message.target
         target = target if type(target) == str else target.id
+        if not url:
+            urls = self.feeds_col.find({"destinations.target": target}, {"url": True})
+            # array of arrays: answer, function
+            def lambda_factory(a):
+                return lambda r: self.edit(message, u["url"], target,
+                        formatting, edit_attribute, conditions)
+            answers = [[
+                u["url"],
+                lambda_factory(a)
+            ] for u in self.feeds_col.find({"destinations.target": target})]
+            self.bot.menu(message.target, message.author_id,
+                "Which feed would you like to edit?",
+                answers
+            )
+            return
         # get the feed
         feed = self.feeds_col.find_one({"url": url})
         if not feed:
@@ -175,45 +191,168 @@ class Plugin():
         # get the destination
         destination = [f for f in feed["destinations"] if f["target"] == target][0]
         # which menu is being requested
-        if display:
+        if formatting:
+            keys = self.default_settings if destination["keys"] == "default" \
+                    else destination["keys"]
+            # array of arrays: answer, function
+            def lambda_factory(a):
+                return lambda r: self.edit(message, url, target, edit_attribute=a)
+            answers = [[
+                "[%s] = %s\n" % (a,b),
+                lambda_factory(a)
+            ] for a,b in keys.items()]
+            self.bot.menu(message.target, message.author_id,
+                "Which embed attribute would you like to change?",
+                answers
+            )
+        elif edit_attribute:
             # build a set of example entry variables to choose from
             sample_feed = feedparser.parse(feed["url"])
             sample_entry = sample_feed["entries"][0]
+            # remove redundant data
             del sample_feed["entries"]
             sample_entry.update({"feed:"+k:v for k, v in sample_feed.items()})
             keys = self.default_settings if destination["keys"] == "default" \
                     else destination["keys"]
-            msg = "```\n" \
-                "Each feed entry has the following data available:\n\n" \
-                "%s\n" \
-                "```" % "\n".join(["[%s] - %s" % (k, v) for k,v in sample_entry.items()
-                        if type(v) == str])
-            print(message.target, msg)
+            msg = "Here's a sample of the data each feed entry has available:\n\n" \
+                    "```\n%s\n```" \
+                            % "\n".join(["$%s - %s" % (k, v)
+                                    for k,v in sample_entry.items()
+                                            if type(v) == str])
+            self.bot.msg(message.target, msg)
+            def confirm(m):
+                value = m.content
+                d = destination.copy()
+                if d["keys"] == "default": d["keys"] = self.default_settings
+                d["keys"][edit_attribute] = value
+                # post an example for the user to validate
+                self.post_entry(d, sample_entry)
+                # if the users says yes
+                def yes(r):
+                    # write the new destination to the database
+                    self.feeds_col.update(
+                        {"url": url, "destinations.target": target},
+                        {"$set": {"destinations.$": d}}
+                    )
+                    # print complete message
+                    self.bot.menu(message.target, message.author_id,
+                        "Changes have been made. Change another?",
+                        ync=[
+                            lambda r:self.edit(
+                                message, url, target, edit_attribute=edit_attribute
+                            ),
+                            lambda r: None,
+                            lambda r: None
+                        ]
+                    )
+                # ask the user to validate the new formatting
+                self.bot.menu(message.target, message.author_id,
+                    "Does this look okay?",
+                    ync=[
+                        yes,
+                        lambda r:self.edit(
+                            message, url, target, edit_attribute=edit_attribute
+                        ),
+                        lambda r: None
+                    ]
+                )
+            # prompt the user to type the new attribute contents
+            self.bot.prompt(message.target, message.author_id,
+                "Type the way you want the %s of the entry to be displayed:" % edit_attribute,
+                confirm
+            )
+        elif conditions:
+            # prepend a "create condition" option to the start of the list
+            self.bot.menu(message.target, message.author_id,
+                "How would you like to edit the conditions?",
+                [
+                    [
+                        "Create a new condition",
+                        lambda r: self.edit(message, url, target, create_condition=True)
+                    ],
+                    [
+                        "Delete an existing condition",
+                        lambda r: self.edit(message, url, target, delete_condition=True)
+                    ]
+                ]
+            )
+        elif create_condition:
+            # build a set of example entry variables to choose from
+            sample_entry = feedparser.parse(feed["url"])["entries"][0]
+            msg = "Here's a sample of the data each feed entry has available:\n\n" \
+                    "```\n%s\n```" \
+                            % "\n".join(["$%s - %s" % (k, v)
+                                    for k,v in sample_entry.items()
+                                            if type(v) == str])
             self.bot.msg(message.target, msg)
 
+            def append_condition(m):
+                cond = re.split(r"[^\];\s?", m.content)
+                cond2 = {}
+                for condition_string in conditions:
+                    m = re.match(r"^(.+)[^\]=(.+,)+", condition_string)
+                    cond2[m.group(1)] = m.group()[2:]
+                cond = cond2
+                """
+                feeds_col.update(
+                    {"url": url, "destination.target": target},
+                    {"$push": {"destination.conditions": cond}}
+                )"""
+
+            self.bot.prompt(
+                "Enter your desired condition matching the format of the example: "
+                "`title=Ted,1080p; ab:size=1;\.\dGb`, where 'title' would have to "
+                "contain both 'Ted' and '1080p', AND the 'ab:size' would be "
+                "between 1 and 2 Gb",
+                lambda m: self.edit(message, url, target, append_condition=m.content)
+            )
+        elif delete_condition:
+            sample_entry = feedparser.parse(feed["url"])["entries"][0]
+            # check if the request contains a valid condition type
+            if not create_condition in sample_entry:
+                raise self.bot.util.RuntimeError(
+                    "Invalid condition type specified. Try %s%s edit -c <url>"
+                            % (self.interface.prefix, self.interface.name),
+                    message.target, self
+                )
+            self.bot.prompt("Enter your condition for field")
         else:
             # ask which property to be edited
             self.bot.menu(message.target, message.author_id,
                 "What aspect of this feed would you like to edit?", [
                 [
-                    "Display - The way the feed is displayed",
-                    lambda: self.edit(message, url, target, display=True)
+                    "Format - The way the feed is formated",
+                    lambda r: self.edit(message, url, target, formatting=True)
+                ],
+                [
+                    "Conditions - Which entries are posted",
+                    lambda r: self.edit(message, url, target, conditions=True)
                 ]
             ])
+
 
     def post_entry(self, destination, entry):
         keys = self.default_settings \
                 if destination["keys"] == "default" \
                 else destination["keys"]
         # turns a key format into value string
-        format_key = lambda t: " ".join(entry[k[1:]]
-                if k[0] == "$" else k for k in keys[t].split())
+        def format_key(t):
+            v = []
+            for k in (keys[t].split() if keys[t] else []):
+                if k[0] == "$":
+                    v.append(entry[k[1:]] if k[1:] in entry else None)
+                else:
+                    v.append(k)
+            return " ".join(v) if not None in v else None
         self.bot.msg(
             destination["target"],
             " " + " ".join(destination["pings"]),
             embed=self.bot.server.embed(
                 title=format_key("title"),
                 desc=format_key("desc"),
+                author_name=format_key("author_name"),
+                author_link=format_key("author_link"),
+                author_icon=format_key("author_icon"),
                 footer=format_key("footer"),
                 url=format_key("url"),
                 color=format_key("color")
