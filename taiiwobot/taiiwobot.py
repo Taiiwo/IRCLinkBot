@@ -18,7 +18,6 @@ class TaiiwoBot:
         # run the blocking function
         self.server.start()
 
-
     def load_plugins(self):
         # get all the plugins from the plugin folder
         plugins = []
