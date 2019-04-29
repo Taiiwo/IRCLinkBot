@@ -22,6 +22,10 @@ class Discord:
         self.client = discord.Client()
 
         @self.client.event
+        async def on_ready():
+            self.name = self.client.user.name
+
+        @self.client.event
         async def on_message(message):
             # for each message callback
             message_callbacks = self.message_callbacks.copy()
