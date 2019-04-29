@@ -25,7 +25,6 @@ class IRC:
             "SENT": []
         }
         self.recv_log = []
-        self.last_pulse = None
 
         self.login()
 
@@ -133,7 +132,9 @@ class IRC:
 
     # Monitors the pulse of the connection, and restarts if it dies
     def ECG(self):
-        if not self.last_pulse:
+        try:
+            self.last_pulse
+        except AttributeError:
             self.last_pulse = time.time()
         while True:
             if time.time() - self.last_pulse > 300:
