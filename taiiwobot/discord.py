@@ -73,7 +73,7 @@ class Discord:
         self.client.run(self.config["api_key"])
 
     def embed(self, title=Empty, url=Empty, desc=Empty, author_name=Empty,
-            author_url=Empty, author_icon=Empty, fields=[], footer=Empty,
+            author_link=Empty, author_icon=Empty, fields=[], footer=Empty,
             color=Empty, thumbnail=Empty):
         e = discord.Embed(title=title, url=url, description=desc, color=int(color, 16))
         if thumbnail:
