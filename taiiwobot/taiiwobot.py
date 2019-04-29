@@ -11,11 +11,13 @@ class TaiiwoBot:
         self.on = server.on
         self.msg = server.msg
         self.menu = server.menu
+        self.prompt = server.prompt
         self.util = util
         # load our plugins
         self.plugins = self.load_plugins()
         # run the blocking function
         self.server.start()
+
 
     def load_plugins(self):
         # get all the plugins from the plugin folder
