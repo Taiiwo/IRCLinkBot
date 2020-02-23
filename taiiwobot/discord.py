@@ -121,36 +121,55 @@ class Discord(Server):
             numbers = ["0⃣", "1⃣", "2⃣", "3⃣", "4⃣", "5⃣", "6⃣", "7⃣", "8⃣", "9⃣", "🔟"]
             # if user supplies an icon to use, use that, else use a number icon
             reactions = [numbers[i] if len(a) < 3 else a[0]
-                    for i, a in enumerate(zip(*answers))]
+                    for i, a in enumerate(zip(answers))]
             # parse the answers array, ignoring the supplied icon if supplied
-            answers, functions = [a_f_tuple if len(a_f_tuple) < 3 else a_f_tuple[1:3]
-                    for a_f_tuple in zip(*answers)]
+            answers, functions = zip(*[a_f if len(a_f) < 3 else a_f[1:3]
+                    for a_f in answers])
         message = "%s\n\n%s\n\nReact to answer." % (
             question,
             "\n".join(["[%s] - %s" % (r, a) for r, a in zip(reactions, answers)])
         )
         self.msg(target, message, reactions=zip(reactions, functions), user=user)
 
+    def prompt(self, target, user, prompt, handler, cancel=False, timeout=60.0):
+        cancel = cancel if cancel else lambda r: None
+        def cancel_wrapper(r):
+            # stop listening for the next message
+            del self.message_callbacks[r["channel"] + user]
+            # run the user submitted cancel function if supplied
+            cancel(r)
+        async def f(a):
+            self.message_callbacks[a.channel.id + user] = [time.time(), handler, timeout]
+        self.msg(target, prompt,
+            reactions=[["❌", cancel_wrapper]],
+            callback=[f, ("$0",), {}],
+            user=user
+        )
+
     # discord method wrappers
-    def msg(self, target, message, embed=None, reactions=tuple(), user=None):
+    def msg(self, target, message, embed=None, reactions=tuple(), user=None, callback=None):
         if type(target) == str:
             if target.isnumeric():
-                t = self.client.get_channel(target)
-                if not t:
-                    t = self.client.get_user_info(target)
-                target = t
+                target = int(target)
+        if type(target) == int:
+            t = self.client.get_channel(target)
+            if not t:
+                t = self.client.get_user_info(target)
+            target = t
         if type(message) == util.Message:
             message = message.content
         if message != "":
             # a list of asynchronous calls to make
             async_calls = [
                 # sending the message
-                [self.client.send_message, (target, message), {"embed": embed}]
+                [target.send, (message,), {"embed": embed}]
             ]
             reactions = list(reactions)
             # add the reactions
             for r, f in reactions:
-                async_calls.append([self.client.add_reaction, ("$0", r), {}])
+                async def add_reaction(message, reaction):
+                    return await message.add_reaction(reaction)
+                async_calls.append([add_reaction, ("$0", r), {}])
             # a callback for when the message and all the reactions have been sent
             async def add_reaction_callbacks(message):
                 # make a note of the message id, so that if the user clicks them
