@@ -178,11 +178,20 @@ class Discord(Server):
             # finally, add the reactions callback if required
             if reactions:
                 async_calls.append([add_reaction_callbacks, ("$0",), {}])
+            if callback:
+                async_calls.append(callback)
             self.gaysyncio(async_calls)
             self.trigger("sent", target, message, embed)
 
     def join(self, channel):
         pass
+
+    # how to mention a user in text.
+    def mention(self, user):
+        return "<@%s>" % user
+
+    def me(self):
+        return self.client.user.id
 
     # event handler handling
     def on(self, command):
