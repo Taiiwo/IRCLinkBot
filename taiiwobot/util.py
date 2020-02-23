@@ -41,7 +41,8 @@ def callback(callbacks, data):
 class Message():
     def __init__(self, nick=None, username=None, author_id=None, host=None,
                     type=None, target=None, content=None, raw_message=None,
-                    timestamp=None, server_type=None, embeds=[], attachments=[]):
+                    timestamp=None, server_type=None, embeds=[], attachments=[],
+                    ident=None):
         self.nick = nick # display name of the user
         self.username = username # unique username of the user
         self.author_id = author_id
