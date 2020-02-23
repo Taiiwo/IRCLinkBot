@@ -205,6 +205,7 @@ class Discord(Server):
             self.callbacks[command].remove(f)
 
     def trigger(self, event, *data):
+        print(event)
         if event in self.callbacks:
             try:
                 util.callback(self.callbacks[event], *data)
@@ -226,7 +227,7 @@ class Discord(Server):
             content=m.content,
             raw_message=m,
             server_type="discord",
-            timestamp=m.timestamp,
+            timestamp=m.created_at,
             embeds=m.embeds,
             attachments=m.attachments
         )
