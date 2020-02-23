@@ -202,7 +202,7 @@ class Interface:
                 # this argument is not a flag, therefore we can add it as an argument
                 arguments += (arg[1:] if arg[0] == "\\" else arg,)
             i += 1
-        return self.func(o_message, *arguments, **kwargs)
+        return self.func(message, *arguments, **kwargs)
 
 def interface_test():
     interface = Interface(
