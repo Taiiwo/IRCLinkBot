@@ -18,40 +18,75 @@ class Discord(Server):
         self.config = defaults
         self.callbacks = {}
         self.reaction_callbacks = {}
+        self.message_callbacks = {}
 
         self.client = discord.Client()
 
         @self.client.event
+        async def on_ready():
+            print("Connected")
+            self.name = self.client.user.name
+
+        @self.client.event
         async def on_message(message):
+            # for each message callback
+            message_callbacks = self.message_callbacks.copy()
+            for callback_id, callback in self.message_callbacks.items():
+                # are we waiting for this message?
+                if callback_id == message.channel.id + message.author.id:
+                    # run the message callback
+                    callback[1](message)
+                    del message_callbacks[callback_id]
+                    # return here to not invoke other plugins with awaited messages
+                    self.message_callbacks = message_callbacks
+                    return
+                timeout = callback[2] if len(callback) > 2 else 60.0
+                # check if the message callback is too old
+                if time.time() - callback[0] > timeout:
+                    # remove the message callback
+                    del message_callbacks[callback_id]
+            self.message_callbacks = message_callbacks
+
             message = self.format_message(message)
             self.trigger("message", message)
 
         @self.client.event
         async def on_reaction_add(reaction, reactor):
+            self.trigger("reaction", reaction, reactor)
             # do we have any code to run in response to this?
             if reaction.message.id in self.reaction_callbacks:
                 user, reactions = self.reaction_callbacks[reaction.message.id]
-                if user != reactor.id:
+                if user and user != reactor.id:
                     return False
                 for reaction_emoji, function in reactions:
                     if reaction.emoji == reaction_emoji:
-                        function()
-                        # remove reactions
-                        calls = []
-                        for reaction_emoji, x in reactions:
-                            calls.append([self.client.remove_reaction, (
-                                reaction.message, reaction_emoji, self.client.user
-                            ), {}])
-                        self.gaysyncio(calls)
-                        # remove callbacks
-                        del self.reaction_callbacks[reaction.message.id]
+                        function({
+                            "emoji": reaction.emoji,
+                            "reactor": reactor.id,
+                            "message": reaction.message.id,
+                            "channel": reaction.message.channel.id
+                        })
+                        # if it was a targeted callback, remove it
+                        if user:
+                            # remove reactions
+                            calls = []
+                            for reaction_emoji, x in reactions:
+                                calls.append([reaction.message.remove_reaction, (
+                                    reaction_emoji, self.client.user
+                                ), {}])
+                            self.gaysyncio(calls)
+                            # remove callbacks
+                            del self.reaction_callbacks[reaction.message.id]
                         break
 
     def start(self):
         self.client.run(self.config["api_key"])
 
+    def code_block(self, text):
+        return "```" + text + "```"
+
     def embed(self, title=Empty, url=Empty, desc=Empty, author_name=Empty,
-            author_url=Empty, author_icon=Empty, fields=[], footer=Empty,
+            author_link=Empty, author_icon=Empty, fields=[], footer=Empty,
             color=Empty, thumbnail=Empty):
         e = discord.Embed(title=title, url=url, description=desc, color=int(color, 16))
         if thumbnail:
