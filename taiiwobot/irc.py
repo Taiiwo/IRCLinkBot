@@ -54,12 +54,12 @@ class IRC:
         ))
         if 'password' in self.config:
             self.msg("nickserv", "identify %s" % (self.config['password']))
-        # listen forever
-        util.thread(self.listen)
         # check the server is alive forever
         util.thread(self.ECG)
         for channel in self.config['autojoin']:
             self.join(channel)
+        # listen forever
+        self.listen()
 
     def send(self, string):
         bytes = string.encode(self.config['locale'], 'ignore')
@@ -110,7 +110,6 @@ class IRC:
             recv = self.connection.recv(self.config['recv_amount'])
             # convert to str, stripping unknown unicode characters
             recv = recv.decode(self.config['locale'], "ignore")
-            print(recv)
             self.last_pulse = time.time()
             self.recv_log.append([recv, self.last_pulse])
             yield recv
@@ -123,6 +122,7 @@ class IRC:
                 break
             for message in block.splitlines():
                 message = self.format_message(message)
+                if message: print(message)
                 if message and message['command'] in self.callbacks:
                     util.callback(
                         self.callbacks[message['command']],
