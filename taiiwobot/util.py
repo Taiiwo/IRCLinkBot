@@ -127,7 +127,8 @@ class Interface:
             return False
         # skip the first arg because it's the name of the command
         i = 1
-        if args[0] != ("" if self.is_subcommand else self.prefix) + self.name:
+        # if command != our command name (omitting prefix if we're a subcommand)
+        if args[0] != self.prefix * (not self.is_subcommand) + self.name:
             # this message does not refer to this interface
             return False
         while i < len(args):
