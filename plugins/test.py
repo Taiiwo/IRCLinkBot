@@ -1,4 +1,6 @@
-class Plugin():
+from taiiwobot.plugin import Plugin
+
+class Test(Plugin):
     def __init__(self, bot):
         self.bot = bot
         self.interface = bot.util.Interface(
@@ -12,18 +14,23 @@ class Plugin():
             self.some_func,
             subcommands=[
                 bot.util.Interface(
-                    "add",
-                    "adds some stuff",
+                    "say",
+                    "says some stuff",
                     [
                         "f force Force adding the thing 0"
                     ],
-                    self.add
+                    self.say
                 )
             ]
         ).listen()
 
     def some_func(self, message, output="output", force=False, quiet=False):
-        self.bot.msg(message.target, "%s %s %s" % (output, force, quiet))
+        print(message.target)
+        self.bot.prompt(message.target, message.author_id,
+            "This is an example prompt: ",
+            lambda m: self.bot.msg(message.target, "Hello, " + m.content)
+        )
 
-    def add(self, force=False):
-        pass
+    def say(self, message, *things, force=False):
+        print("weed")
+        self.bot.msg(message.target, " ".join(things))
