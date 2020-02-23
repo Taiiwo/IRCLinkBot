@@ -11,12 +11,15 @@ class Server:
         # code blocks aren't supported by default
         return text
 
+<<<<<<< HEAD
     def mention(self, user):
         return user
 
     def me(self):
         return self.config["user"]
 
+=======
+>>>>>>> dc83748e2cbac802a5b33d8c442e93a5e791d745
     def menu(self, target, user, question, answers=None, ync=None, cancel=False):
         if ync:
             if len(ync) != 3:

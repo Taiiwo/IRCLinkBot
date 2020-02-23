@@ -24,7 +24,10 @@ class Discord(Server):
 
         @self.client.event
         async def on_ready():
+<<<<<<< HEAD
             print("Connected")
+=======
+>>>>>>> dc83748e2cbac802a5b33d8c442e93a5e791d745
             self.name = self.client.user.name
 
         @self.client.event
@@ -60,6 +63,7 @@ class Discord(Server):
                     return False
                 for reaction_emoji, function in reactions:
                     if reaction.emoji == reaction_emoji:
+<<<<<<< HEAD
                         function({
                             "emoji": reaction.emoji,
                             "reactor": reactor.id,
@@ -77,13 +81,29 @@ class Discord(Server):
                             self.gaysyncio(calls)
                             # remove callbacks
                             del self.reaction_callbacks[reaction.message.id]
+=======
+                        function(reaction)
+                        # remove reactions
+                        calls = []
+                        for reaction_emoji, x in reactions:
+                            calls.append([self.client.remove_reaction, (
+                                reaction.message, reaction_emoji, self.client.user
+                            ), {}])
+                        self.gaysyncio(calls)
+                        # remove callbacks
+                        del self.reaction_callbacks[reaction.message.id]
+>>>>>>> dc83748e2cbac802a5b33d8c442e93a5e791d745
                         break
 
     def start(self):
         self.client.run(self.config["api_key"])
 
     def code_block(self, text):
+<<<<<<< HEAD
         return "```" + text + "```"
+=======
+        return "```" + text _ "```"
+>>>>>>> dc83748e2cbac802a5b33d8c442e93a5e791d745
 
     def embed(self, title=Empty, url=Empty, desc=Empty, author_name=Empty,
             author_link=Empty, author_icon=Empty, fields=[], footer=Empty,
@@ -135,7 +155,11 @@ class Discord(Server):
         cancel = cancel if cancel else lambda r: None
         def cancel_wrapper(r):
             # stop listening for the next message
+<<<<<<< HEAD
             del self.message_callbacks[r["channel"] + user]
+=======
+            del self.message_callbacks[r.message.channel.id + user]
+>>>>>>> dc83748e2cbac802a5b33d8c442e93a5e791d745
             # run the user submitted cancel function if supplied
             cancel(r)
         async def f(a):

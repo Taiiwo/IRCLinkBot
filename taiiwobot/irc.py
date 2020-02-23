@@ -3,8 +3,9 @@ import time
 import re
 
 from . import util
+from .server import Server
 
-class IRC:
+class IRC(Server):
     def __init__(self, config):
         missing_keys = util.missing_keys(["user", "nick", "host"], config)
         if missing_keys:
@@ -25,7 +26,6 @@ class IRC:
             "SENT": []
         }
         self.recv_log = []
-        self.last_pulse = None
 
         self.login()
 
@@ -98,6 +98,7 @@ class IRC:
                     self.add_callback(f, "SENT")
         return handler
 
+
     # Adds a callback for every message recieved
     def add_callback(self, callback, *commands):
         for command in commands:
@@ -117,21 +118,25 @@ class IRC:
     def listen(self):
         for block in self.recv():
             # if the server stops responding, it sends us a blank string
-            if not block:
+            if block == "":
                 self.reconnect()
                 break
             for message in block.splitlines():
                 message = self.format_message(message)
                 if message: print(message)
                 if message and message['command'] in self.callbacks:
+                    callback = self.callbacks[message['command']]
                     util.callback(
-                        self.callbacks[message['command']],
+                        callback,
                         message
                     )
 
+
     # Monitors the pulse of the connection, and restarts if it dies
     def ECG(self):
-        if not self.last_pulse:
+        try:
+            self.last_pulse
+        except AttributeError:
             self.last_pulse = time.time()
         while True:
             if time.time() - self.last_pulse > 300:

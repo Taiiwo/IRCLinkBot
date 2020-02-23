@@ -25,7 +25,10 @@ class Test(Plugin):
         ).listen()
 
     def some_func(self, message, output="output", force=False, quiet=False):
+<<<<<<< HEAD
         print(message.target)
+=======
+>>>>>>> dc83748e2cbac802a5b33d8c442e93a5e791d745
         self.bot.prompt(message.target, message.author_id,
             "This is an example prompt: ",
             lambda m: self.bot.msg(message.target, "Hello, " + m.content)

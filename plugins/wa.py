@@ -3,9 +3,14 @@ from urllib.parse import urlencode
 from bs4 import BeautifulSoup
 import html
 import re
+<<<<<<< HEAD
 from taiiwobot.plugin import Plugin
 
 class WolframAlpha(Plugin):
+=======
+
+class Plugin():
+>>>>>>> dc83748e2cbac802a5b33d8c442e93a5e791d745
     def __init__(self, bot):
         self.bot = bot
         self.interface = bot.util.Interface(
