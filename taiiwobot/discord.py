@@ -5,8 +5,9 @@ import re
 Empty = discord.Embed.Empty
 
 from . import util
+from .server import Server
 
-class Discord:
+class Discord(Server):
     def __init__(self, config):
         missing_keys = util.missing_keys(["api_key"], config)
         if missing_keys:
