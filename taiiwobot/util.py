@@ -140,7 +140,8 @@ class Interface:
             # is arg a subcommand?
             if subcommand:
                 # process the rest of this command as the sub command
-                return subcommand.process(Message(content=" ".join(args[i:])),
+                message.content = " ".join(args[i:])
+                return subcommand.process(message,
                     arguments=arguments, kwargs=kwargs, o_message=message) # pass the flags we got
             elif arg.lstrip("-") == "help":
                 self.help(o_message.target, self.func.__self__)
