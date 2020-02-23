@@ -1,6 +1,7 @@
 import os
 import time
-from . import util, config
+import importlib.machinery
+from . import util, config, plugin
 
 class TaiiwoBot:
     def __init__(self, server, config):
@@ -10,6 +11,7 @@ class TaiiwoBot:
         self.on = server.on
         self.msg = server.msg
         self.menu = server.menu
+        self.prompt = server.prompt
         self.util = util
         # load our plugins
         self.plugins = self.load_plugins()
@@ -20,11 +22,24 @@ class TaiiwoBot:
         # get all the plugins from the plugin folder
         plugins = []
         for root, dirs, files in os.walk('plugins'):
+            # for each py file in the plugins folder
             for file in files:
                 if file[-3:] == ".py":
+                    # import it
                     plugin = __import__(
-                        os.path.join(root, file[:-3]).replace('/', '.')
+                        os.path.join(root, file[:-3]).replace('/', '.').replace("\\", ".")
                     )
-                    plugin.Plugin()
-                    #module = getattr(plugin, file[:-3])
+                    plugin = getattr(plugin, file[:-3])
+                    # find all the plugin classes
+                    for attr in dir(plugin):
+                        # ignore the _ attrs for safety
+                        if attr[0] == "_":
+                            continue
+                        # if the attr is a unintitialized class
+                        if isinstance(getattr(plugin, attr), type):
+                            # if the class is based on the plugin class
+                            if getattr(plugin, attr).__bases__[0] == plugin.Plugin:
+                                # init the class and add it to the plugin list
+                                plugins.append(getattr(plugin, attr)(self))
+                                break
         return plugins
