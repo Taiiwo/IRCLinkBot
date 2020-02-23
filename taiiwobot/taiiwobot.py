@@ -1,11 +1,7 @@
 import os
 import time
 import importlib.machinery
-<<<<<<< HEAD
 from . import util, config, plugin
-=======
-from . import util, config
->>>>>>> dc83748e2cbac802a5b33d8c442e93a5e791d745
 
 class TaiiwoBot:
     def __init__(self, server, config):
@@ -34,7 +30,6 @@ class TaiiwoBot:
                         os.path.join(root, file[:-3]).replace('/', '.').replace("\\", ".")
                     )
                     plugin = getattr(plugin, file[:-3])
-<<<<<<< HEAD
                     # find all the plugin classes
                     for attr in dir(plugin):
                         # ignore the _ attrs for safety
@@ -47,8 +42,4 @@ class TaiiwoBot:
                                 # init the class and add it to the plugin list
                                 plugins.append(getattr(plugin, attr)(self))
                                 break
-=======
-                    plugin = plugin.Plugin(self)
-                    plugins.append(plugin)
->>>>>>> dc83748e2cbac802a5b33d8c442e93a5e791d745
         return plugins
