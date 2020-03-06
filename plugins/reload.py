@@ -23,21 +23,25 @@ class Reload(Plugin):
                 self.bot.plugins.remove(plugin)
                 self.bot.msg(message.target, "Plugin unloaded..")
                 # load the plugin
-                for root, dirs, files in os.walk('plugins'):
-                    # for each py file in the plugins folder
-                    for file in files:
-                        if file[-3:] == ".py" and file[:-3].lower() == query.lower():
-                            # import it
-                            namespace = {}
-                            with open(os.path.join(root, file)) as plugin_file:
-                                code = compile(
-                                    plugin_file.read(),
-                                    os.path.join(root, file),
-                                    "exec"
-                                )
-                                exec(code, namespace)
-                            plugin = namespace[plugin_name]
-                            # init the class and add it to the plugin list
-                            self.bot.plugins.append(plugin(self.bot))
-                            self.bot.msg(message.target, "Plugin loaded!")
-                            return
+                break
+        for root, dirs, files in os.walk("plugins"):
+            # for each py file in the plugins folder
+            for file in files:
+                if file[-3:] == ".py" and file[:-3].lower() == query.lower():
+                    # import it
+                    namespace = {}
+                    with open(os.path.join(root, file)) as plugin_file:
+                        code = compile(
+                            plugin_file.read(), os.path.join(root, file), "exec"
+                        )
+                        exec(code, namespace)
+                    plugin = False
+                    for key in namespace:
+                        if key.lower() == query.lower():
+                            plugin = namespace[key]
+                    # init the class and add it to the plugin list
+                    if plugin:
+                        self.bot.plugins.append(plugin(self.bot))
+                        self.bot.msg(message.target, "Plugin loaded!")
+                    else:
+                        self.bot.msg(message.target, "Plugin not found.")
