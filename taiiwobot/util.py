@@ -45,7 +45,8 @@ class Message():
                     ident=None):
         self.nick = nick # display name of the user
         self.username = username # unique username of the user
-        self.author_id = author_id
+        self.author = author_id
+        self.author_id = author_id # deprecated
         self.host = host
         self.type = type
         self.target = target
@@ -118,6 +119,10 @@ class Interface:
             "```" % (self.prefix + self.name, self.desc, subcommands, flags)
         )
 
+    # Future Taiiwo here. This function is a completely needless reimplementation
+    # of the argparse module. Come and marvel of the effects of not searching
+    # for code before you write it, and the subbornness of still using it
+    # even if the original code is probably better...........
     def process(self, message, arguments=False, kwargs=False, o_message=False):
         kwargs = kwargs if kwargs else {}
         arguments = arguments if arguments else tuple()
