@@ -37,8 +37,8 @@ class RSS(Plugin):
                         "d formatting Show the edit formatting menu 0",
                         "ea edit-attribute The name of the embed attribute to be edited 1",
                         "c conditions Show the condition editing menu 0",
-                        "cc create-condition Create a condition 1",
-                        "ec edit-condition Edit an existing condition 1"
+                        "cc create-condition Specify a condition to create 0",
+                        "dc delete-condition Delete a condition 0",
                     ],
                     self.edit
                 )
@@ -154,9 +154,18 @@ class RSS(Plugin):
                 "destination": {"target": target}
             }})
 
-    def edit(self, message, url=None, target=None, formatting=False,
-            edit_attribute=None, conditions=False, create_condition=False,
-            edit_condition=None):
+    def edit(
+        self,
+        message,
+        url=None,
+        target=None,
+        formatting=False,
+        edit_attribute=None,
+        conditions=False,
+        create_condition=False,
+        edit_condition=None,
+        delete_condition=None,
+    ):
         # sanitize user input
         target = target if target else message.target
         target = target if type(target) == str else target.id
@@ -273,43 +282,58 @@ class RSS(Plugin):
         elif create_condition:
             # build a set of example entry variables to choose from
             sample_entry = feedparser.parse(feed["url"])["entries"][0]
-            msg = "Here's a sample of the data each feed entry has available:\n\n" \
-                    "```\n%s\n```" \
-                            % "\n".join(["$%s - %s" % (k, v)
-                                    for k,v in sample_entry.items()
-                                            if type(v) == str])
+            msg = (
+                "Here's a sample of the data each feed entry has available:\n\n"
+                "```\n%s\n```"
+                % "\n".join(
+                    [
+                        "%s - %s" % (k, v)
+                        for k, v in sample_entry.items()
+                        if type(v) == str
+                    ]
+                )
+            )
             self.bot.msg(message.target, msg)
 
-            def append_condition(m):
-                cond = re.split(r"[^\];\s?", m.content)
-                cond2 = {}
-                for condition_string in conditions:
-                    m = re.match(r"^(.+)[^\]=(.+,)+", condition_string)
-                    cond2[m.group(1)] = m.group()[2:]
-                cond = cond2
-                """
-                feeds_col.update(
-                    {"url": url, "destination.target": target},
-                    {"$push": {"destination.conditions": cond}}
-                )"""
+            def append_condition(condition):
+                condict = self.parse_condition(condition)
+                self.feeds_col.update(
+                    {"url": url, "destinations.target": target},
+                    {"$push": {"destinations.$.conditions": condition}},
+                )
+                self.bot.msg(
+                    message.target, "Your condition has been added to the feed."
+                )
 
+            # prompt for a condition
             self.bot.prompt(
-                "Enter your desired condition matching the format of the example: "
-                "`title=Ted,1080p; ab:size=1;\.\dGb`, where 'title' would have to "
-                "contain both 'Ted' and '1080p', AND the 'ab:size' would be "
-                "between 1 and 2 Gb",
-                lambda m: self.edit(message, url, target, append_condition=m.content)
+                message.target,
+                message.author,
+                "Enter your desired condition matching the format of the "
+                + "example: `title=(720p|1080p); title=Joker, where "
+                + "'title' would contain'720p' or '1080p', AND contain 'Joker'",
+                lambda m: append_condition(m.content),
             )
         elif delete_condition:
-            sample_entry = feedparser.parse(feed["url"])["entries"][0]
-            # check if the request contains a valid condition type
-            if not create_condition in sample_entry:
-                raise self.bot.util.RuntimeError(
-                    "Invalid condition type specified. Try %s%s edit -c <url>"
-                            % (self.interface.prefix, self.interface.name),
-                    message.target, self
+
+            def delete_condition_f(condition):
+                r = self.feeds_col.update(
+                    {"url": url, "destinations.target": target},
+                    {"$pull": {"destinations.$.conditions": condition}},
                 )
-            self.bot.prompt("Enter your condition for field")
+                self.bot.msg(message.target, "Condition deleted.")
+
+            # ask them which condition they want to delete
+            for destination in feed["destinations"]:
+                if destination["target"] == target:
+                    conditions = destination["conditions"]
+            self.bot.menu(
+                message.target,
+                message.author,
+                "Select the condition you'd like to delete: ",
+                [[c, lambda r: delete_condition_f(c)] for c in conditions],
+            )
+
         else:
             # ask which property to be edited
             self.bot.menu(message.target, message.author_id,
