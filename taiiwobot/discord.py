@@ -25,8 +25,8 @@ class Discord(Server):
 
         @self.client.event
         async def on_ready():
-            print("Connected")
             self.name = self.client.user.name
+            self.trigger("ready", True)
 
         @self.client.event
         async def on_message(message):
