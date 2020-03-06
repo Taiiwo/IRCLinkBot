@@ -1,6 +1,7 @@
 import discord
 import time
 import re
+from bson import Int64
 
 Empty = discord.Embed.Empty
 
@@ -151,6 +152,8 @@ class Discord(Server):
         if type(target) == str:
             if target.isnumeric():
                 target = int(target)
+        if type(target) == Int64: # for some reason mongodb stores ints as
+            target = int(target) # int64 for no reason
         if type(target) == int:
             t = self.client.get_channel(target)
             if not t:
