@@ -3,6 +3,7 @@ import time
 import importlib.machinery
 from . import util, config, plugin
 
+
 class TaiiwoBot:
     def __init__(self, server, config):
         self.server = server
@@ -14,20 +15,25 @@ class TaiiwoBot:
         self.prompt = server.prompt
         self.util = util
         # load our plugins
-        self.plugins = self.load_plugins()
+        @server.on("ready")
+        def server_ready(d):
+            self.plugins = self.load_plugins()
+
         # run the blocking function
         self.server.start()
 
     def load_plugins(self):
         # get all the plugins from the plugin folder
         plugins = []
-        for root, dirs, files in os.walk('plugins'):
+        for root, dirs, files in os.walk("plugins"):
             # for each py file in the plugins folder
             for file in files:
                 if file[-3:] == ".py":
                     # import it
                     plugin = __import__(
-                        os.path.join(root, file[:-3]).replace('/', '.').replace("\\", ".")
+                        os.path.join(root, file[:-3])
+                        .replace("/", ".")
+                        .replace("\\", ".")
                     )
                     plugin = getattr(plugin, file[:-3])
                     # find all the plugin classes
