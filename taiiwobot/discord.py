@@ -189,9 +189,17 @@ class Discord(Server):
     def join(self, channel):
         pass
 
-    # how to mention a user in text.
-    def mention(self, user):
-        return "<@%s>" % user
+    # how to mention a target in text.
+    def mention(self, target):
+        if isinstance(target, str) and target.isnumeric():
+            target = int(target)
+        channel = self.client.get_channel(target)
+        if channel:
+            return "<#%s>" % target
+        user = discord.utils.get(self.client.users, id=target)
+        if user:
+            return "<@%s>" % target
+        return str(target)
 
     def me(self):
         return self.client.user.id
