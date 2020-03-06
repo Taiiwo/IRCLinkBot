@@ -4,6 +4,7 @@ import time
 import re
 from taiiwobot.plugin import Plugin
 
+
 class RSS(Plugin):
     def __init__(self, bot):
         self.bot = bot
@@ -18,18 +19,15 @@ class RSS(Plugin):
                     "Adds an RSS feed to listen to. Usage: $rss add [flags] <url>",
                     [
                         "t target The target channel the feed updates will appear in 1",
-                        "p pings Which users to ping for each update. Comma and/or space separated. 1",
-                        'c conditions Filter keys with a regex. Eg: `-c="title:weather"` to only post entries with "weather" in the title 1'
+                        'c conditions Filter keys with a regex. Eg: `-c="title=weather; desc=UK` to only post entries with "weather" in the title, and "UK" in the description 1',
                     ],
-                    self.add
+                    self.add,
                 ),
                 bot.util.Interface(
                     "remove",
                     "Removes an RSS feed from the target channel. Usage $rss remove [flags] <url>",
-                    [
-                        "t target The target channel to delete the feeds from 1"
-                    ],
-                    self.delete
+                    ["t target The target channel to delete the feeds from 1"],
+                    self.delete,
                 ),
                 bot.util.Interface(
                     "edit",
@@ -50,6 +48,7 @@ class RSS(Plugin):
         self.db = self.bot.util.get_db()
         self.feeds_col = self.db["rss_feeds"]
         self.default_settings = {
+            "message": None,
             "title": "$title",
             "desc": "$description",
             "footer": "published at $published",
@@ -66,20 +65,14 @@ class RSS(Plugin):
         #self.bot.msg(message.target, "%s %s %s" % (output, force, quiet))
         self.interface.help(message.target, self)
 
-    def add(self, message, url=None, target="", pings="", conditions=""):
+    def add(self, message, url=None, target="", conditions=""):
         if not url:
             raise self.bot.util.RuntimeError(
                 "Missing argument: url. Usage: $rss add [flags] <url>",
                 message.target, self
             )
         # parse the input values
-        pings = pings.replace(",", " ").split()
-        conditions = re.split(r";\s?", conditions)
-        conditions2 = []
-        for condition_string in conditions:
-            p = condition_string.split(":")
-            conditions2.append({p[0]: p[1:]})
-        conditions = conditions2
+        conditions = self.parse_condition(conditions)
         target = target if target else message.target
         target = target if type(target) == str else target.id
         existing_feed = self.feeds_col.find_one({"url": url})
