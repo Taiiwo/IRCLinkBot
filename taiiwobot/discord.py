@@ -8,13 +8,13 @@ Empty = discord.Embed.Empty
 from . import util
 from .server import Server
 
+
 class Discord(Server):
     def __init__(self, config):
         missing_keys = util.missing_keys(["api_key"], config)
         if missing_keys:
-            quit("[E] Missing args: %s. Check config.json" % (', ').join(missing_keys))
-        defaults = {
-        }
+            quit("[E] Missing args: %s. Check config.json" % (", ").join(missing_keys))
+        defaults = {}
         defaults.update(config)
         self.config = defaults
         self.callbacks = {}
@@ -61,20 +61,26 @@ class Discord(Server):
                     return False
                 for reaction_emoji, function in reactions:
                     if reaction.emoji == reaction_emoji:
-                        function({
-                            "emoji": reaction.emoji,
-                            "reactor": reactor.id,
-                            "message": reaction.message.id,
-                            "channel": reaction.message.channel.id
-                        })
+                        function(
+                            {
+                                "emoji": reaction.emoji,
+                                "reactor": reactor.id,
+                                "message": reaction.message.id,
+                                "channel": reaction.message.channel.id,
+                            }
+                        )
                         # if it was a targeted callback, remove it
                         if user:
                             # remove reactions
                             calls = []
                             for reaction_emoji, x in reactions:
-                                calls.append([reaction.message.remove_reaction, (
-                                    reaction_emoji, self.client.user
-                                ), {}])
+                                calls.append(
+                                    [
+                                        reaction.message.remove_reaction,
+                                        (reaction_emoji, self.client.user),
+                                        {},
+                                    ]
+                                )
                             self.gaysyncio(calls)
                             # remove callbacks
                             del self.reaction_callbacks[reaction.message.id]
@@ -86,19 +92,33 @@ class Discord(Server):
     def code_block(self, text):
         return "```" + text + "```"
 
-    def embed(self, title=Empty, url=Empty, desc=Empty, author_name=Empty,
-            author_link=Empty, author_icon=Empty, fields=[], footer=Empty,
-            color=Empty, thumbnail=Empty):
+    def embed(
+        self,
+        title=Empty,
+        url=Empty,
+        desc=Empty,
+        author_name=Empty,
+        author_link=Empty,
+        author_icon=Empty,
+        fields=[],
+        footer=Empty,
+        color=Empty,
+        thumbnail=Empty,
+    ):
         e = discord.Embed(title=title, url=url, description=desc, color=int(color, 16))
         if thumbnail:
             e.set_thumbnail(url=thumbnail)
         for field in fields:
-            e.add_field(name=field[0], value=field[1],
-                        inline=field[2] if len(field) > 2 and not field[2] else True)
+            e.add_field(
+                name=field[0],
+                value=field[1],
+                inline=field[2] if len(field) > 2 and not field[2] else True,
+            )
         if author_name:
             e.set_author(
                 name=author_name,
-                url=author_link or Empty, icon_url=author_icon or Empty
+                url=author_link or Empty,
+                icon_url=author_icon or Empty,
             )
         e.set_footer(text=footer)
         return e
@@ -106,8 +126,9 @@ class Discord(Server):
     def menu(self, target, user, question, answers=None, ync=None, cancel=False):
         if ync:
             if len(ync) != 3:
-                raise util.Error("ync must have 3 elements:"
-                        "a function for yes, no, and cancel")
+                raise util.Error(
+                    "ync must have 3 elements:" "a function for yes, no, and cancel"
+                )
             reactions = ["👍", "👎", "❌"]
             answers = ["Yes", "No", "Cancel"]
             functions = ync
@@ -116,48 +137,62 @@ class Discord(Server):
                 raise util.Error("You can't call this function with no answers")
             if len(answers) > 11:
                 raise util.Error(
-                    "A maximum of 11 options are supported. You supplied %s" %
-                    len(answers)
+                    "A maximum of 11 options are supported. You supplied %s"
+                    % len(answers)
                 )
             numbers = ["1⃣", "2⃣", "3⃣", "4⃣", "5⃣", "6⃣", "7⃣", "8⃣", "9⃣", "🔟", "0⃣"]
             # if user supplies an icon to use, use that, else use a number icon
-            reactions = [numbers[i] if len(a) < 3 else a[0]
-                    for i, a in enumerate(zip(answers))]
+            reactions = [
+                numbers[i] if len(a) < 3 else a[0] for i, a in enumerate(zip(answers))
+            ]
             # parse the answers array, ignoring the supplied icon if supplied
-            answers, functions = zip(*[a_f if len(a_f) < 3 else a_f[1:3]
-                    for a_f in answers])
+            answers, functions = zip(
+                *[a_f if len(a_f) < 3 else a_f[1:3] for a_f in answers]
+            )
         message = "%s\n\n%s\n\nReact to answer." % (
             question,
-            "\n".join(["[%s] - %s" % (r, a) for r, a in zip(reactions, answers)])
+            "\n".join(["[%s] - %s" % (r, a) for r, a in zip(reactions, answers)]),
         )
         self.msg(target, message, reactions=zip(reactions, functions), user=user)
 
     def prompt(self, target, user, prompt, handler, cancel=False, timeout=60.0):
         cancel = cancel if cancel else lambda r: None
+
         def cancel_wrapper(r):
             # stop listening for the next message
             del self.message_callbacks[r["channel"] + user]
             # run the user submitted cancel function if supplied
             cancel(r)
+
         async def f(a):
-            self.message_callbacks[a.channel.id + user] = [time.time(), handler, timeout]
-        self.msg(target, prompt,
+            self.message_callbacks[a.channel.id + user] = [
+                time.time(),
+                handler,
+                timeout,
+            ]
+
+        self.msg(
+            target,
+            prompt,
             reactions=[["❌", cancel_wrapper]],
             callback=[f, ("$0",), {}],
-            user=user
+            user=user,
         )
 
     # discord method wrappers
-    def msg(self, target, message, embed=None, reactions=tuple(), user=None, callback=None):
+    def msg(
+        self, target, message, embed=None, reactions=tuple(), user=None, callback=None
+    ):
         if type(target) == str:
             if target.isnumeric():
                 target = int(target)
-        if type(target) == Int64: # for some reason mongodb stores ints as
-            target = int(target) # int64 for no reason
+        if type(target) == Int64:  # for some reason pymongo returns ints as
+            target = int(target)  # int64 for no reason
         if type(target) == int:
             t = self.client.get_channel(target)
             if not t:
-                t = self.client.get_user_info(target)
+                print(target)
+                t = self.client.get_user(target)
             target = t
         if type(message) == util.Message:
             message = message.content
@@ -170,14 +205,17 @@ class Discord(Server):
             reactions = list(reactions)
             # add the reactions
             for r, f in reactions:
+
                 async def add_reaction(message, reaction):
                     return await message.add_reaction(reaction)
+
                 async_calls.append([add_reaction, ("$0", r), {}])
             # a callback for when the message and all the reactions have been sent
             async def add_reaction_callbacks(message):
                 # make a note of the message id, so that if the user clicks them
                 # the reaction callback function is run
                 self.reaction_callbacks[message.id] = (user, reactions)
+
             # finally, add the reactions callback if required
             if reactions:
                 async_calls.append([add_reaction_callbacks, ("$0",), {}])
@@ -208,6 +246,7 @@ class Discord(Server):
     def on(self, command):
         def handler(f):
             self.add_callback(f, command)
+
         return handler
 
     # removes an even handler
@@ -240,7 +279,7 @@ class Discord(Server):
             server_type="discord",
             timestamp=m.created_at,
             embeds=m.embeds,
-            attachments=m.attachments
+            attachments=m.attachments,
         )
 
     def gaysyncio(self, calls):
@@ -260,4 +299,5 @@ class Discord(Server):
                         args2.append(arg)
                 args = args2
                 buffer.append(await function(*args, **kwargs))
+
         self.client.loop.create_task(f())
