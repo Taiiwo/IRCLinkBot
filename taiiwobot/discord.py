@@ -119,7 +119,7 @@ class Discord(Server):
                     "A maximum of 11 options are supported. You supplied %s" %
                     len(answers)
                 )
-            numbers = ["0⃣", "1⃣", "2⃣", "3⃣", "4⃣", "5⃣", "6⃣", "7⃣", "8⃣", "9⃣", "🔟"]
+            numbers = ["1⃣", "2⃣", "3⃣", "4⃣", "5⃣", "6⃣", "7⃣", "8⃣", "9⃣", "🔟", "0⃣"]
             # if user supplies an icon to use, use that, else use a number icon
             reactions = [numbers[i] if len(a) < 3 else a[0]
                     for i, a in enumerate(zip(answers))]
