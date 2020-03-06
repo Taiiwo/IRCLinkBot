@@ -467,9 +467,10 @@ class RSS(Plugin):
                         for conditions in destination["conditions"]:
                             condict = self.parse_condition(conditions)
                             for key, condition in condict.items():
-                                if key == "" or re.search(condition, entry[key]):
-                                    match = True
-                                    break
+                                for cond in condition:
+                                    if key == "" or re.search(cond, entry[key]):
+                                        match = True
+                                        break
                         if not match:
                             # entry does not match the conditions for this dest
                             continue
