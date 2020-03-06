@@ -11,6 +11,9 @@ class Reload(Plugin):
             "reload", "Reloads a plugin's code for dev purposes", [], self.reload
         ).listen()
 
+    def unload(self):
+        exit("You can't reload this plugin using itsself for obvious reasons...")
+
     def reload(self, message, query):
         for plugin in self.bot.plugins:
             if type(plugin).__name__.lower() == query.lower():
