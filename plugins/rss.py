@@ -356,15 +356,16 @@ class RSS(Plugin):
         # turns a key format into value string
         def format_key(t):
             v = []
-            for k in (keys[t].split() if keys[t] else []):
+            for k in keys[t].split() if t in keys and keys[t] else []:
                 if k[0] == "$":
                     v.append(entry[k[1:]] if k[1:] in entry else None)
                 else:
                     v.append(k)
             return " ".join(v) if not None in v else None
+
         self.bot.msg(
             destination["target"],
-            " " + " ".join(destination["pings"]),
+            format_key("message") + " ",
             embed=self.bot.server.embed(
                 title=format_key("title"),
                 desc=format_key("desc"),
