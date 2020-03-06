@@ -40,8 +40,8 @@ class RSS(Plugin):
                         "cc create-condition Specify a condition to create 0",
                         "dc delete-condition Delete a condition 0",
                     ],
-                    self.edit
-                )
+                    self.edit,
+                ),
             ],
         ).listen()
 
@@ -57,36 +57,41 @@ class RSS(Plugin):
             "author_name": "$feed:title",
             "author_link": "$feed:link",
             "author_icon": None,
-            "color": "0xbade83"
+            "color": "0xbade83",
         }
-        self.bot.util.thread(self.loop)
+        self.stopped = False
+        self.loop_thread = self.bot.util.thread(self.loop)
 
     def root(self, message):
-        #self.bot.msg(message.target, "%s %s %s" % (output, force, quiet))
+        # self.bot.msg(message.target, "%s %s %s" % (output, force, quiet))
         self.interface.help(message.target, self)
 
     def add(self, message, url=None, target="", conditions=""):
         if not url:
             raise self.bot.util.RuntimeError(
                 "Missing argument: url. Usage: $rss add [flags] <url>",
-                message.target, self
+                message.target,
+                self,
             )
         # parse the input values
         conditions = self.parse_condition(conditions)
         target = target if target else message.target
-        target = target if type(target) == str else target.id
+        target = target if type(target) == int else int(target)
         existing_feed = self.feeds_col.find_one({"url": url})
         if url[:7] not in ["https:/", "http://"]:
             raise self.bot.util.RuntimeError(
                 "`url` must be a valid URL meaning it must start with http:// "
                 "or https://",
-                message.target, self
+                message.target,
+                self,
             )
         feed_sample = feedparser.parse(url)
         if len(feed_sample["entries"]) < 1:
             raise self.bot.util.RuntimeError(
                 "This does not appear to be a valid feed. "
-                "Feeds must have at least 1 entry.", message.target, self
+                "Feeds must have at least 1 entry.",
+                message.target,
+                self,
             )
         if existing_feed:
             for destination in existing_feed["destinations"]:
@@ -94,10 +99,13 @@ class RSS(Plugin):
                     raise self.bot.util.RuntimeError(
                         "That feed is already being tracked in this channel! "
                         "To edit the way that feed is managed, type: `%s edit`"
-                        "To remove that feed, type `%s remove <url>`" %
-                        (self.interface.prefix + self.interface.name,
-                        self.interface.prefix + self.interface.name),
-                        message.target, self
+                        "To remove that feed, type `%s remove <url>`"
+                        % (
+                            self.interface.prefix + self.interface.name,
+                            self.interface.prefix + self.interface.name,
+                        ),
+                        message.target,
+                        self,
                     )
             feed = existing_feed
         else:
@@ -105,16 +113,15 @@ class RSS(Plugin):
                 "url": url,
                 # TODO: potentially add a better way of identifying entries uniquely
                 "unique_key": feed_sample["entries"][0]["title"],
-                "destinations": []
+                "destinations": [],
             }
         destination = {
             "target": target,
-            "pings": pings,
             "keys": "default",
-            "conditions": conditions
+            "conditions": conditions,
         }
         entry = feed_sample["entries"][0]
-        entry.update({"feed:"+k:v for k, v in feed_sample.items()})
+        entry.update({"feed:" + k: v for k, v in feed_sample.items()})
         # post a sample of the feed
         self.post_entry(destination, entry)
         # callback function for if the user hits "yes" in the following menu
@@ -122,27 +129,32 @@ class RSS(Plugin):
             # the user decided the feed looked good
             if existing_feed:
                 # edit the existing feed
-                self.feeds_col.update(existing_feed, {"$push": {
-                    "destinations": destination
-                }})
+                self.feeds_col.update(
+                    existing_feed, {"$push": {"destinations": destination}}
+                )
             else:
                 # insert a new feed into the db
                 feed["destinations"].append(destination)
                 self.feeds_col.insert_one(feed)
+
         # ask the user if it needs editing
-        self.bot.menu(message.target, message.author_id,
+        self.bot.menu(
+            message.target,
+            message.author_id,
             "Does this look okay?",
-            ync=[yes, lambda r:yes(r)+self.edit(message,url), lambda r: None]
+            ync=[yes, lambda r: yes(r) + self.edit(message, url), lambda r: None],
         )
 
-    def delete(self, message, url=None, target=None):
+    def delete(self, message, *args, target=None):
+        url = args[0]
         if not url:
             raise self.bot.util.RuntimeError(
                 "Missing argument: url. Usage: $rss delete [flags] <url>",
-                message.target, self
+                message.target,
+                self,
             )
         target = target if target else message.target
-        target = target if type(target) == str else target.id
+        target = target if type(target) == int else int(target)
         feed = self.feeds_col.find_one({"url": url})
         # if this is the only place the feed is used
         if len(feed["destinations"]) == 1:
@@ -150,9 +162,7 @@ class RSS(Plugin):
             self.feeds_col.remove(feed)
         else:
             # delete this destination
-            self.feeds_col.update(feed, {"$pull":{
-                "destination": {"target": target}
-            }})
+            self.feeds_col.update(feed, {"$pull": {"destination": {"target": target}}})
 
     def edit(
         self,
@@ -168,20 +178,24 @@ class RSS(Plugin):
     ):
         # sanitize user input
         target = target if target else message.target
-        target = target if type(target) == str else target.id
+        target = target if type(target) == int else int(target)
         if not url:
             urls = self.feeds_col.find({"destinations.target": target}, {"url": True})
             # array of arrays: answer, function
-            def lambda_factory(a):
-                return lambda r: self.edit(message, u["url"], target,
-                        formatting, edit_attribute, conditions)
-            answers = [[
-                u["url"],
-                lambda_factory(a)
-            ] for u in self.feeds_col.find({"destinations.target": target})]
-            self.bot.menu(message.target, message.author_id,
+            def lambda_factory(u):
+                return lambda r: self.edit(
+                    message, u["url"], target, formatting, edit_attribute, conditions
+                )
+
+            answers = [
+                [u["url"], lambda_factory(u)]
+                for u in self.feeds_col.find({"destinations.target": target})
+            ]
+            self.bot.menu(
+                message.target,
+                message.author_id,
                 "Which feed would you like to edit?",
-                answers
+                answers,
             )
             return
         # get the feed
@@ -189,24 +203,31 @@ class RSS(Plugin):
         if not feed:
             raise self.bot.util.RuntimeError(
                 "That feed is not currently being tracked. If you meant to add"
-                "it use $rss add <url>", message.target, self
+                "it use $rss add <url>",
+                message.target,
+                self,
             )
         # get the destination
         destination = [f for f in feed["destinations"] if f["target"] == target][0]
         # which menu is being requested
         if formatting:
-            keys = self.default_settings if destination["keys"] == "default" \
-                    else destination["keys"]
+            keys = (
+                self.default_settings
+                if destination["keys"] == "default"
+                else destination["keys"]
+            )
             # array of arrays: answer, function
             def lambda_factory(a):
                 return lambda r: self.edit(message, url, target, edit_attribute=a)
-            answers = [[
-                "[%s] = %s\n" % (a,b),
-                lambda_factory(a)
-            ] for a,b in keys.items()]
-            self.bot.menu(message.target, message.author_id,
+
+            answers = [
+                ["[%s] = %s\n" % (a, b), lambda_factory(a)] for a, b in keys.items()
+            ]
+            self.bot.menu(
+                message.target,
+                message.author_id,
                 "Which embed attribute would you like to change?",
-                answers
+                answers,
             )
         elif edit_attribute:
             # build a set of example entry variables to choose from
@@ -214,19 +235,30 @@ class RSS(Plugin):
             sample_entry = sample_feed["entries"][0]
             # remove redundant data
             del sample_feed["entries"]
-            sample_entry.update({"feed:"+k:v for k, v in sample_feed.items()})
-            keys = self.default_settings if destination["keys"] == "default" \
-                    else destination["keys"]
-            msg = "Here's a sample of the data each feed entry has available:\n\n" \
-                    "```\n%s\n```" \
-                            % "\n".join(["$%s - %s" % (k, v)
-                                    for k,v in sample_entry.items()
-                                            if type(v) == str])
+            sample_entry.update({"feed:" + k: v for k, v in sample_feed.items()})
+            keys = (
+                self.default_settings
+                if destination["keys"] == "default"
+                else destination["keys"]
+            )
+            msg = (
+                "Here's a sample of the data each feed entry has available:\n\n"
+                "```\n%s\n```"
+                % "\n".join(
+                    [
+                        "$%s - %s" % (k, v)
+                        for k, v in sample_entry.items()
+                        if type(v) == str
+                    ]
+                )
+            )
             self.bot.msg(message.target, msg)
+
             def confirm(m):
                 value = m.content
                 d = destination.copy()
-                if d["keys"] == "default": d["keys"] = self.default_settings
+                if d["keys"] == "default":
+                    d["keys"] = self.default_settings
                 d["keys"][edit_attribute] = value
                 # post an example for the user to validate
                 self.post_entry(d, sample_entry)
@@ -235,49 +267,53 @@ class RSS(Plugin):
                     # write the new destination to the database
                     self.feeds_col.update(
                         {"url": url, "destinations.target": target},
-                        {"$set": {"destinations.$": d}}
+                        {"$set": {"destinations.$": d}},
                     )
                     # print complete message
-                    self.bot.menu(message.target, message.author_id,
-                        "Changes have been made. Change another?",
-                        ync=[
-                            lambda r:self.edit(
-                                message, url, target, edit_attribute=edit_attribute
-                            ),
-                            lambda r: None,
-                            lambda r: None
-                        ]
-                    )
+                    self.bot.msg(message.target, "Changed have been made.")
+
                 # ask the user to validate the new formatting
-                self.bot.menu(message.target, message.author_id,
+                self.bot.menu(
+                    message.target,
+                    message.author_id,
                     "Does this look okay?",
                     ync=[
                         yes,
-                        lambda r:self.edit(
+                        lambda r: self.edit(
                             message, url, target, edit_attribute=edit_attribute
                         ),
-                        lambda r: None
-                    ]
+                        lambda r: None,
+                    ],
                 )
+
             # prompt the user to type the new attribute contents
-            self.bot.prompt(message.target, message.author_id,
-                "Type the way you want the %s of the entry to be displayed:" % edit_attribute,
-                confirm
+            self.bot.prompt(
+                message.target,
+                message.author_id,
+                "Type the way you want the %s of the entry to be displayed:"
+                % edit_attribute,
+                confirm,
             )
         elif conditions:
             # prepend a "create condition" option to the start of the list
-            self.bot.menu(message.target, message.author_id,
+            self.bot.menu(
+                message.target,
+                message.author_id,
                 "How would you like to edit the conditions?",
                 [
                     [
                         "Create a new condition",
-                        lambda r: self.edit(message, url, target, create_condition=True)
+                        lambda r: self.edit(
+                            message, url, target, create_condition=True
+                        ),
                     ],
                     [
                         "Delete an existing condition",
-                        lambda r: self.edit(message, url, target, delete_condition=True)
-                    ]
-                ]
+                        lambda r: self.edit(
+                            message, url, target, delete_condition=True
+                        ),
+                    ],
+                ],
             )
         elif create_condition:
             # build a set of example entry variables to choose from
@@ -336,23 +372,40 @@ class RSS(Plugin):
 
         else:
             # ask which property to be edited
-            self.bot.menu(message.target, message.author_id,
-                "What aspect of this feed would you like to edit?", [
+            self.bot.menu(
+                message.target,
+                message.author_id,
+                "What aspect of this feed would you like to edit?",
                 [
-                    "Format - The way the feed is formated",
-                    lambda r: self.edit(message, url, target, formatting=True)
+                    [
+                        "Format - The way the feed is formated",
+                        lambda r: self.edit(message, url, target, formatting=True),
+                    ],
+                    [
+                        "Conditions - Which entries are posted",
+                        lambda r: self.edit(message, url, target, conditions=True),
+                    ],
                 ],
-                [
-                    "Conditions - Which entries are posted",
-                    lambda r: self.edit(message, url, target, conditions=True)
-                ]
-            ])
+            )
 
+    # parses a post condition string
+    def parse_condition(self, condition):
+        # split by any ;<space>
+        conditions = re.split(r"[^\\];\s?", condition)
+        ret = {}
+        for c in conditions:
+            # Basically splits by =, allowing for \=
+            m = re.match(r"^(.+[^\\])=(.*)", c)
+            key = m.group(1).replace(r"\=", "=")
+            ret[key] = re.split(m.group(1), r",\s?")
+        return ret
 
     def post_entry(self, destination, entry):
-        keys = self.default_settings \
-                if destination["keys"] == "default" \
-                else destination["keys"]
+        keys = (
+            self.default_settings
+            if destination["keys"] == "default"
+            else destination["keys"]
+        )
         # turns a key format into value string
         def format_key(t):
             v = []
@@ -374,15 +427,16 @@ class RSS(Plugin):
                 author_icon=format_key("author_icon"),
                 footer=format_key("footer"),
                 url=format_key("url"),
-                color=format_key("color")
-            )
+                color=format_key("color"),
+            ),
         )
 
     def loop(self):
-        while True:
+        while not self.stopped:
+            print("checking for feeds")
             for feed in self.feeds_col.find({}):
                 f = feedparser.parse(feed["url"])
-                if "entries" in f:
+                if "entries" not in f:
                     # could not get feed. Disconnected from the internet?
                     continue
                 # find out where the new entries start
@@ -395,7 +449,7 @@ class RSS(Plugin):
                 if i == 0:
                     # no new articles, go to next feed
                     continue
-                elif i+1 > len(f["entries"]):
+                elif i + 1 > len(f["entries"]):
                     # we didn't find our title at all. Post all articles
                     i = len(f["entries"])
                 # make list of only new entries
@@ -403,25 +457,28 @@ class RSS(Plugin):
                 # remove entry list from the feed to save resources
                 del f["entries"]
                 # for each new entry
-                for entry in f["entries"][:i]:
+                for entry in entries:
                     # add some of the feed keys for use in markup
-                    entry.update({"feed:"+k:v for k, v in f.items()})
+                    entry.update({"feed:" + k: v for k, v in f.items()})
                     for destination in feed["destinations"]:
                         # default to true if there are no conditions
                         match = False if destination["conditions"] else True
                         # run the conditions against the entry
-                        for key, conditions in destination["conditions"]:
-                            for conditions in conditions:
-                                if re.search(condition, entry[key]):
+                        for conditions in destination["conditions"]:
+                            condict = self.parse_condition(conditions)
+                            for key, condition in condict.items():
+                                if key == "" or re.search(condition, entry[key]):
                                     match = True
                                     break
                         if not match:
                             # entry does not match the conditions for this dest
                             continue
                         self.post_entry(destination, entry)
-                self.feeds_col.update(feed, {
-                    "$set":{
-                        "unique_key": f["entries"][0]["title"]
-                    }
-                })
-            time.sleep(60*60)
+                self.feeds_col.update(
+                    feed, {"$set": {"unique_key": entries[0]["title"]}}
+                )
+            time.sleep(60 * 10)
+
+    def unload(self):
+        super().unload()
+        self.stopped = True
