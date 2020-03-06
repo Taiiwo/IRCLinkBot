@@ -3,14 +3,12 @@ import inspect
 
 from taiiwobot.plugin import Plugin
 
+
 class Reload(Plugin):
     def __init__(self, bot):
         self.bot = bot
         self.interface = bot.util.Interface(
-            "reload",
-            "Reloads a plugin's code for dev purposes",
-            [],
-            self.reload
+            "reload", "Reloads a plugin's code for dev purposes", [], self.reload
         ).listen()
 
     def reload(self, message, query):
