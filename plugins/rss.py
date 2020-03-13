@@ -76,7 +76,6 @@ class RSS(Plugin):
                 self,
             )
         # parse the input values
-        conditions = self.parse_condition(conditions)
         target = target if target else message.target
         target = target if type(target) == int else int(target)
         existing_feed = self.feeds_col.find_one({"url": url})
