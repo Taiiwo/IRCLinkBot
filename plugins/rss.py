@@ -475,16 +475,13 @@ class RSS(Plugin):
                         if destination["conditions"]:
                             for conditions in destination["conditions"]:
                                 condict = self.parse_condition(conditions)
-                                print(condict)
                                 if not condict:
                                     # conditions were invalid, set match to true
                                     # but also evaluate the other conditions
                                     match = True
                                     continue
                                 for key, condition in condict.items():
-                                    print(key, condition)
                                     for cond in condition:
-                                        print(cond, entry[key])
                                         if key == "" or re.search(cond, entry[key]):
                                             match = True
                                             break
