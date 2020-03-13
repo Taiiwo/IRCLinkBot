@@ -2,6 +2,8 @@ import feedparser
 import pymongo
 import time
 import re
+from tomd import Tomd
+import html
 from taiiwobot.plugin import Plugin
 
 
@@ -406,6 +408,11 @@ class RSS(Plugin):
             if destination["keys"] == "default"
             else destination["keys"]
         )
+        # remove html formatting from the description
+        summary = html.unescape(
+            Tomd(entry["summary"].replace("%22", '"').replace("%3E", ">")).markdown
+        )
+        entry["summary"] = summary if summary != "" else entry["summary"]
         # turns a key format into value string
         def format_key(t):
             v = []
