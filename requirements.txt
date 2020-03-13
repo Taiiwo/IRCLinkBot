@@ -3,3 +3,5 @@ pymongo
 feedparser
 bs4
 requests
+shodan
+tomd
