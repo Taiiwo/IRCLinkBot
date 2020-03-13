@@ -247,7 +247,7 @@ class RSS(Plugin):
                 "```\n%s\n```"
                 % "\n".join(
                     [
-                        "$%s - %s" % (k, v)
+                        "$%s - %s" % (k, v[:100])
                         for k, v in sample_entry.items()
                         if type(v) == str
                     ]
@@ -325,7 +325,7 @@ class RSS(Plugin):
                 % "\n".join(
                     [
                         "%s - %s" % (k, v)
-                        for k, v in sample_entry.items()
+                        for k, v[:100] in sample_entry.items()
                         if type(v) == str
                     ]
                 )
