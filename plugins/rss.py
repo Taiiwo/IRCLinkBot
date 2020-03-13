@@ -392,6 +392,8 @@ class RSS(Plugin):
 
     # parses a post condition string
     def parse_condition(self, condition):
+        if condition == "":
+            return None
         # split by any ;<space>
         conditions = re.split(r"[^\\];\s?", condition)
         ret = {}
@@ -399,7 +401,7 @@ class RSS(Plugin):
             # Basically splits by =, allowing for \=
             m = re.match(r"^(.+[^\\])=(.*)", c)
             key = m.group(1).replace(r"\=", "=")
-            ret[key] = re.split(m.group(1), r",\s?")
+            ret[key] = re.split(r",\s?", m.group(2))
         return ret
 
     def post_entry(self, destination, entry):
@@ -467,17 +469,29 @@ class RSS(Plugin):
                 for entry in entries:
                     # add some of the feed keys for use in markup
                     entry.update({"feed:" + k: v for k, v in f.items()})
+                    # print(entry["title"])
                     for destination in feed["destinations"]:
-                        # default to true if there are no conditions
-                        match = False if destination["conditions"] else True
+                        match = False
                         # run the conditions against the entry
-                        for conditions in destination["conditions"]:
-                            condict = self.parse_condition(conditions)
-                            for key, condition in condict.items():
-                                for cond in condition:
-                                    if key == "" or re.search(cond, entry[key]):
-                                        match = True
-                                        break
+                        if destination["conditions"]:
+                            for conditions in destination["conditions"]:
+                                condict = self.parse_condition(conditions)
+                                print(condict)
+                                if not condict:
+                                    # conditions were invalid, set match to true
+                                    # but also evaluate the other conditions
+                                    match = True
+                                    continue
+                                for key, condition in condict.items():
+                                    print(key, condition)
+                                    for cond in condition:
+                                        print(cond, entry[key])
+                                        if key == "" or re.search(cond, entry[key]):
+                                            match = True
+                                            break
+                        else:
+                            # default to true if there are no conditions
+                            match = True
                         if not match:
                             # entry does not match the conditions for this dest
                             continue
