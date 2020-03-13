@@ -3,7 +3,7 @@ from taiiwobot.plugin import Plugin
 import requests
 import random
 import time
-from bs4 import BeautifulSoup
+import json
 
 
 class WYR(Plugin):
@@ -33,27 +33,11 @@ class WYR(Plugin):
                 message.target, "You must react before requesting more questions!"
             )
             return
-        while i < 10:
-            i += 1
-            # this website conveniently puts the whole question in the page title
-            rand = str(random.randint(255150, 256442))
-            print(rand)
-            r = requests.get("http://www.rrrather.com/view/" + rand)
-            # get page title
-            soup = BeautifulSoup(r.content, "html.parser")
-            title = soup.find("title")
-            if len(r.history) > 1:
-                print(title, r.history)
-                continue
-            self.reacted = time.time()
-            self.bot.msg(
-                message.target,
-                title.string,
-                reactions=[["1⃣", self.set_reacted], ["2⃣", self.set_reacted],],
-                user=message.author,
-            )
-            return
+        wyr = json.loads(requests.get("http://www.rrrather.com/botapi").text)
+        question = " ".join([wyr["title"], wyr["choicea"], "or", wyr["choiceb"] + "?"])
+        self.reacted = time.time()
         self.bot.msg(
             message.target,
-            "There seems to be something wrong with the API. Please try again later.",
+            question,
+            reactions=[["1⃣", self.set_reacted], ["2⃣", self.set_reacted],],
         )
