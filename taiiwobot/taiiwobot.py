@@ -14,10 +14,12 @@ class TaiiwoBot:
         self.menu = server.menu
         self.prompt = server.prompt
         self.util = util
+        self.plugins = []
         # load our plugins
         @server.on("ready")
         def server_ready(d):
-            self.plugins = self.load_plugins()
+            if len(self.plugins) == 0:
+                self.plugins = self.load_plugins()
 
         # run the blocking function
         self.server.start()
