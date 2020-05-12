@@ -91,6 +91,9 @@ class Discord(Server):
     def embed(self, title=Empty, url=Empty, desc=Empty, author_name=Empty,
             author_url=Empty, author_icon=Empty, fields=[], footer=Empty,
             color=Empty, thumbnail=Empty):
+    def code_block(self, text):
+        return "```" + text + "```"
+
         e = discord.Embed(title=title, url=url, description=desc, color=int(color, 16))
         if thumbnail:
             e.set_thumbnail(url=thumbnail)
@@ -166,10 +169,26 @@ class Discord(Server):
     def join(self, channel):
         pass
 
+    # how to mention a target in text.
+    def mention(self, target):
+        if isinstance(target, str) and target.isnumeric():
+            target = int(target)
+        channel = self.client.get_channel(target)
+        if channel:
+            return "<#%s>" % target
+        user = discord.utils.get(self.client.users, id=target)
+        if user:
+            return "<@%s>" % target
+        return str(target)
+
+    def me(self):
+        return self.client.user.id
+
     # event handler handling
     def on(self, command):
         def handler(f):
             self.add_callback(f, command)
+
         return handler
 
     # removes an even handler
