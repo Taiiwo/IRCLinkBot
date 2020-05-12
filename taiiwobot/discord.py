@@ -233,6 +233,7 @@ class Discord(Server):
             self.callbacks[command].remove(f)
 
     def trigger(self, event, *data):
+        print(event)
         if event in self.callbacks:
             try:
                 util.callback(self.callbacks[event], *data)
