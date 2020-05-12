@@ -5,3 +5,4 @@ config.json
 .ftpconfig
 .remote-sync.json
 __pycache__
+lib/cicada
