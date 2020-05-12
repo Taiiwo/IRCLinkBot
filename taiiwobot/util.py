@@ -44,7 +44,8 @@ class Message():
                     timestamp=None, server_type=None, embeds=[], attachments=[]):
         self.nick = nick # display name of the user
         self.username = username # unique username of the user
-        self.author_id = author_id
+        self.author = author_id
+        self.author_id = author_id # deprecated
         self.host = host
         self.type = type
         self.target = target
