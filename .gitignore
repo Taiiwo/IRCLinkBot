@@ -1,6 +1,5 @@
 *.log
 *.pyc
-pass
 *~
 config.json
 .ftpconfig
