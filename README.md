@@ -1,102 +1,269 @@
-IRCLinkBot(TaiiwoBot) v4
+TaiiwoBot - v5
 ==========
-Introduction - What is IRCLinkBot(TaiiwoBot) v4?
+Introduction - What is TaiiwoBot v5?
 ------------------------------------------------
-This program is mainly a core IRC bot, that allows you to add custom plugins and customization options that runs quickly on a high memory system.
-There are a lot of plugins preinstalled that I developed. 
-In fact, the whole bot is in functioning condition.
-The latest version of this bot is running unedited on my server, so you may run into it on IRC.
+This program is chat bot framework that allows you to add custom plugins and customization options that runs quickly on a high memory system.
+There are some plugins preinstalled that I developed.
+You can use these as is, or as examples to build your own plugins.
+It it built to run on any platform, but the currently supported plaforms are IRC and Discord.
 
-Introduction - What is Version 4? Why is it better than Version3?
+<video controls autoplay>
+    <source src="https://thumbs.gfycat.com/FearlessTightGarpike-mobile.mp4" type="video/mp4">
+    Video not supported by your browser!
+</video>
+
+
+Refactor - Why is this different from IRCLinkBot?
 -----------------------------------------------------------------
-In this restructure, I tried to make the bot both easy to develop, and also add more flexibility with regards to creating output data.
+In this restructure, I decided to make the bot totally platform independant.
+Theoretically, all of the plugins should work on any chat platform, as long as an appropriate
+server wrapper is created.
 
-I wanted to have individual plugin files with a simple interface, to make it easy for developers to make quick plugins, and not have them do too much work to run them.
-I also wanted to have the bot update automatically, with regards to both the config, and developing plugins.
+On top of having drop in plugins like in the previous version, the plugins now have
+a class structure for a more robust plugin coding experience, automatic help text,
+and implementation of argument and subcommand parsing, allowing you to code normal pythonic
+functions as opposed to parsing input data from the message string.
 
- - Plugins will be executed in respose to certain actions, as opposed to every time a message is received from IRC.
- - Plugins will be executed in separate threads separated by directory.
+The server wrappers are implemented in a way that makes creating cross platform plugins
+extremely high level and simple. Many interface features are implemented at the server wrapper
+level, so you can create very advanced looking, experience-rich plugins with very little code.
 
 How to run the bot:
 -------------------
-You will need the following libraries (Listed by their names in the debian repositories):
- - python-BeautifulSoup
+1. Install the dependecies in requirements.txt: `pip install -r requirements.txt`
+2. Run the bot with `python discord_main.py` or replace `discord` with your platform of choice
+3. If it's your first time running the bot, a `config.json` file will be created for you to edit. Add the required values for your chosen platform (including API Tokens), and repeat step 2
 
-As mentioned before, the bot is running in it's current configuration.
-This means you'll need to change linkbot.conf.
-Linkbot.conf is well commented, so that should walk you through the editing process.
-
-Once you have the config setup, you'll need to choose your plugins.
-Some plugins come preinstalled with TaiiwoBot, these cover a wide range of things, but feel free to disable them and add your own.
-(all plugins are ran within a 'try' statement, so there is no danger of crashing the bot with your experiments (Beware, however, of channel flooding))
-You can disable plugins by adding a '#' to the end of their filename.
-To disable wa.py for example (In /plugins/privmsg/information) type in the directory of wa.py(In *NIX): ```mv wa.py wa.py\#```
-
-Now you're ready to boot up TaiiwoBot!
-Simply type: python main.py
-Note, you can add an ' &' at the end of the command in order to daemonize TaiiwoBot (To keep your shell while he's running( TaiiwoBot is male and sentient ;) ))
-Note note, you should disable the output options of TaiiwoBot in the config file if you are to do this.
+Once the bot successfully logs in, you can get started by typing `$help` anywhere the bot can read.
 
 Developing Plugins
 ------------------
 ### The Plugin Code
-The main() function of the plugin will be run.
-Feel free to import external libraries in your plugin (Duplicate importations are handled by Python).
-main() is run as: main(data)
-where data is an  associative array (Dict) containing data from the bot.
-It is done in this way so that I can continuously offer new information to the plugin developers without losing compatability with old plugins.
-It is because of this however, that it's difficult to keep the documentation up to date.
-If you want to take a look at what is definitely being passed inside data, I reccomend you have a read through main.py
-Otherwise, here is a list of the most useful information passed inside data:
+Creating plugins is very simple. Open a new python file in the plugins directory.
+Create a new class that inherits the Plugin base class. Make sure the class name
+is the same as the file name, and type `$reload example` to load your plugin into
+the running bot (The plugin will also automatically load when the bot is restarted).
 
-data['recv'] 
+Most basic plugin example:
 
-- This contains the latest data pulled from IRC, delivered in a maximum size specified by 'recvLen' in the config. 
-- For examples of output, check the logs (If logging is enabled)
+```python
+from taiiwobot import Plugin
 
-data['config'] 
+class Example(Plugin):
+    def __init__(self, bot):
+        # this code runs when the plugin is loaded
+```
 
-- This is a JSON DOM, parsed from the config file.
-- This DOM is updated every time a new message is sent, so there is no need to manually reimport it.
-- You can change it with updateConf(data['config']).
-- This will write any changes you have made to the physical file.
-- This is recomended if you ever change the data, as un'updated' data will not be present when the bot is rebooted.
+### Interfacing with the platform
+The code above will run your code, and give it access to the `bot` context, but
+nothing else. In order for your plugin to listen for and parse user input we need to create an `Interface`.
 
-data['loop']
-- This is simply the amount of messages received from IRC.
+Creating an Interface can look a bit complicated, but it's really very simple,
+and it gets all of the user friendly stuff out of the way, so you can focus on programming.
 
-The only other important(restrictive) thing is what to return.
-Each plugin must return a string, '', None, , False, or just not return anything (You theoretically could return an integer. It would be converted to a string, but I don't see why you'd want to, as there are no integer only IRC commands)
-You're most likely going to want to try to return a string as a result of a positive plugin run.
-Simply, anything returned by a plugin is sent to IRC.
-Not so simply, you are responsible for appending '\r\n' to each individual command.
-If you want to send multiple commands (Such as multiline speech), you need only separate the commands with '\r\n'.
-For example:
-```Python
-def main(data):
-	return 'PRIVMSG Taiiwo :Nice bot.\r\nPRIVMSG Taiiwo :I like the part where you make your own plugins.\r\n'
+Take this example:
+
+```python
+from taiiwobot import Plugin
+
+class Example(Plugin):
+    def __init__(self, bot):
+        # make the bot context accessible
+        self.bot = bot
+        # define our interface
+        self.interface = bot.util.Interface(
+            "example", # plugin name
+            "This is a demo plugin you can use to learn how plugins work", # plugin description
+            ["e example-flag This is an example flag 1"], # flags - we'll explain these later
+            self.say, # main function
+        ).listen() # Begin listening for messages
+
+    def say(self, message, *things, example_flag=""):
+        # sends a message to the channel it came from
+        self.bot.msg(message.target, " ".join(things))
+```
+
+The above is a very simple example of an Interface. It will listen to messages
+starting with the prefix, followed by the plugin name (`$example`), and will execute
+the main function in response. In this case, `self.say()`. The interface will automatically
+parse the arguments supplied by the user, and pass them to the `*things` argument.
+The `say()` function then repeats the user's message to the same channel that sent it
+using the `message` context object.
+
+The interface also handles your help text. You can now type `$example help`, and
+the interface will create useful help documentation, telling the user how to use
+it's subcommands and flags. It will look something like this:
+
+```
+$example - This is a demo plugin you can use to learn how plugins work
+
+Subcommands:
+    help       display usage information for this command
+
+Flags:
+    --help                    display usage information for this command
+    -e --example-flag=<value> This is an example flag
+```
+
+### Flags
+Adding flags to your Interface allows you to pass keyword arguments to your main
+function, parsed directly from the user's message. Flags are defined as an array of
+flag strings. The syntax for defining a flag string consists of 4 parts:
+
+1. short name
+2. long name
+3. description
+4. value type
+
+For example: "e example-flag This is an example flag 1"
+
+The above flag can be invoked by the user with either `-e value` or `--example-flag="value with space"`.
+The values will be passed as keyword arguments to your main function in the form `main_function(..., example_flag="parsed value")`. Note: hyphens are converted to underscores to maintain naming conventions.
+
+The description is used in the generation of the help text, and should be used to
+describe the function of the flag, and the accepted values.
+
+Value type determines the type of the value that will be parsed from the flag and can be either:
+
+0. A boolean flag; can be passed by itsself, and sets the flag value to True
+1. A string value; sets the flag to expect a string value
+
+Both short and long flag types support string values expressed in the following ways:
+
+```bash
+-f value
+-f "value with space"
+-f="value with space"
+-f=value
+```
+
+Obviously, flags and flag values are consumed, and don't show up in the function aruments.
+If you want raw message content including flags, use `message.content`.
+
+### Subcommands
+The purpose of a subcommand is to allow the plugin to accept secondary commands to
+separate its functionality into multiple functions defined within the plugin class.
+Subcommands are submitted to the interface as a keyword argument in the form of an array of Interface objects.
+
+### In summary:
+You should now understand all the features of the following example, and be well on
+your way to creating awsome plugins:
+
+```python
+from taiiwobot import Plugin
+
+class Example(Plugin):
+    def __init__(self, bot):
+        self.bot = bot
+        self.interface = bot.util.Interface(
+            "example", # plugin name
+            "This is a demo plugin you can use to learn how plugins work", # plugin description
+            [ # Flags: <short form> <long form> <description> <1=string or 0=bool>
+            # these will be loaded as kwargs to your main function
+                "o output Specifies the location of the output file 1",
+                "f force Forces the action 0",
+                "q quiet Does the action quietly 0"
+            ],
+            self.some_func, # main function
+            subcommands=[ # list of subcommands
+                bot.util.Interface(
+                    "sub", # invoked with $template sub <args/flags>
+                    "says some stuff", # subcommand description
+                    [ # subcommand flags
+                        "f force Force adding the thing 0"
+                    ],
+                    self.say # subcommand function
+                )
+            ]
+        ).listen() # sets the on message callbacks and parses messages
+
+    # flags are parsed and passed to the assigned function like so:
+    # *args catches all uncaught command arguments as an array.
+    def some_func(self, message, *args, output="output", force=False, quiet=False):
+        # asks the user for some text, runs the handler function with
+        # their response
+        self.bot.prompt(message.target, message.author_id,
+            "This is an example prompt: ",
+            lambda m: self.bot.msg(message.target, "Hello, " + m.content)
+        )
+
+    def say(self, message, *things, force=False):
+        # sends a message to the channel it came from
+        self.bot.msg(message.target, " ".join(things))
 
 ```
 
-### Plugin Placement
-One of the 2 main ways that TaiiwoBot boast speed, is because his plugins are ran situationally.
-Most IRC bots simply run every plugin for every received message from IRC.
-TaiiwoBot, on the other hand, uses the plugins location to determine when the plugin is run. so, for example, your plugins waiting for a command via private message to itself, aren't run until the bot receives a private message addressed to itsself.
-Simularly, the plugins that you intend to run in response to things said in channels (Usually a vast majority of them), aren't executed on, say 'PING' requests.
 
-The structure is fairly simple. Below is a commented directory tree.
+The Bot API
+-----------
+So now you've parsed your input and created your command, you're going to want
+to interact back with the user. The simplest way to do this is to use the `bot.msg`
+method used above to send text back into the channel, but as promised, this framework
+has some useful features to make coding plugins even easier. Here's a list of all the
+things you can do:
 
-| dir name 		| description |
-|-----------------------|-------------|
-| /plugins/root/	| Python files placed here will have main() executed when ever a message is received from IRC. |
-| /plugins/privmsg/	| Python files placed here will have main() executed when a private message is sent to one of the channels that TaiiwoBot has joined. |
-| /plugins/privmsgbot/	| These scripts will have main() executed whenever TaiiwoBot receives a private message is send directly to TaiiwoBot (/msg TaiiwoBot !help) |
+### bot.msg
+Sends a message to the target. Arguments:
 
-All new folders with these directories will we dropped into, and all plugins within them will be executed in separate threads.
-This allows you to separate plugins by speed, or by category, or however you'd like.
-You can ignore a directory by prepending '#' to it's name.
-This is useful for quickly disabling large groups of plugins.
+- target - The desired destination of the message.
+- message - the string of the message contents
+- embed=bot.embed - send fancy rich embeds (If the platform supports them)
+- reactions=[[emoji, callback], ...] - Add reactions to your message, and run `callback` when clicked
+- user=util.User - If specified, reaction callbacks only apply to `user`
+- files=[file] - an array of files to upload to the target
 
-TaiiwoBot was designed to have a massive amount of plugins running at once.
-Adding more plugins only uses more memory and does not slow down response time (As long as your server can handle the concurrent processing) as all plugins are executed in threads separated by directory.
-TaiiwoBot does not wait for a single plugin to finish before running the next.
+### bot.menu
+Creates a menu for the user to supply input. Arguments:
+
+- target - The desired destination of the message.
+- user:util.User - The user to listen to
+- question:str - The text at the top of the menu
+- answers=[[answer, callback], ...] - The list of answers, and their callbacks
+- cancel=callback - callback for if the menu is cancelled
+- ync=[callback, callback, callback] - shorthand for quick yes, no, cancel menu
+
+### bot.prompt
+Prompt the user for a response, and pass it to a handler. Arguments:
+
+- target - The desired destination of the message.
+- user:util.User - The user to listen to
+- prompt:str - The text at the top of the menu
+- handler:function(message) - function to run when the user has responded
+- cancel=function(reaction_event) - callback function if the user cancels the prompt
+- timeout=float(60.0) - amount of time to wait before timing out the prompt
+
+### bot.server.me()
+Returns the user representor for the bot user
+
+### bot.server.mention
+returns the mention string for the target using the current platform. Arguments:
+
+target - the target to mention
+
+### bot.server.join
+Joins a target object (not really implemented as most platforms don't support bots joining servers)
+
+### bot.server.code_block
+returns a code block formatted for the target platform. Arguments:
+
+- text:str - string to put in the code block
+
+### Bot events
+Bot is event driven. Use these methods to control bot event handlers:
+
+#### bot.on
+function decorator to handle raw bot events. Arguments:
+
+- event:str - Name of the event to handle
+
+#### bot.off
+Removes an event handler. Arguments:
+
+- handler:function - hander to remove
+- event:str - event name to remove it from
+
+#### bot.trigger
+Triggers a global bot event. Arguments:
+
+- event:str - name of the event to trigger
+- \*data - data to send to the even handler
