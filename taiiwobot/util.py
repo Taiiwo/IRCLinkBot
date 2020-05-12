@@ -83,7 +83,10 @@ class Interface:
     def listen(self):
         @self.func.__self__.bot.on("message")
         def on_message(message):
-            self.func.__self__.interface.process(message)
+            if not self.func or hasattr(self.func.__self__, "_unloaded"):
+                self.func = None
+            else:
+                self.func.__self__.interface.process(message)
         return self
 
     def add_subcommand(self, interface):
