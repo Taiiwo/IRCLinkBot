@@ -12,13 +12,13 @@ class Discord(Server):
     def __init__(self, config):
         missing_keys = util.missing_keys(["api_key"], config)
         if missing_keys:
-            quit("[E] Missing args: %s. Check config.json" % (', ').join(missing_keys))
-        defaults = {
-        }
+            quit("[E] Missing args: %s. Check config.json" % (", ").join(missing_keys))
+        defaults = {}
         defaults.update(config)
         self.config = defaults
         self.callbacks = {}
         self.reaction_callbacks = {}
+        self.message_callbacks = {}
 
         self.client = discord.Client()
 
@@ -29,6 +29,24 @@ class Discord(Server):
 
         @self.client.event
         async def on_message(message):
+            # for each message callback
+            message_callbacks = self.message_callbacks.copy()
+            for callback_id, callback in self.message_callbacks.items():
+                # are we waiting for this message?
+                if callback_id == message.channel.id + message.author.id:
+                    # run the message callback
+                    callback[1](message)
+                    del message_callbacks[callback_id]
+                    # return here to not invoke other plugins with awaited messages
+                    self.message_callbacks = message_callbacks
+                    return
+                timeout = callback[2] if len(callback) > 2 else 60.0
+                # check if the message callback is too old
+                if time.time() - callback[0] > timeout:
+                    # remove the message callback
+                    del message_callbacks[callback_id]
+            self.message_callbacks = message_callbacks
+
             message = self.format_message(message)
             self.trigger("message", message)
 
