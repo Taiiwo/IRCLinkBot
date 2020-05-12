@@ -141,10 +141,18 @@ class Discord(Server):
     ):
         if type(target) == str:
             if target.isnumeric():
-                t = self.client.get_channel(target)
-                if not t:
-                    t = self.client.get_user_info(target)
-                target = t
+                target = int(target)
+        if type(target) == Int64:  # for some reason pymongo returns ints as
+            target = int(target)  # int64 for no reason
+        if type(target) == int:
+            t = self.client.get_channel(target)
+            if not t:
+                print(target)
+                t = self.client.get_user(target)
+            target = t
+        if not target:
+            # target does not exist
+            return False
         if type(message) == util.Message:
             message = message.content
         if message != "":
