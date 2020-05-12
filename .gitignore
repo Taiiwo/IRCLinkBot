@@ -4,5 +4,4 @@
 config.json
 .ftpconfig
 .remote-sync.json
-.gitmodules
 __pycache__

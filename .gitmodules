@@ -1,0 +1,3 @@
+[submodule "lib/cicada"]
+	path = lib/cicada
+	url = https://github.com/taiiwo/cicada
