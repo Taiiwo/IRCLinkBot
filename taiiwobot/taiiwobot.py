@@ -6,10 +6,15 @@ class TaiiwoBot:
     def __init__(self, server, config):
         self.server = server
         self.config = config
+        # expose server functions
         self.on = server.on
+        self.msg = server.msg
+        self.menu = server.menu
+        self.util = util
         # load our plugins
-        # note, we don't actually need to do anything with them as they add their own callbacks to stuff
-        self.load_plugins()
+        self.plugins = self.load_plugins()
+        # run the blocking function
+        self.server.start()
 
     def load_plugins(self):
         # get all the plugins from the plugin folder

@@ -98,7 +98,6 @@ class IRC:
                     self.add_callback(f, "SENT")
         return handler
 
-
     # Adds a callback for every message recieved
     def add_callback(self, callback, *commands):
         for command in commands:
