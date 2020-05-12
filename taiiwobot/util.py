@@ -142,7 +142,8 @@ class Interface:
             # is arg a subcommand?
             if subcommand:
                 # process the rest of this command as the sub command
-                return subcommand.process(Message(content=" ".join(args[i:])),
+                message.content = " ".join(args[i:])
+                return subcommand.process(message,
                     arguments=arguments, kwargs=kwargs, o_message=message) # pass the flags we got
             elif arg.lstrip("-") == "help":
                 self.help(o_message.target, self.func.__self__)
@@ -203,7 +204,7 @@ class Interface:
                 # this argument is not a flag, therefore we can add it as an argument
                 arguments += (arg[1:] if arg[0] == "\\" else arg,)
             i += 1
-        return self.func(o_message, *arguments, **kwargs)
+        return self.func(message, *arguments, **kwargs)
 
 def interface_test():
     interface = Interface(
