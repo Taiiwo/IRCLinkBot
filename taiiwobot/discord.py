@@ -149,12 +149,16 @@ class Discord(Server):
             # a list of asynchronous calls to make
             async_calls = [
                 # sending the message
-                [self.client.send_message, (target, message), {"embed": embed}]
+                [target.send, (message,), {"embed": embed, "files": files}]
             ]
             reactions = list(reactions)
             # add the reactions
             for r, f in reactions:
-                async_calls.append([self.client.add_reaction, ("$0", r), {}])
+
+                async def add_reaction(message, reaction):
+                    return await message.add_reaction(reaction)
+
+                async_calls.append([add_reaction, ("$0", r), {}])
             # a callback for when the message and all the reactions have been sent
             async def add_reaction_callbacks(message):
                 # make a note of the message id, so that if the user clicks them
@@ -218,9 +222,9 @@ class Discord(Server):
             content=m.content,
             raw_message=m,
             server_type="discord",
-            timestamp=m.timestamp,
+            timestamp=m.created_at,
             embeds=m.embeds,
-            attachments=m.attachments
+            attachments=m.attachments,
         )
 
     def gaysyncio(self, calls):
