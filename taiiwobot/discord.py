@@ -23,6 +23,11 @@ class Discord(Server):
         self.client = discord.Client()
 
         @self.client.event
+        async def on_ready():
+            self.name = self.client.user.name
+            self.trigger("ready", True)
+
+        @self.client.event
         async def on_message(message):
             message = self.format_message(message)
             self.trigger("message", message)
