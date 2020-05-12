@@ -70,8 +70,9 @@ class Interface:
             self.subcommands.append(subcommand)
         self.is_subcommand = is_subcommand
         try:
-            self.flag_info = [[x[0], x[1], " ".join(x[2:-1]), int(x[-1])]
-                    for x in [b.split() for b in flag_info]]
+            self.flag_info = [[
+                x[0], x[1].replace("-", "_"), " ".join(x[2:-1]), int(x[-1])
+            ] for x in [b.split() for b in flag_info]]
         except ValueError as e:
             raise Error("The last word of a flag string must be an integer", e)
         self.flags = []
@@ -115,6 +116,10 @@ class Interface:
             "```" % (self.prefix + self.name, self.desc, subcommands, flags)
         )
 
+    # Future Taiiwo here. This function is a completely needless reimplementation
+    # of the argparse module. Come and marvel of the effects of not searching
+    # for code before you write it, and the subbornness of still using it
+    # even if the original code is probably better...........
     def process(self, message, arguments=False, kwargs=False, o_message=False):
         kwargs = kwargs if kwargs else {}
         arguments = arguments if arguments else tuple()
@@ -124,7 +129,8 @@ class Interface:
             return False
         # skip the first arg because it's the name of the command
         i = 1
-        if args[0] != ("" if self.is_subcommand else self.prefix) + self.name:
+        # if command != our command name (omitting prefix if we're a subcommand)
+        if args[0] != self.prefix * (not self.is_subcommand) + self.name:
             # this message does not refer to this interface
             return False
         while i < len(args):
