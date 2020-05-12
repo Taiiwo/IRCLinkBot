@@ -3,3 +3,5 @@
 pass
 *~
 config.json
+.ftpconfig
+.remote-sync.json
