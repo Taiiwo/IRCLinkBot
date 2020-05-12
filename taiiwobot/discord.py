@@ -108,40 +108,49 @@ class Discord(Server):
         if thumbnail:
             e.set_thumbnail(url=thumbnail)
         for field in fields:
-            e.add_field(name=field[0], value=field[1],
-                        inline=field[2] if len(field) > 2 and not field[2] else True)
-        if author_name or author_url or author_icon:
-            e.set_author(name=author_name, url=author_url, icon_url=author_icon)
+            e.add_field(
+                name=field[0],
+                value=field[1],
+                inline=field[2] if len(field) > 2 and not field[2] else True,
+            )
+        if author_name:
+            e.set_author(
+                name=author_name,
+                url=author_link or Empty,
+                icon_url=author_icon or Empty,
+            )
         e.set_footer(text=footer)
         return e
 
     def menu(self, target, user, question, answers=None, ync=None):
         if ync:
             if len(ync) != 3:
-                raise util.Error("ync must have 3 elements:"
-                        "a function for yes, no, and cancel")
+                raise util.Error(
+                    "ync must have 3 elements:" "a function for yes, no, and cancel"
+                )
             reactions = ["👍", "👎", "❌"]
             answers = ["Yes", "No", "Cancel"]
             functions = ync
-
         else:
             if not answers:
                 raise util.Error("You can't call this function with no answers")
             if len(answers) > 11:
                 raise util.Error(
-                    "A maximum of 11 options are supported. You supplied %s" %
-                    len(answers)
+                    "A maximum of 11 options are supported. You supplied %s"
+                    % len(answers)
                 )
             numbers = ["0⃣", "1⃣", "2⃣", "3⃣", "4⃣", "5⃣", "6⃣", "7⃣", "8⃣", "9⃣", "🔟"]
             # if user supplies an icon to use, use that, else use a number icon
-            reactions = [numbers[i] if len(a) < 3 else a[0]
-                    for i, a in enumerate(zip(*answers))]
+            reactions = [
+                numbers[i] if len(a) < 3 else a[0] for i, a in enumerate(zip(answers))
+            ]
             # parse the answers array, ignoring the supplied icon if supplied
-            answers, functions = [a_f_tuple if len(a_f_tuple) < 3 else a_f_tuple[1:3]
-                    for a_f_tuple in zip(*answers)]
+            answers, functions = zip(
+                *[a_f if len(a_f) < 3 else a_f[1:3] for a_f in answers]
+            )
         message = "%s\n\n%s\n\nReact to answer." % (
             question,
-            "\n".join(["[%s] - %s" % (r, a) for r, a in zip(reactions, answers)])
+            "\n".join(["[%s] - %s" % (r, a) for r, a in zip(reactions, answers)]),
         )
         self.msg(target, message, reactions=zip(reactions, functions), user=user)
 
@@ -267,4 +276,5 @@ class Discord(Server):
                         args2.append(arg)
                 args = args2
                 buffer.append(await function(*args, **kwargs))
+
         self.client.loop.create_task(f())
