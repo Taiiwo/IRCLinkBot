@@ -1,10 +1,20 @@
 import pymongo
+import requests
 from threading import Thread
 
 def thread(func, args=[], kwargs={}):
     thread = Thread(target=func, args=args, kwargs=kwargs)
     thread.start()
     return thread
+
+def maketiny(url):# make a tinyurl from a string
+    try:
+        html = requests.get("http://tinyurl.com/api-create.php?url=" + url)
+        tiny = str(html.text)
+        tiny = tiny.replace("http", "https")
+        return tiny
+    except:
+        return url
 
 db = False
 def get_db():
