@@ -55,7 +55,7 @@ class LiberPrimus(Plugin):
             or (page_number > 14 and book == 1)
             or (page_number > 56 and book == 2)
         ):
-            print( page_number)
+            print(page_number)
             raise self.bot.util.RuntimeError(
                 "Invalid page number", message.target, self
             )

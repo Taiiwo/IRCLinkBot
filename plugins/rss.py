@@ -324,8 +324,8 @@ class RSS(Plugin):
                 "```\n%s\n```"
                 % "\n".join(
                     [
-                        "%s - %s" % (k, v[:100])
-                        for k, v in sample_entry.items()
+                        "%s - %s" % (k, v)
+                        for k, v[:100] in sample_entry.items()
                         if type(v) == str
                     ]
                 )
@@ -333,7 +333,6 @@ class RSS(Plugin):
             self.bot.msg(message.target, msg)
 
             def append_condition(condition):
-                print(condition)
                 condict = self.parse_condition(condition)
                 self.feeds_col.update(
                     {"url": url, "destinations.target": target},
@@ -471,10 +470,10 @@ class RSS(Plugin):
                     entry.update({"feed:" + k: v for k, v in f.items()})
                     # print(entry["title"])
                     for destination in feed["destinations"]:
+                        match = False
                         # run the conditions against the entry
                         if destination["conditions"]:
                             for conditions in destination["conditions"]:
-                                match = False
                                 condict = self.parse_condition(conditions)
                                 if not condict:
                                     # conditions were invalid, set match to true

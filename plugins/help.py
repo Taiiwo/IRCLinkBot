@@ -24,15 +24,18 @@ class Help(Plugin):
             plugin_list += "%s%s - %s\n" % (
                 interface.prefix,
                 interface.name,
-                interface.desc
+                interface.desc,
             )
 
-        self.bot.msg(message.target, self.bot.server.code_block(
-            "Bot Help menu\n" +
-            "-------------\n" +
-            "Below is a list of all the commands available. Type '<command> help' " +
-            "for more information on a specific command, including subcommands " +
-            "and flag info. Flag values with spaces in can be submitted like '--flag=\"flag value\"'. " +
-            "Args in [] are optional, Args in <> are mandatory.\n\n" +
-            plugin_list
-        ))
+        self.bot.msg(
+            message.target,
+            self.bot.server.code_block(
+                "Bot Help menu\n"
+                + "-------------\n"
+                + "Below is a list of all the commands available. Type '<command> help' "
+                + "for more information on a specific command, including subcommands "
+                + "and flag info. Flag values with spaces in can be submitted like '--flag=\"flag value\"'. "
+                + "Args in [] are optional, Args in <> are mandatory.\n\n"
+                + plugin_list
+            ),
+        )

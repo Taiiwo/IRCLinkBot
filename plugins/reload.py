@@ -7,10 +7,7 @@ class Reload(Plugin):
     def __init__(self, bot):
         self.bot = bot
         self.interface = bot.util.Interface(
-            "reload",
-            "Reloads a plugin's code for dev purposes",
-            [],
-            self.reload
+            "reload", "Reloads a plugin's code for dev purposes", [], self.reload
         ).listen()
 
     def unload(self):
@@ -26,7 +23,7 @@ class Reload(Plugin):
                 self.bot.msg(message.target, "Plugin unloaded..")
                 # load the plugin
                 break
-        for root, dirs, files in os.walk('plugins'):
+        for root, dirs, files in os.walk("plugins"):
             # for each py file in the plugins folder
             for file in files:
                 if file[-3:] == ".py" and file[:-3].lower() == query.lower():
