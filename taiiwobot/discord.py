@@ -136,7 +136,9 @@ class Discord(Server):
         self.msg(target, message, reactions=zip(reactions, functions), user=user)
 
     # discord method wrappers
-    def msg(self, target, message, embed=None, reactions=tuple(), user=None):
+    def msg(
+        self, target, message, embed=None, reactions=tuple(), user=None, callback=None, files=[]
+    ):
         if type(target) == str:
             if target.isnumeric():
                 t = self.client.get_channel(target)
@@ -164,9 +166,12 @@ class Discord(Server):
                 # make a note of the message id, so that if the user clicks them
                 # the reaction callback function is run
                 self.reaction_callbacks[message.id] = (user, reactions)
+
             # finally, add the reactions callback if required
             if reactions:
                 async_calls.append([add_reaction_callbacks, ("$0",), {}])
+            if callback:
+                async_calls.append(callback)
             self.gaysyncio(async_calls)
             self.trigger("sent", target, message, embed)
 
