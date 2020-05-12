@@ -88,12 +88,22 @@ class Discord(Server):
     def start(self):
         self.client.run(self.config["api_key"])
 
-    def embed(self, title=Empty, url=Empty, desc=Empty, author_name=Empty,
-            author_url=Empty, author_icon=Empty, fields=[], footer=Empty,
-            color=Empty, thumbnail=Empty):
     def code_block(self, text):
         return "```" + text + "```"
 
+    def embed(
+        self,
+        title=Empty,
+        url=Empty,
+        desc=Empty,
+        author_name=Empty,
+        author_link=Empty,
+        author_icon=Empty,
+        fields=[],
+        footer=Empty,
+        color=Empty,
+        thumbnail=Empty,
+    ):
         e = discord.Embed(title=title, url=url, description=desc, color=int(color, 16))
         if thumbnail:
             e.set_thumbnail(url=thumbnail)
