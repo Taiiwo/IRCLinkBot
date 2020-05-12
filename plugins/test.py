@@ -1,5 +1,8 @@
-class Plugin():
+from taiiwobot.plugin import Plugin
+
+class Test(Plugin):
     def __init__(self, bot):
+        print("test plugin init")
         self.bot = bot
         self.interface = bot.util.Interface(
             "test",
@@ -23,6 +26,7 @@ class Plugin():
         ).listen()
 
     def some_func(self, message, output="output", force=False, quiet=False):
+        print("test running")
         self.bot.msg(message.target, "%s %s %s" % (output, force, quiet))
 
     def add(self, force=False):
